@@ -1,37 +1,29 @@
-
 # Etapa 1: Construcción
 FROM public.ecr.aws/docker/library/node:20 AS build
 
-# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos del proyecto
-COPY package*.json ./
+# Copiar solo package.json (sin lockfile para evitar bug npm optional deps)
+COPY package.json ./
 
-# Instalar dependencias
+# Instalar dependencias frescas para la plataforma Linux
 RUN npm install
 
-# Copiar el resto de los archivos de la aplicación
+# Copiar el resto de los archivos
 COPY . .
 
-# Construir la aplicación Angular para producción
+# Construir Angular para producción
 RUN npm run build -- --configuration production
 
-# Etapa 2: Configuración del servidor
+# Etapa 2: Servidor Nginx
 FROM public.ecr.aws/docker/library/nginx:alpine
 
-# Eliminar configuración predeterminada de NGINX
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copiar archivos construidos desde la etapa anterior
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist/ordamy-frontend/browser /usr/share/nginx/html
 
-# Copiar archivo personalizado de configuración de NGINX
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Exponer el puerto 80
 EXPOSE 80
 
-# Comando por defecto
 CMD ["nginx", "-g", "daemon off;"]
-
