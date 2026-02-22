@@ -1,30 +1,37 @@
-# Stage 1: Build (Debian for native module compatibility)
+
+# Etapa 1: Construcción
 FROM public.ecr.aws/docker/library/node:20 AS build
 
+# Establecer directorio de trabajo
 WORKDIR /app
+
+# Copiar archivos del proyecto
 COPY package*.json ./
-RUN npm ci
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar el resto de los archivos de la aplicación
 COPY . .
-RUN npx ng build --configuration=production
 
-# Stage 2: Serve with Nginx
-FROM public.ecr.aws/docker/library/nginx:alpine
+# Construir la aplicación Angular para producción
+RUN npm run build -- --configuration production
 
-COPY --from=build /app/dist/ordamy-frontend/browser /usr/share/nginx/html
+# Etapa 2: Configuración del servidor
+FROM public.ecr.aws/docker/library/nginx:stable-alpine
 
-RUN echo 'server { \
-  listen 80; \
-  root /usr/share/nginx/html; \
-  index index.html; \
-  location / { \
-    try_files $uri $uri/ /index.html; \
-  } \
-  location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ { \
-    expires 1y; \
-    add_header Cache-Control "public, immutable"; \
-  } \
-}' > /etc/nginx/conf.d/default.conf
+# Eliminar configuración predeterminada de NGINX
+RUN rm -rf /usr/share/nginx/html/*
 
+# Copiar archivos construidos desde la etapa anterior
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copiar archivo personalizado de configuración de NGINX
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Exponer el puerto 80
 EXPOSE 80
 
+# Comando por defecto
 CMD ["nginx", "-g", "daemon off;"]
+
