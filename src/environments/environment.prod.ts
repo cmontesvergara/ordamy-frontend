@@ -1,8 +1,8 @@
 export const environment = {
     production: true,
-    baseUrl: 'https://sso.msoft.uno',
-    ssoUrl: 'https://portal.msoft.uno',
+    baseUrl: 'https://back-sso.bigso.co',
+    ssoUrl: 'https://sso.bigso.co',
     appId: 'ordamy',
-    callbackUrl: 'https://ordamy.msoft.uno/auth/callback',
-    authApiUrl: 'https://ordamy-api.msoft.uno',
+    callbackUrl: 'https://ordamy.bigso.co/auth/callback',
+    authApiUrl: 'https://ordamy-middleware.bigso.co',
 };
