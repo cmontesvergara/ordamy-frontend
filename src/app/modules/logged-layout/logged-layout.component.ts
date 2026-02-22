@@ -22,7 +22,7 @@ interface MenuItem {
         <div class="sidebar-header">
           <div class="logo">
             <img *ngIf="sidebarCollapsed" src="assets/ordamy_icon_512.png" alt="Ordamy Icon" class="logo-icon-img" />
-            <img *ngIf="!sidebarCollapsed" src="assets/ordamy_logo.svg" alt="Ordamy Logo" class="logo-full-img" />
+            <img *ngIf="!sidebarCollapsed" [src]="themeService.isDark ? 'assets/ordamy_logo_invert.png' : 'assets/ordamy_logo.png'" alt="Ordamy Logo" class="logo-full-img" />
           </div>
           <button class="collapse-btn" (click)="sidebarCollapsed = !sidebarCollapsed">
             {{ sidebarCollapsed ? '→' : '←' }}
