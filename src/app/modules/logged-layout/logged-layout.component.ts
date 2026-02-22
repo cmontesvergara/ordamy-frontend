@@ -5,24 +5,24 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { ThemeService } from '../../core/services/theme/theme.service';
 
 interface MenuItem {
-    label: string;
-    icon: string;
-    route: string;
-    permission?: { resource: string; action: string };
+  label: string;
+  icon: string;
+  route: string;
+  permission?: { resource: string; action: string };
 }
 
 @Component({
-    selector: 'app-logged-layout',
-    standalone: true,
-    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
-    template: `
+  selector: 'app-logged-layout',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  template: `
     <div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
       <!-- Sidebar -->
       <aside class="sidebar">
         <div class="sidebar-header">
           <div class="logo">
-            <span class="logo-icon">📦</span>
-            <span class="logo-text" *ngIf="!sidebarCollapsed">Ordamy</span>
+            <img *ngIf="sidebarCollapsed" src="assets/ordamy_icon_512.png" alt="Ordamy Icon" class="logo-icon-img" />
+            <img *ngIf="!sidebarCollapsed" src="assets/ordamy_logo.svg" alt="Ordamy Logo" class="logo-full-img" />
           </div>
           <button class="collapse-btn" (click)="sidebarCollapsed = !sidebarCollapsed">
             {{ sidebarCollapsed ? '→' : '←' }}
@@ -95,56 +95,56 @@ interface MenuItem {
       </nav>
     </div>
   `,
-    styleUrl: './logged-layout.component.scss',
+  styleUrl: './logged-layout.component.scss',
 })
 export class LoggedLayoutComponent implements OnInit {
-    sidebarCollapsed = false;
-    userName = '';
-    tenantName = '';
-    currentPageTitle = 'Dashboard';
+  sidebarCollapsed = false;
+  userName = '';
+  tenantName = '';
+  currentPageTitle = 'Dashboard';
 
-    menuItems: MenuItem[] = [
-        { label: 'Dashboard', icon: '📊', route: '/dashboard' },
-        { label: 'Órdenes', icon: '📋', route: '/orders' },
-        { label: 'Clientes', icon: '👥', route: '/customers' },
-        { label: 'Egresos', icon: '💸', route: '/expenses' },
-        { label: 'Caja', icon: '🏦', route: '/cashier' },
-        { label: 'Cartera', icon: '💰', route: '/portfolio' },
-        { label: 'Reportes', icon: '📈', route: '/reports' },
-        { label: 'Configuración', icon: '⚙️', route: '/settings' },
-    ];
+  menuItems: MenuItem[] = [
+    { label: 'Dashboard', icon: '📊', route: '/dashboard' },
+    { label: 'Órdenes', icon: '📋', route: '/orders' },
+    { label: 'Clientes', icon: '👥', route: '/customers' },
+    { label: 'Egresos', icon: '💸', route: '/expenses' },
+    { label: 'Caja', icon: '🏦', route: '/cashier' },
+    { label: 'Cartera', icon: '💰', route: '/portfolio' },
+    { label: 'Reportes', icon: '📈', route: '/reports' },
+    { label: 'Configuración', icon: '⚙️', route: '/settings' },
+  ];
 
-    constructor(
-        private authService: AuthService,
-        private router: Router,
-        public themeService: ThemeService,
-    ) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    public themeService: ThemeService,
+  ) { }
 
-    ngOnInit() {
-        this.authService.getSession().subscribe({
-            next: (session: any) => {
-                if (session?.user) {
-                    this.userName = `${session.user.firstName} ${session.user.lastName}`;
-                }
-                if (session?.tenant) {
-                    this.tenantName = session.tenant.name;
-                }
-            },
-        });
-    }
+  ngOnInit() {
+    this.authService.getSession().subscribe({
+      next: (session: any) => {
+        if (session?.user) {
+          this.userName = `${session.user.firstName} ${session.user.lastName}`;
+        }
+        if (session?.tenant) {
+          this.tenantName = session.tenant.name;
+        }
+      },
+    });
+  }
 
-    toggleTheme() {
-        this.themeService.toggleMode();
-    }
+  toggleTheme() {
+    this.themeService.toggleMode();
+  }
 
-    logout() {
-        this.authService.logout().subscribe({
-            next: () => {
-                window.location.href = '/';
-            },
-            error: () => {
-                window.location.href = '/';
-            },
-        });
-    }
+  logout() {
+    this.authService.logout().subscribe({
+      next: () => {
+        window.location.href = '/';
+      },
+      error: () => {
+        window.location.href = '/';
+      },
+    });
+  }
 }
