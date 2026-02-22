@@ -4,8 +4,8 @@ import { isLoggedGuard } from './core/guards/is-logged/is-logged.guard';
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full',
+        loadChildren: () =>
+            import('./modules/home/home.routes').then((m) => m.HOME_ROUTES),
     },
     {
         path: 'auth',
