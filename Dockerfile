@@ -1,20 +1,17 @@
-# Stage 1: Build
-FROM public.ecr.aws/docker/library/node:20-alpine AS build
+# Stage 1: Build (Debian for native module compatibility)
+FROM public.ecr.aws/docker/library/node:20 AS build
 
 WORKDIR /app
-RUN apk add --no-cache python3 make g++
 COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npx ng build --configuration=production
 
 # Stage 2: Serve with Nginx
-FROM nginx:alpine
+FROM public.ecr.aws/docker/library/nginx:alpine
 
-# Copy Angular build output
 COPY --from=build /app/dist/ordamy-frontend/browser /usr/share/nginx/html
 
-# Nginx config for Angular SPA routing
 RUN echo 'server { \
   listen 80; \
   root /usr/share/nginx/html; \
