@@ -1,0 +1,94 @@
+@use '../../shared/styles/module';
+
+.accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.account-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--card-bg, #fff);
+    border: 2px solid var(--border-color, #e2e8f0);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: #6366f1;
+    }
+
+    &.selected {
+        border-color: #6366f1;
+        background: rgba(99, 102, 241, 0.05);
+    }
+}
+
+.account-icon {
+    font-size: 1.5rem;
+}
+
+.account-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-name {
+    font-size: 0.8rem;
+    color: var(--text-secondary, #64748b);
+}
+
+.account-balance {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary, #1e293b);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+
+    h3 {
+        margin: 0;
+        font-size: 1rem;
+    }
+}
+
+.date-filters {
+    display: flex;
+    gap: 0.5rem;
+
+    input[type="date"] {
+        padding: 0.375rem 0.5rem;
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 8px;
+        font-size: 0.8rem;
+    }
+}
+
+.income {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.expense {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.income-text {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.expense-text {
+    color: #ef4444;
+    font-weight: 600;
+}

@@ -1,0 +1,38 @@
+@use '../../shared/styles/module';
+
+.summary-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #92400e;
+
+    strong {
+        font-size: 1.25rem;
+        color: #b45309;
+    }
+}
+
+.overdue {
+    background: rgba(239, 68, 68, 0.03);
+}
+
+.debt {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.overdue-badge {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.ok-badge {
+    background: #dcfce7;
+    color: #16a34a;
+}
