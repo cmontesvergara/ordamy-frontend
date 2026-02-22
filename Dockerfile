@@ -18,7 +18,7 @@ COPY . .
 RUN npm run build -- --configuration production
 
 # Etapa 2: Configuración del servidor
-FROM public.ecr.aws/docker/library/nginx:stable-alpine
+FROM public.ecr.aws/docker/library/nginx:alpine
 
 # Eliminar configuración predeterminada de NGINX
 RUN rm -rf /usr/share/nginx/html/*
