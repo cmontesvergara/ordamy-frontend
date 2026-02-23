@@ -6,6 +6,10 @@ WORKDIR /app
 # Copiar solo package.json (sin lockfile para evitar bug npm optional deps)
 COPY package.json ./
 
+# Consumir el build-arg de CapRover para invalidar la caché de Docker en cada despliegue
+ARG CAPROVER_GIT_COMMIT_SHA
+RUN echo "Deploying commit: $CAPROVER_GIT_COMMIT_SHA"
+
 # Instalar dependencias frescas para la plataforma Linux
 RUN npm install
 
