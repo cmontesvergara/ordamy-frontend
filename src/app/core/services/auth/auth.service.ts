@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -23,6 +24,24 @@ export class AuthService {
      * Get current session info (validates cookie via middleware → SSO)
      */
     getSession() {
+        if ((environment as any).mockAuth) {
+            return of({
+                user: {
+                    userId: 'local-bypass',
+                    id: 'local-bypass',
+                    email: 'admin@ordamy.local',
+                    firstName: 'Admin',
+                    lastName: 'LocalBypass',
+                    isSuperAdmin: true,
+                },
+                tenant: {
+                    id: 'local-tenant',
+                    name: 'Ordamy Local',
+                    slug: 'ordamy-local',
+                    permissions: []
+                }
+            });
+        }
         return this.http.get(`${environment.authApiUrl}/api/auth/session`, {
             withCredentials: true,
         });

@@ -5,54 +5,39 @@
 @tailwind utilities;
 
 // ─── CSS Variables ────────────────────────────────
-:root {
-    // Colors
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-light: rgba(99, 102, 241, 0.1);
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222 47% 11%;
+        --card: 210 40% 96%;
+        --card-foreground: 240 0% 0%;
+        --primary: 24.6 95% 53.1%; // Orange brand color
+        --primary-foreground: 60 9.1% 97.8%;
+        --muted: 213 27% 84%;
+        --muted-foreground: 215 16% 47%;
+        --destructive: 350 100% 40%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 214 32% 91%;
+        --radius: 0.5rem;
+    }
 
-    // Light mode
-    --bg-primary: #f8fafc;
-    --bg-secondary: #f1f5f9;
-    --card-bg: #fff;
-    --sidebar-bg: #1e293b;
-    --sidebar-text: #cbd5e1;
-    --navbar-bg: #fff;
-    --input-bg: #fff;
-    --hover-bg: #f1f5f9;
-    --table-header-bg: #f8fafc;
-
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-color: #e2e8f0;
-    --badge-bg: #ede9fe;
-    --badge-text: #6366f1;
-
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --radius: 12px;
-}
-
-// ─── Dark Mode ────────────────────────────────────
-html.dark {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --card-bg: #1e293b;
-    --sidebar-bg: #0f172a;
-    --sidebar-text: #94a3b8;
-    --navbar-bg: #1e293b;
-    --input-bg: #334155;
-    --hover-bg: #334155;
-    --table-header-bg: #1e293b;
-
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border-color: #334155;
-    --badge-bg: rgba(99, 102, 241, 0.2);
-    --badge-text: #a5b4fc;
-
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    [type='text'],
+    [type='email'],
+    [type='url'],
+    [type='password'],
+    [type='number'],
+    [type='date'],
+    [type='datetime-local'],
+    [type='month'],
+    [type='search'],
+    [type='tel'],
+    [type='time'],
+    [type='week'],
+    [multiple],
+    textarea,
+    select {
+        @apply w-full rounded-md border border-border bg-background px-3 py-3 text-sm text-foreground placeholder-muted-foreground focus:z-10 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary;
+    }
 }
 
 // ─── Base Reset ───────────────────────────────────
@@ -72,8 +57,8 @@ html {
 
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     line-height: 1.5;
     min-height: 100vh;
 }
@@ -85,7 +70,7 @@ h3,
 h4,
 h5,
 h6 {
-    color: var(--text-primary);
+    color: hsl(var(--foreground));
     font-weight: 600;
     line-height: 1.3;
 }

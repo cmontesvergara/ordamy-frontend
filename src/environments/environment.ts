@@ -5,4 +5,5 @@ export const environment = {
     appId: 'ordamy',
     callbackUrl: 'http://localhost:4200/auth/callback',
     authApiUrl: 'http://localhost:4300',    // ordamy-middleware
+    mockAuth: true,                         // true = bypass SSO & Permissions locally
 };

@@ -62,11 +62,6 @@ import { ReportService } from '../../core/services/report/report.service';
         </table>
       </div>
     </div>
-
-    <div class="loading" *ngIf="loading">
-      <div class="spinner"></div>
-      <p>Cargando dashboard...</p>
-    </div>
   `,
   styles: [`
     .dashboard-grid {
@@ -157,7 +152,6 @@ import { ReportService } from '../../core/services/report/report.service';
 })
 export class DashboardComponent implements OnInit {
   data: any = null;
-  loading = true;
 
   constructor(private reportService: ReportService) { }
 
@@ -165,11 +159,8 @@ export class DashboardComponent implements OnInit {
     this.reportService.getDashboard().subscribe({
       next: (res: any) => {
         this.data = res.data;
-        this.loading = false;
       },
-      error: () => {
-        this.loading = false;
-      },
+      error: () => { },
     });
   }
 }
