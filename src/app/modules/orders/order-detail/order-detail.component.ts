@@ -40,6 +40,35 @@ import { SettingsService } from '../../../core/services/settings/settings.servic
         </div>
       </div>
 
+      <!-- O10: Operational Status Stepper -->
+      <div class="stepper-card" *ngIf="order.status === 'ACTIVE'">
+        <h4>Estado Operativo</h4>
+        <div class="stepper">
+          @for (step of operationalSteps; track step.key; let i = $index) {
+            <div class="step" [class.completed]="i < currentStepIndex" [class.active]="i === currentStepIndex" [class.pending]="i > currentStepIndex">
+              <div class="step-dot">
+                {{ i < currentStepIndex ? '✓' : (i + 1) }}
+              </div>
+              <span class="step-label">{{ step.label }}</span>
+            </div>
+            @if (i < operationalSteps.length - 1) {
+              <div class="step-connector" [class.completed]="i < currentStepIndex"></div>
+            }
+          }
+        </div>
+        <div class="stepper-actions" *ngIf="!updatingStatus">
+          <button class="btn btn-outline btn-sm" *ngIf="currentStepIndex > 0" (click)="changeOperationalStatus(-1)">
+            ← {{ operationalSteps[currentStepIndex - 1]?.label }}
+          </button>
+          <button class="btn btn-primary btn-sm" *ngIf="currentStepIndex < operationalSteps.length - 1" (click)="changeOperationalStatus(1)">
+            {{ operationalSteps[currentStepIndex + 1]?.label }} →
+          </button>
+        </div>
+        <div class="stepper-actions" *ngIf="updatingStatus">
+          <span class="text-muted">Actualizando...</span>
+        </div>
+      </div>
+
       <!-- Info Grid -->
       <div class="info-grid">
         <div class="info-card">
@@ -163,6 +192,20 @@ export class OrderDetailComponent implements OnInit {
   newPayment = { paymentMethodId: '', amount: 0, notes: '' };
   printMode: 'production' | 'customer' | null = null;
   today = new Date();
+  updatingStatus = false;
+
+  // O10: Operational status steps
+  operationalSteps = [
+    { key: 'PENDING', label: 'Pendiente' },
+    { key: 'APPROVED', label: 'Aprobada' },
+    { key: 'IN_PRODUCTION', label: 'En Producción' },
+    { key: 'PRODUCED', label: 'Producida' },
+    { key: 'DELIVERED', label: 'Entregada' },
+  ];
+
+  get currentStepIndex(): number {
+    return this.operationalSteps.findIndex(s => s.key === this.order?.operationalStatus) || 0;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -216,14 +259,28 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
+  // O10: Change operational status (forward or backward 1 step)
+  changeOperationalStatus(direction: number) {
+    const nextIndex = this.currentStepIndex + direction;
+    if (nextIndex < 0 || nextIndex >= this.operationalSteps.length) return;
+
+    const nextStatus = this.operationalSteps[nextIndex].key;
+    this.updatingStatus = true;
+    this.orderService.updateOperationalStatus(this.order.id, nextStatus).subscribe({
+      next: (res: any) => {
+        this.order.operationalStatus = res.data.operationalStatus;
+        this.updatingStatus = false;
+      },
+      error: () => { this.updatingStatus = false; },
+    });
+  }
+
   // O4/O5: Print order
   printOrder(mode: 'production' | 'customer') {
     this.printMode = mode;
-    // Add/remove CSS class on body for print mode
     document.body.classList.add('printing', `print-${mode}`);
     setTimeout(() => {
       window.print();
-      // Cleanup after print dialog closes
       setTimeout(() => {
         document.body.classList.remove('printing', `print-${mode}`);
         this.printMode = null;

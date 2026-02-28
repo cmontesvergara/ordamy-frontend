@@ -11,6 +11,111 @@
     flex-wrap: wrap;
 }
 
+// O10: Stepper
+.stepper-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+
+    h4 {
+        margin: 0 0 1rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-secondary, #64748b);
+        letter-spacing: 0.5px;
+    }
+}
+
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 1rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 80px;
+}
+
+.step-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+
+    .completed & {
+        background: #16a34a;
+        border-color: #16a34a;
+        color: #fff;
+    }
+
+    .active & {
+        background: #6366f1;
+        border-color: #6366f1;
+        color: #fff;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+    }
+}
+
+.step-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #94a3b8;
+    text-align: center;
+    line-height: 1.2;
+
+    .completed & {
+        color: #16a34a;
+    }
+
+    .active & {
+        color: #6366f1;
+        font-weight: 600;
+    }
+}
+
+.step-connector {
+    flex: 1;
+    height: 3px;
+    background: #e2e8f0;
+    min-width: 20px;
+    max-width: 60px;
+    margin: 0 -0.25rem;
+    margin-bottom: 1.5rem;
+    transition: background 0.3s;
+
+    &.completed {
+        background: #16a34a;
+    }
+}
+
+.stepper-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.text-muted {
+    color: var(--text-secondary, #64748b);
+    font-size: 0.85rem;
+}
+
+// Info grid
 .info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -144,12 +249,11 @@
 // Print styles
 @media print {
 
-    // Hide UI elements
-    .no-print {
+    .no-print,
+    .stepper-card {
         display: none !important;
     }
 
-    // Show print header & footer
     .print-header {
         display: block;
         text-align: center;
@@ -176,7 +280,6 @@
         margin-top: 2rem;
     }
 
-    // Clean up cards for print
     .card,
     .info-card {
         border: 1px solid #ddd !important;
@@ -202,7 +305,6 @@
     }
 }
 
-// O4: Production print — hide monetary columns
 :host-context(body.print-production) {
     @media print {
         .hide-on-production {
@@ -212,5 +314,20 @@
         .no-print-production {
             display: none !important;
         }
+    }
+}
+
+@media (max-width: 640px) {
+    .stepper {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .step {
+        min-width: 60px;
+    }
+
+    .step-connector {
+        min-width: 10px;
     }
 }

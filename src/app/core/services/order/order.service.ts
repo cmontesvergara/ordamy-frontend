@@ -29,4 +29,8 @@ export class OrderService {
     cancel(id: string, reason: string) {
         return this.http.put<any>(`${this.url}/${id}/cancel`, { reason }, { withCredentials: true });
     }
+
+    updateOperationalStatus(id: string, operationalStatus: string) {
+        return this.http.put<any>(`${this.url}/${id}/operational-status`, { operationalStatus }, { withCredentials: true });
+    }
 }
