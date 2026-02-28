@@ -12,8 +12,14 @@ export class ReportService {
         return this.http.get<any>(`${this.url}/dashboard`, { withCredentials: true });
     }
 
-    getPortfolio() {
-        return this.http.get<any>(`${this.url}/portfolio`, { withCredentials: true });
+    getPortfolio(params: any = {}) {
+        let httpParams = new HttpParams();
+        Object.keys(params).forEach((key) => {
+            if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+                httpParams = httpParams.set(key, params[key]);
+            }
+        });
+        return this.http.get<any>(`${this.url}/portfolio`, { params: httpParams, withCredentials: true });
     }
 
     getDaily(date?: string) {

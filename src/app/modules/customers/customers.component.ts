@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CustomerService } from '../../core/services/customer/customer.service';
 
 @Component({
-    selector: 'app-customers',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-customers',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  template: `
     <div class="page-header">
       <h1>Clientes</h1>
       <button class="btn btn-primary" (click)="showForm = !showForm">
@@ -72,7 +73,7 @@ import { CustomerService } from '../../core/services/customer/customer.service';
         </thead>
         <tbody>
           @for (c of customers; track c.id) {
-            <tr>
+            <tr class="clickable" [routerLink]="['/customers', c.id]">
               <td class="mono">{{ c.identification }}</td>
               <td><strong>{{ c.name }}</strong></td>
               <td>{{ c.phone || '—' }}</td>
@@ -98,63 +99,63 @@ import { CustomerService } from '../../core/services/customer/customer.service';
       </div>
     </div>
   `,
-    styleUrl: './customers.component.scss',
+  styleUrl: './customers.component.scss',
 })
 export class CustomersComponent implements OnInit {
-    customers: any[] = [];
-    total = 0;
-    page = 1;
-    limit = 20;
-    searchTerm = '';
-    loading = true;
-    showForm = false;
-    saving = false;
-    searchTimeout: any;
+  customers: any[] = [];
+  total = 0;
+  page = 1;
+  limit = 20;
+  searchTerm = '';
+  loading = true;
+  showForm = false;
+  saving = false;
+  searchTimeout: any;
 
-    newCustomer = { identification: '', name: '', phone: '', email: '', address: '' };
+  newCustomer = { identification: '', name: '', phone: '', email: '', address: '' };
 
-    get totalPages() { return Math.ceil(this.total / this.limit); }
+  get totalPages() { return Math.ceil(this.total / this.limit); }
 
-    constructor(private customerService: CustomerService) { }
+  constructor(private customerService: CustomerService) { }
 
-    ngOnInit() { this.loadCustomers(); }
+  ngOnInit() { this.loadCustomers(); }
 
-    loadCustomers() {
-        this.loading = true;
-        this.customerService.list({ page: this.page, limit: this.limit, search: this.searchTerm }).subscribe({
-            next: (res: any) => {
-                this.customers = res.data;
-                this.total = res.total;
-                this.loading = false;
-            },
-            error: () => { this.loading = false; },
-        });
-    }
+  loadCustomers() {
+    this.loading = true;
+    this.customerService.list({ page: this.page, limit: this.limit, search: this.searchTerm }).subscribe({
+      next: (res: any) => {
+        this.customers = res.data;
+        this.total = res.total;
+        this.loading = false;
+      },
+      error: () => { this.loading = false; },
+    });
+  }
 
-    onSearch() {
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
-            this.page = 1;
-            this.loadCustomers();
-        }, 400);
-    }
+  onSearch() {
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.page = 1;
+      this.loadCustomers();
+    }, 400);
+  }
 
-    changePage(p: number) {
-        this.page = p;
+  changePage(p: number) {
+    this.page = p;
+    this.loadCustomers();
+  }
+
+  createCustomer() {
+    if (!this.newCustomer.identification || !this.newCustomer.name) return;
+    this.saving = true;
+    this.customerService.create(this.newCustomer).subscribe({
+      next: () => {
+        this.saving = false;
+        this.showForm = false;
+        this.newCustomer = { identification: '', name: '', phone: '', email: '', address: '' };
         this.loadCustomers();
-    }
-
-    createCustomer() {
-        if (!this.newCustomer.identification || !this.newCustomer.name) return;
-        this.saving = true;
-        this.customerService.create(this.newCustomer).subscribe({
-            next: () => {
-                this.saving = false;
-                this.showForm = false;
-                this.newCustomer = { identification: '', name: '', phone: '', email: '', address: '' };
-                this.loadCustomers();
-            },
-            error: () => { this.saving = false; },
-        });
-    }
+      },
+      error: () => { this.saving = false; },
+    });
+  }
 }

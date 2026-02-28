@@ -3,10 +3,13 @@
 .filters {
     display: flex;
     gap: 0.75rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
 
     .search-input {
         flex: 1;
+        min-width: 200px;
     }
 
     select {
@@ -17,6 +20,32 @@
         background: var(--card-bg, #fff);
         color: var(--text-primary, #1e293b);
         min-width: 180px;
+    }
+}
+
+.date-filters {
+    margin-bottom: 1rem;
+    align-items: flex-end;
+}
+
+.date-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    label {
+        font-size: 0.75rem;
+        color: var(--text-secondary, #64748b);
+        font-weight: 500;
+    }
+
+    input[type="date"] {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 10px;
+        font-size: 0.875rem;
+        background: var(--card-bg, #fff);
+        color: var(--text-primary, #1e293b);
     }
 }
 
@@ -31,6 +60,161 @@
 .debt {
     color: #ef4444;
     font-weight: 600;
+}
+
+.text-muted {
+    color: var(--text-secondary, #64748b);
+    font-size: 0.85rem;
+}
+
+// Actions column
+.actions-cell {
+    position: relative;
+    width: 60px;
+}
+
+.actions-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-action {
+    background: none;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0.25rem 0.5rem;
+    color: var(--text-secondary, #64748b);
+    line-height: 1;
+    transition: all 0.15s;
+
+    &:hover {
+        background: var(--hover-bg, #f1f5f9);
+        color: var(--text-primary, #1e293b);
+    }
+}
+
+.actions-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 20;
+    min-width: 180px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: 0.375rem;
+    animation: fadeIn 0.1s ease;
+
+    button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 0.8125rem;
+        border-radius: 6px;
+        color: var(--text-primary, #1e293b);
+        transition: background 0.15s;
+
+        &:hover {
+            background: var(--hover-bg, #f1f5f9);
+        }
+
+        &.danger {
+            color: #ef4444;
+
+            &:hover {
+                background: rgba(239, 68, 68, 0.08);
+            }
+        }
+    }
+}
+
+// Cancel modal
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.15s ease;
+}
+
+.modal-content {
+    background: var(--card-bg, #fff);
+    border-radius: 16px;
+    padding: 1.5rem;
+    max-width: 460px;
+    width: 90%;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+
+    h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.125rem;
+    }
+
+    p {
+        margin: 0 0 1rem;
+        color: var(--text-secondary, #64748b);
+        font-size: 0.875rem;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 10px;
+        font-size: 0.875rem;
+        resize: vertical;
+        font-family: inherit;
+    }
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.15s;
+
+    &:hover {
+        background: #dc2626;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @media (max-width: 640px) {

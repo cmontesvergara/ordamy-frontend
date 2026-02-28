@@ -18,8 +18,14 @@ export class CustomerService {
         return this.http.get<any>(this.url, { params: httpParams, withCredentials: true });
     }
 
-    get(id: string) {
-        return this.http.get<any>(`${this.url}/${id}`, { withCredentials: true });
+    get(id: string, params: any = {}) {
+        let httpParams = new HttpParams();
+        Object.keys(params).forEach((key) => {
+            if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+                httpParams = httpParams.set(key, params[key]);
+            }
+        });
+        return this.http.get<any>(`${this.url}/${id}`, { params: httpParams, withCredentials: true });
     }
 
     create(data: any) {

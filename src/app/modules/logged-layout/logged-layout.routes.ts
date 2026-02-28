@@ -38,6 +38,12 @@ export const LOGGED_ROUTES: Routes = [
                 canActivate: [hasPermissionGuard('customers', 'read')],
             },
             {
+                path: 'customers/:id',
+                loadComponent: () =>
+                    import('../customers/customer-detail/customer-detail.component').then((m) => m.CustomerDetailComponent),
+                canActivate: [hasPermissionGuard('customers', 'read')],
+            },
+            {
                 path: 'expenses',
                 loadComponent: () =>
                     import('../expenses/expenses.component').then((m) => m.ExpensesComponent),

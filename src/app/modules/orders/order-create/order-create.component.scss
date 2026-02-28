@@ -144,12 +144,109 @@
     }
 }
 
-@media (max-width: 640px) {
-    .item-row {
-        flex-wrap: wrap;
+.seller-readonly {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
 
-        .flex-2 {
-            flex-basis: 100%;
+.seller-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: var(--primary-bg, #ede9fe);
+    color: var(--primary-color, #6366f1);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.seller-hint {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #64748b);
+    padding-left: 0.25rem;
+}
+
+// Create customer modal (O3)
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.15s ease;
+}
+
+.modal-content {
+    background: var(--card-bg, #fff);
+    border-radius: 16px;
+    padding: 1.5rem;
+    max-width: 540px;
+    width: 92%;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h3 {
+        margin: 0;
+        font-size: 1.125rem;
+    }
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary, #64748b);
+    line-height: 1;
+    padding: 0.25rem;
+
+    &:hover {
+        color: var(--text-primary, #1e293b);
+    }
+}
+
+.modal-body {
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+
+        .full-width {
+            grid-column: 1 / -1;
         }
+    }
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+}
+
+.error-msg {
+    color: #ef4444;
+    font-size: 0.8125rem;
+    margin: 0.75rem 0 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
     }
 }

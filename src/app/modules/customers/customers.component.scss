@@ -1,1 +1,9 @@
 @use '../../shared/styles/module';
+
+.clickable {
+    cursor: pointer;
+
+    &:hover {
+        background: var(--hover-bg, #f1f5f9);
+    }
+}

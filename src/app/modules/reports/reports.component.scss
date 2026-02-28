@@ -66,9 +66,27 @@
     border-top: 1px solid var(--border-color, #e2e8f0);
 }
 
+.total-row {
+    border-top: 2px solid var(--border-color, #e2e8f0);
+
+    td {
+        padding-top: 0.75rem;
+    }
+}
+
+.text-green {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.text-red {
+    color: #ef4444;
+    font-weight: 600;
+}
+
 .kpi-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
 }
 
@@ -90,6 +108,10 @@
     &.net-card {
         background: #dbeafe;
     }
+
+    &.orders-card {
+        background: #fef3c7;
+    }
 }
 
 .kpi-label {
@@ -102,6 +124,27 @@
 .kpi-value {
     font-size: 1.5rem;
     font-weight: 700;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .card {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+
+    .data-table {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 640px) {
