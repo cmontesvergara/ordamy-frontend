@@ -27,7 +27,8 @@ export class OrderDetailComponent implements OnInit {
   // Edit order
   editingOrder = false;
   savingOrder = false;
-  editOrderData: any = { notes: '', dueDate: '' };
+  editOrderData: any = { notes: '', dueDate: '', items: [] };
+  editSubtotal = 0;
 
   // Edit payment
   editingPayment: any = null;
@@ -105,13 +106,39 @@ export class OrderDetailComponent implements OnInit {
       this.editOrderData = {
         notes: this.order.notes || '',
         dueDate: this.order.dueDate ? new Date(this.order.dueDate).toISOString().split('T')[0] : '',
+        items: (this.order.items || []).map((item: any) => ({
+          productId: item.productId,
+          description: item.description,
+          quantity: parseFloat(item.quantity),
+          unitPrice: parseFloat(item.unitPrice),
+        })),
       };
+      this.recalcEditTotals();
     }
+  }
+
+  addEditItem() {
+    this.editOrderData.items.push({ productId: null, description: '', quantity: 1, unitPrice: 0 });
+  }
+
+  removeEditItem(index: number) {
+    this.editOrderData.items.splice(index, 1);
+    this.recalcEditTotals();
+  }
+
+  recalcEditTotals() {
+    this.editSubtotal = (this.editOrderData.items || []).reduce(
+      (sum: number, item: any) => sum + (parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0), 0
+    );
   }
 
   saveOrderEdit() {
     this.savingOrder = true;
-    this.orderService.update(this.order.id, this.editOrderData).subscribe({
+    this.orderService.update(this.order.id, {
+      notes: this.editOrderData.notes,
+      dueDate: this.editOrderData.dueDate,
+      items: this.editOrderData.items,
+    }).subscribe({
       next: (res: any) => {
         this.order = res.data;
         this.savingOrder = false;

@@ -37,6 +37,30 @@
     }
 }
 
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.flex-grow {
+    flex: 1;
+}
+
+.edit-items-table {
+    input {
+        padding: 0.375rem 0.5rem;
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 6px;
+        font-size: 0.8rem;
+    }
+}
+
+.input-full {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 // Payment action buttons
 .btn-icon {
     background: none;
