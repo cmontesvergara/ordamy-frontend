@@ -26,6 +26,10 @@ export class OrderService {
         return this.http.post<any>(this.url, data, { withCredentials: true });
     }
 
+    update(id: string, data: any) {
+        return this.http.put<any>(`${this.url}/${id}`, data, { withCredentials: true });
+    }
+
     cancel(id: string, reason: string) {
         return this.http.put<any>(`${this.url}/${id}/cancel`, { reason }, { withCredentials: true });
     }

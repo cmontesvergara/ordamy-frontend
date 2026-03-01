@@ -9,7 +9,7 @@ import { SettingsService } from '../../../core/services/settings/settings.servic
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './order-detail.component.html',
   styleUrl: './order-detail.component.scss',
 })
@@ -23,6 +23,15 @@ export class OrderDetailComponent implements OnInit {
   printMode: 'production' | 'customer' | null = null;
   today = new Date();
   updatingStatus = false;
+
+  // Edit order
+  editingOrder = false;
+  savingOrder = false;
+  editOrderData: any = { notes: '', dueDate: '' };
+
+  // Edit payment
+  editingPayment: any = null;
+  editPaymentData: any = { paymentMethodId: '', amount: 0, notes: '' };
 
   // O10: Operational status steps
   operationalSteps = [
@@ -89,7 +98,60 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  // O10: Change operational status (forward or backward 1 step)
+  // Edit order
+  toggleEditOrder() {
+    this.editingOrder = !this.editingOrder;
+    if (this.editingOrder) {
+      this.editOrderData = {
+        notes: this.order.notes || '',
+        dueDate: this.order.dueDate ? new Date(this.order.dueDate).toISOString().split('T')[0] : '',
+      };
+    }
+  }
+
+  saveOrderEdit() {
+    this.savingOrder = true;
+    this.orderService.update(this.order.id, this.editOrderData).subscribe({
+      next: (res: any) => {
+        this.order = res.data;
+        this.savingOrder = false;
+        this.editingOrder = false;
+      },
+      error: () => { this.savingOrder = false; },
+    });
+  }
+
+  // Edit payment
+  startEditPayment(payment: any) {
+    this.editingPayment = payment;
+    this.editPaymentData = {
+      paymentMethodId: payment.paymentMethodId || payment.paymentMethod?.id,
+      amount: parseFloat(payment.amount),
+      notes: payment.notes || '',
+    };
+  }
+
+  savePaymentEdit() {
+    if (!this.editingPayment) return;
+    this.savingPayment = true;
+    this.paymentService.update(this.editingPayment.id, this.editPaymentData).subscribe({
+      next: () => {
+        this.savingPayment = false;
+        this.editingPayment = null;
+        this.loadOrder(this.order.id);
+      },
+      error: () => { this.savingPayment = false; },
+    });
+  }
+
+  deletePayment(payment: any) {
+    if (!confirm(`¿Eliminar pago de $${parseFloat(payment.amount).toLocaleString()}? Esta acción revertirá el saldo de la orden.`)) return;
+    this.paymentService.delete(payment.id).subscribe({
+      next: () => { this.loadOrder(this.order.id); },
+    });
+  }
+
+  // O10: Change operational status
   changeOperationalStatus(direction: number) {
     const nextIndex = this.currentStepIndex + direction;
     if (nextIndex < 0 || nextIndex >= this.operationalSteps.length) return;
@@ -105,7 +167,7 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  // O4/O5: Print order
+  // Print order
   printOrder(mode: 'production' | 'customer') {
     this.printMode = mode;
     document.body.classList.add('printing', `print-${mode}`);
