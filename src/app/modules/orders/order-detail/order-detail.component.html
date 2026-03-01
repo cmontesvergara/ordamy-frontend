@@ -33,23 +33,24 @@
     <h4>Estado Operativo</h4>
     <div class="stepper">
       @for (step of operationalSteps; track step.key; let i = $index) {
-        <div class="step" [class.completed]="i < currentStepIndex" [class.active]="i === currentStepIndex" [class.pending]="i > currentStepIndex">
-          <div class="step-dot">
-            {{ i < currentStepIndex ? '✓' : (i + 1) }}
-          </div>
-          <span class="step-label">{{ step.label }}</span>
+      <div class="step" [class.completed]="i < currentStepIndex" [class.active]="i === currentStepIndex"
+        [class.pending]="i > currentStepIndex">
+        <div class="step-dot">
+          {{ i < currentStepIndex ? '✓' : (i + 1) }} </div>
+            <span class="step-label">{{ step.label }}</span>
         </div>
-        @if (i < operationalSteps.length - 1) {
-          <div class="step-connector" [class.completed]="i < currentStepIndex"></div>
-        }
+        @if (i < operationalSteps.length - 1) { <div class="step-connector" [class.completed]="i < currentStepIndex">
+      </div>
+      }
       }
     </div>
     <div class="stepper-actions" *ngIf="!updatingStatus">
       <button class="btn btn-outline btn-sm" *ngIf="currentStepIndex > 0" (click)="changeOperationalStatus(-1)">
-        ← {{ operationalSteps[currentStepIndex - 1]?.label }}
+        ← {{ operationalSteps[currentStepIndex - 1].label }}
       </button>
-      <button class="btn btn-primary btn-sm" *ngIf="currentStepIndex < operationalSteps.length - 1" (click)="changeOperationalStatus(1)">
-        {{ operationalSteps[currentStepIndex + 1]?.label }} →
+      <button class="btn btn-primary btn-sm" *ngIf="currentStepIndex < operationalSteps.length - 1"
+        (click)="changeOperationalStatus(1)">
+        {{ operationalSteps[currentStepIndex + 1].label }} →
       </button>
     </div>
     <div class="stepper-actions" *ngIf="updatingStatus">
@@ -68,8 +69,10 @@
     <div class="info-card" [class.hide-on-production]="printMode === 'production'">
       <h4>Resumen</h4>
       <div class="summary-row"><span>Subtotal</span><span>$ {{ order.subtotal | number:'1.0-0' }}</span></div>
-      <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>$ {{ order.taxAmount | number:'1.0-0' }}</span></div>
-      <div class="summary-row" *ngIf="order.discount > 0"><span>Descuento</span><span>-$ {{ order.discount | number:'1.0-0' }}</span></div>
+      <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>$ {{ order.taxAmount | number:'1.0-0'
+          }}</span></div>
+      <div class="summary-row" *ngIf="order.discount > 0"><span>Descuento</span><span>-$ {{ order.discount |
+          number:'1.0-0' }}</span></div>
       <div class="summary-row total"><span>Total</span><span>$ {{ order.total | number:'1.0-0' }}</span></div>
       <div class="summary-row balance"><span>Saldo</span><span>$ {{ order.balance | number:'1.0-0' }}</span></div>
     </div>
@@ -97,13 +100,13 @@
       </thead>
       <tbody>
         @for (item of order.items; track item.id) {
-          <tr>
-            <td>{{ item.description }}</td>
-            <td>{{ item.product?.name || '—' }}</td>
-            <td class="text-right">{{ item.quantity }}</td>
-            <td class="text-right hide-on-production">$ {{ item.unitPrice | number:'1.0-0' }}</td>
-            <td class="text-right hide-on-production">$ {{ item.lineTotal | number:'1.0-0' }}</td>
-          </tr>
+        <tr>
+          <td>{{ item.description }}</td>
+          <td>{{ item.product?.name || '—' }}</td>
+          <td class="text-right">{{ item.quantity }}</td>
+          <td class="text-right hide-on-production">$ {{ item.unitPrice | number:'1.0-0' }}</td>
+          <td class="text-right hide-on-production">$ {{ item.lineTotal | number:'1.0-0' }}</td>
+        </tr>
         }
       </tbody>
     </table>
@@ -113,7 +116,8 @@
   <div class="card section no-print-production">
     <div class="section-header">
       <h3>Pagos ({{ order.payments?.length }})</h3>
-      <button *ngIf="order.status === 'ACTIVE' && order.balance > 0" class="btn btn-primary btn-sm no-print" (click)="showPaymentForm = !showPaymentForm">
+      <button *ngIf="order.status === 'ACTIVE' && order.balance > 0" class="btn btn-primary btn-sm no-print"
+        (click)="showPaymentForm = !showPaymentForm">
         {{ showPaymentForm ? 'Cancelar' : '+ Registrar Pago' }}
       </button>
     </div>
@@ -123,7 +127,7 @@
       <select [(ngModel)]="newPayment.paymentMethodId">
         <option value="">Medio de pago</option>
         @for (m of paymentMethods; track m.id) {
-          <option [value]="m.id">{{ m.name }}</option>
+        <option [value]="m.id">{{ m.name }}</option>
         }
       </select>
       <input type="number" [(ngModel)]="newPayment.amount" [max]="order.balance" placeholder="Monto" />
@@ -144,12 +148,12 @@
       </thead>
       <tbody>
         @for (p of order.payments; track p.id) {
-          <tr>
-            <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm' }}</td>
-            <td>{{ p.paymentMethod?.name }}</td>
-            <td class="text-right">$ {{ p.amount | number:'1.0-0' }}</td>
-            <td>{{ p.notes || '—' }}</td>
-          </tr>
+        <tr>
+          <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ p.paymentMethod?.name }}</td>
+          <td class="text-right">$ {{ p.amount | number:'1.0-0' }}</td>
+          <td>{{ p.notes || '—' }}</td>
+        </tr>
         }
       </tbody>
     </table>
