@@ -21,11 +21,11 @@ export class LoggedLayoutComponent implements OnInit {
   sidebarCollapsed = false;
   userName = '';
   tenantName = '';
-  currentPageTitle = 'Dashboard';
+  currentPageTitle = 'Estadísticas';
   ssoUrl = environment.ssoUrl;
 
   menuItems: MenuItem[] = [
-    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
+    { label: 'Estadísticas', icon: 'dashboard', route: '/dashboard' },
     { label: 'Órdenes', icon: 'orders', route: '/orders' },
     { label: 'Clientes', icon: 'customers', route: '/customers' },
     { label: 'Egresos', icon: 'expenses', route: '/expenses' },
