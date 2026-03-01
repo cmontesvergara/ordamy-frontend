@@ -23,6 +23,9 @@ export class SettingsComponent implements OnInit {
     newSupplier = { name: '', phone: '' };
     newTax = { name: '', rate: 0 };
 
+    // Generic inline edit state
+    editing: any = null;
+
     constructor(private settingsService: SettingsService) { }
 
     ngOnInit() {
@@ -37,6 +40,7 @@ export class SettingsComponent implements OnInit {
         this.settingsService.getFinancialConfig().subscribe({ next: (res: any) => { this.financialConfig = res.data; } });
     }
 
+    // ─── Create ───
     addPaymentMethod() {
         this.settingsService.createPaymentMethod({ name: this.newPaymentMethod }).subscribe({
             next: () => { this.newPaymentMethod = ''; this.loadAll(); },
@@ -64,6 +68,42 @@ export class SettingsComponent implements OnInit {
     saveFinancial() {
         this.settingsService.updateFinancialConfig(this.financialConfig).subscribe({
             next: () => { alert('Configuración guardada'); },
+        });
+    }
+
+    // ─── Edit (generic) ───
+    startEdit(type: string, item: any) {
+        this.editing = { id: item.id, type, data: { ...item } };
+    }
+
+    saveEdit(type: string) {
+        if (!this.editing) return;
+        const { id, data } = this.editing;
+
+        const obs = type === 'payment' ? this.settingsService.updatePaymentMethod(id, data)
+            : type === 'category' ? this.settingsService.updateCategory(id, data)
+                : type === 'supplier' ? this.settingsService.updateSupplier(id, data)
+                    : this.settingsService.updateTaxConfig(id, data);
+
+        obs.subscribe({
+            next: () => { this.editing = null; this.loadAll(); },
+            error: (err: any) => { alert(err.error?.error || 'Error al actualizar'); },
+        });
+    }
+
+    // ─── Delete (generic) ───
+    deleteItem(type: string, item: any) {
+        const labels: any = { payment: 'medio de pago', category: 'categoría', supplier: 'proveedor', tax: 'configuración de impuesto' };
+        if (!confirm(`¿Eliminar ${labels[type]} "${item.name}"?`)) return;
+
+        const obs = type === 'payment' ? this.settingsService.deletePaymentMethod(item.id)
+            : type === 'category' ? this.settingsService.deleteCategory(item.id)
+                : type === 'supplier' ? this.settingsService.deleteSupplier(item.id)
+                    : this.settingsService.deleteTaxConfig(item.id);
+
+        obs.subscribe({
+            next: () => { this.loadAll(); },
+            error: (err: any) => { alert(err.error?.error || 'Error al eliminar'); },
         });
     }
 }

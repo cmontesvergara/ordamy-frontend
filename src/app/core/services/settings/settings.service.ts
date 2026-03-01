@@ -18,6 +18,9 @@ export class SettingsService {
     updatePaymentMethod(id: string, data: any) {
         return this.http.put<any>(`${this.url}/payment-methods/${id}`, data, { withCredentials: true });
     }
+    deletePaymentMethod(id: string) {
+        return this.http.delete<any>(`${this.url}/payment-methods/${id}`, { withCredentials: true });
+    }
 
     // Categories
     getCategories(type?: string) {
@@ -29,6 +32,9 @@ export class SettingsService {
     }
     updateCategory(id: string, data: any) {
         return this.http.put<any>(`${this.url}/categories/${id}`, data, { withCredentials: true });
+    }
+    deleteCategory(id: string) {
+        return this.http.delete<any>(`${this.url}/categories/${id}`, { withCredentials: true });
     }
 
     // Suppliers
@@ -42,6 +48,9 @@ export class SettingsService {
     updateSupplier(id: string, data: any) {
         return this.http.put<any>(`${this.url}/suppliers/${id}`, data, { withCredentials: true });
     }
+    deleteSupplier(id: string) {
+        return this.http.delete<any>(`${this.url}/suppliers/${id}`, { withCredentials: true });
+    }
 
     // Tax Configs
     getTaxConfigs() {
@@ -49,6 +58,12 @@ export class SettingsService {
     }
     createTaxConfig(data: any) {
         return this.http.post<any>(`${this.url}/tax-configs`, data, { withCredentials: true });
+    }
+    updateTaxConfig(id: string, data: any) {
+        return this.http.put<any>(`${this.url}/tax-configs/${id}`, data, { withCredentials: true });
+    }
+    deleteTaxConfig(id: string) {
+        return this.http.delete<any>(`${this.url}/tax-configs/${id}`, { withCredentials: true });
     }
 
     // Financial Config
