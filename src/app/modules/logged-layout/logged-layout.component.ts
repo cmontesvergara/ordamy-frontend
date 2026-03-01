@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { environment } from '../../../environments/environment';
 
 interface MenuItem {
   label: string;
@@ -21,6 +22,7 @@ export class LoggedLayoutComponent implements OnInit {
   userName = '';
   tenantName = '';
   currentPageTitle = 'Dashboard';
+  ssoUrl = environment.ssoUrl;
 
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
