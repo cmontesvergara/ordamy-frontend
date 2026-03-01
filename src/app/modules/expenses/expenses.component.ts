@@ -116,4 +116,36 @@ export class ExpensesComponent implements OnInit {
     if (!confirm('¿Eliminar este egreso?')) return;
     this.expenseService.delete(id).subscribe({ next: () => this.loadExpenses() });
   }
+
+  // Edit expense
+  editingExpense: any = null;
+  savingEdit = false;
+  editData: any = {};
+
+  startEditExpense(expense: any) {
+    this.editingExpense = expense;
+    this.editData = {
+      description: expense.description || '',
+      amount: parseFloat(expense.amount),
+      categoryId: expense.categoryId || expense.category?.id || '',
+      supplierId: expense.supplierId || expense.supplier?.id || '',
+      paymentMethodId: expense.paymentMethodId || expense.paymentMethod?.id || '',
+      invoiceNumber: expense.invoiceNumber || '',
+      expenseDate: expense.expenseDate ? new Date(expense.expenseDate).toISOString().split('T')[0] : '',
+      notes: expense.notes || '',
+    };
+  }
+
+  saveExpenseEdit() {
+    if (!this.editingExpense) return;
+    this.savingEdit = true;
+    this.expenseService.update(this.editingExpense.id, this.editData).subscribe({
+      next: () => {
+        this.savingEdit = false;
+        this.editingExpense = null;
+        this.loadExpenses();
+      },
+      error: () => { this.savingEdit = false; },
+    });
+  }
 }
