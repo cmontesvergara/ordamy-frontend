@@ -5,10 +5,10 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CustomerService } from '../../../core/services/customer/customer.service';
 
 @Component({
-    selector: 'app-customer-detail',
-    standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink],
-    template: `
+  selector: 'app-customer-detail',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  template: `
     <div *ngIf="customer" class="detail-page">
       <div class="page-header">
         <div>
@@ -64,6 +64,14 @@ import { CustomerService } from '../../../core/services/customer/customer.servic
             <option value="COMPLETED">Completadas</option>
             <option value="CANCELLED">Anuladas</option>
           </select>
+          <select [(ngModel)]="operationalFilter" (change)="onFilter()">
+            <option value="">Estado operativo</option>
+            <option value="PENDING">Pendiente</option>
+            <option value="APPROVED">Aprobada</option>
+            <option value="IN_PRODUCTION">En Producción</option>
+            <option value="PRODUCED">Producida</option>
+            <option value="DELIVERED">Entregada</option>
+          </select>
           <div class="date-group">
             <label>Desde</label>
             <input type="date" [(ngModel)]="dateFrom" (change)="onFilter()" />
@@ -72,7 +80,7 @@ import { CustomerService } from '../../../core/services/customer/customer.servic
             <label>Hasta</label>
             <input type="date" [(ngModel)]="dateTo" (change)="onFilter()" />
           </div>
-          <button class="btn btn-outline btn-sm" *ngIf="dateFrom || dateTo || statusFilter" (click)="clearFilters()">✕ Limpiar</button>
+          <button class="btn btn-outline btn-sm" *ngIf="dateFrom || dateTo || statusFilter || operationalFilter" (click)="clearFilters()">✕ Limpiar</button>
         </div>
 
         <table class="data-table">
@@ -84,6 +92,7 @@ import { CustomerService } from '../../../core/services/customer/customer.servic
               <th class="text-right">Total</th>
               <th class="text-right">Saldo</th>
               <th>Estado</th>
+              <th>Operativo</th>
             </tr>
           </thead>
           <tbody>
@@ -95,10 +104,11 @@ import { CustomerService } from '../../../core/services/customer/customer.servic
                 <td class="text-right">$ {{ o.total | number:'1.0-0' }}</td>
                 <td class="text-right" [class.debt]="o.balance > 0">$ {{ o.balance | number:'1.0-0' }}</td>
                 <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
+                <td><span class="badge op-{{ o.operationalStatus }}">{{ operationalLabels[o.operationalStatus] || o.operationalStatus }}</span></td>
               </tr>
             }
             @if (orders.length === 0 && !loadingOrders) {
-              <tr><td colspan="6" class="empty">No se encontraron órdenes</td></tr>
+              <tr><td colspan="7" class="empty">No se encontraron órdenes</td></tr>
             }
           </tbody>
         </table>
@@ -116,69 +126,80 @@ import { CustomerService } from '../../../core/services/customer/customer.servic
       <p>Cargando cliente...</p>
     </div>
   `,
-    styleUrl: './customer-detail.component.scss',
+  styleUrl: './customer-detail.component.scss',
 })
 export class CustomerDetailComponent implements OnInit {
-    customer: any = null;
-    orders: any[] = [];
-    orderTotal = 0;
-    orderPage = 1;
-    orderLimit = 20;
-    loading = true;
-    loadingOrders = false;
-    statusFilter = '';
-    dateFrom = '';
-    dateTo = '';
+  customer: any = null;
+  orders: any[] = [];
+  orderTotal = 0;
+  orderPage = 1;
+  orderLimit = 20;
+  loading = true;
+  loadingOrders = false;
+  statusFilter = '';
+  operationalFilter = '';
+  dateFrom = '';
+  dateTo = '';
 
-    get totalOrderPages() { return Math.ceil(this.orderTotal / this.orderLimit); }
+  operationalLabels: any = {
+    PENDING: 'Pendiente',
+    APPROVED: 'Aprobada',
+    IN_PRODUCTION: 'En Producción',
+    PRODUCED: 'Producida',
+    DELIVERED: 'Entregada',
+  };
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        private customerService: CustomerService,
-    ) { }
+  get totalOrderPages() { return Math.ceil(this.orderTotal / this.orderLimit); }
 
-    ngOnInit() {
-        const id = this.route.snapshot.paramMap.get('id')!;
-        this.loadCustomer(id);
-    }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private customerService: CustomerService,
+  ) { }
 
-    loadCustomer(id: string) {
-        this.loading = true;
-        this.customerService.get(id, {
-            dateFrom: this.dateFrom,
-            dateTo: this.dateTo,
-            status: this.statusFilter,
-            page: this.orderPage,
-            limit: this.orderLimit,
-        }).subscribe({
-            next: (res: any) => {
-                this.customer = res.data;
-                this.orders = res.data.orders || [];
-                this.orderTotal = res.data.orderTotal || 0;
-                this.loading = false;
-                this.loadingOrders = false;
-            },
-            error: () => { this.loading = false; this.loadingOrders = false; },
-        });
-    }
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id')!;
+    this.loadCustomer(id);
+  }
 
-    onFilter() {
-        this.orderPage = 1;
-        this.loadingOrders = true;
-        this.loadCustomer(this.customer.id);
-    }
+  loadCustomer(id: string) {
+    this.loading = true;
+    this.customerService.get(id, {
+      dateFrom: this.dateFrom,
+      dateTo: this.dateTo,
+      status: this.statusFilter,
+      operationalStatus: this.operationalFilter,
+      page: this.orderPage,
+      limit: this.orderLimit,
+    }).subscribe({
+      next: (res: any) => {
+        this.customer = res.data;
+        this.orders = res.data.orders || [];
+        this.orderTotal = res.data.orderTotal || 0;
+        this.loading = false;
+        this.loadingOrders = false;
+      },
+      error: () => { this.loading = false; this.loadingOrders = false; },
+    });
+  }
 
-    clearFilters() {
-        this.dateFrom = '';
-        this.dateTo = '';
-        this.statusFilter = '';
-        this.onFilter();
-    }
+  onFilter() {
+    this.orderPage = 1;
+    this.loadingOrders = true;
+    this.loadCustomer(this.customer.id);
+  }
 
-    changePage(p: number) {
-        this.orderPage = p;
-        this.loadingOrders = true;
-        this.loadCustomer(this.customer.id);
-    }
+  clearFilters() {
+    this.dateFrom = '';
+    this.dateTo = '';
+    this.statusFilter = '';
+    this.operationalFilter = '';
+    this.onFilter();
+  }
+
+  changePage(p: number) {
+    this.orderPage = p;
+    this.loadingOrders = true;
+    this.loadCustomer(this.customer.id);
+  }
 }

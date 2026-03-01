@@ -88,8 +88,8 @@ import { CustomerService } from '../../core/services/customer/customer.service';
         <tbody>
           @for (o of orders; track o.id) {
             <tr [class.overdue]="o.daysOverdue > 0">
-              <td class="mono">{{ o.number }}</td>
-              <td><strong>{{ o.customer?.name }}</strong></td>
+              <td class="mono"><a class="link" [routerLink]="['/orders', o.id]">{{ o.number }}</a></td>
+              <td><a class="link-name" [routerLink]="['/customers', o.customer?.id]"><strong>{{ o.customer?.name }}</strong></a></td>
               <td>{{ o.orderDate | date:'dd/MM/yyyy' }}</td>
               <td class="text-muted">{{ o.sellerName }}</td>
               <td>{{ o.dueDate ? (o.dueDate | date:'dd/MM/yyyy') : '—' }}</td>

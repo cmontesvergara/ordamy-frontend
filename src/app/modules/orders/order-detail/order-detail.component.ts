@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../core/services/order/order.service';
 import { PaymentService } from '../../../core/services/payment/payment.service';
@@ -18,6 +18,7 @@ import { SettingsService } from '../../../core/services/settings/settings.servic
           <span class="badge status-{{ order.status }}">{{ order.status }}</span>
         </div>
         <div class="header-actions">
+          <a routerLink="/orders" class="btn btn-outline">← Volver</a>
           <button class="btn btn-outline btn-sm" (click)="printOrder('production')" title="Para producción (sin precios)">
             🏭 Imprimir Producción
           </button>

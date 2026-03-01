@@ -50,13 +50,13 @@ import { OrderService } from '../../core/services/order/order.service';
             <th class="text-right">Total</th>
             <th class="text-right">Saldo</th>
             <th>Estado</th>
+            <th>Operativo</th>
             <th>Items</th>
-            <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
           @for (o of orders; track o.id) {
-            <tr>
+            <tr class="clickable" [routerLink]="['/orders', o.id]">
               <td class="mono">{{ o.number }}</td>
               <td><strong>{{ o.customer?.name }}</strong></td>
               <td>{{ o.orderDate | date:'dd/MM/yyyy' }}</td>
@@ -64,17 +64,8 @@ import { OrderService } from '../../core/services/order/order.service';
               <td class="text-right">$ {{ o.total | number:'1.0-0' }}</td>
               <td class="text-right" [class.debt]="o.balance > 0">$ {{ o.balance | number:'1.0-0' }}</td>
               <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
+              <td><span class="badge op-{{ o.operationalStatus }}">{{ operationalLabels[o.operationalStatus] || '—' }}</span></td>
               <td>{{ o._count?.items || 0 }}</td>
-              <td class="text-center actions-cell">
-                <div class="actions-wrapper">
-                  <button class="btn-action" (click)="toggleMenu(o.id, $event)">⋮</button>
-                  <div class="actions-menu" *ngIf="openMenuId === o.id">
-                    <button (click)="goToDetail(o.id)">👁 Ver detalle</button>
-                    <button (click)="goToDetail(o.id)">💰 Registrar abono</button>
-                    <button *ngIf="o.status === 'ACTIVE'" class="danger" (click)="cancelOrder(o)">❌ Anular</button>
-                  </div>
-                </div>
-              </td>
             </tr>
           }
           @if (orders.length === 0 && !loading) {
@@ -122,6 +113,14 @@ export class OrdersComponent implements OnInit {
   showCancelModal = false;
   cancelTarget: any = null;
   cancelReason = '';
+
+  operationalLabels: any = {
+    PENDING: 'Pendiente',
+    APPROVED: 'Aprobada',
+    IN_PRODUCTION: 'En Producción',
+    PRODUCED: 'Producida',
+    DELIVERED: 'Entregada',
+  };
 
   get totalPages() { return Math.ceil(this.total / this.limit); }
 

@@ -1,5 +1,25 @@
 @use '../../shared/styles/module';
 
+.link {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.link-name {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+        color: #6366f1;
+        text-decoration: underline;
+    }
+}
+
 .filters {
     display: flex;
     gap: 0.75rem;
