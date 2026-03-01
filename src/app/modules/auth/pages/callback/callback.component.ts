@@ -5,12 +5,7 @@ import { AuthService } from '../../../../core/services/auth/auth.service';
 @Component({
     selector: 'app-callback',
     standalone: true,
-    template: `
-    <div class="callback-container">
-      <div class="loader"></div>
-      <p>Autenticando...</p>
-    </div>
-  `,
+    templateUrl: './callback.component.html',
     styles: [`
     .callback-container {
       display: flex;

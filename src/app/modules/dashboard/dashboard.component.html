@@ -1,0 +1,55 @@
+<div class="dashboard-grid" *ngIf="data">
+  <!-- KPI Cards -->
+  <div class="kpi-card sales">
+    <div class="kpi-icon">💰</div>
+    <div class="kpi-info">
+      <span class="kpi-label">Ventas del mes</span>
+      <span class="kpi-value">\$ {{ data.salesThisMonth | number:'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <div class="kpi-card expenses">
+    <div class="kpi-icon">💸</div>
+    <div class="kpi-info">
+      <span class="kpi-label">Egresos del mes</span>
+      <span class="kpi-value">\$ {{ data.expensesThisMonth | number:'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <div class="kpi-card orders">
+    <div class="kpi-icon">📋</div>
+    <div class="kpi-info">
+      <span class="kpi-label">Órdenes activas</span>
+      <span class="kpi-value">{{ data.activeOrders }}</span>
+    </div>
+  </div>
+
+  <div class="kpi-card portfolio">
+    <div class="kpi-icon">📊</div>
+    <div class="kpi-info">
+      <span class="kpi-label">Cartera</span>
+      <span class="kpi-value">\$ {{ data.portfolioBalance | number:'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <!-- Accounts Table -->
+  <div class="card accounts-card">
+    <h3>Cuentas</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Medio de pago</th>
+          <th class="text-right">Saldo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (account of data.accounts; track account.id) {
+          <tr>
+            <td>{{ account.name }}</td>
+            <td class="text-right">\$ {{ account.balance | number:'1.0-0' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

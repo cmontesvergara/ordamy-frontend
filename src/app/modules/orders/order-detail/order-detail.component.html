@@ -1,0 +1,170 @@
+<div *ngIf="order" class="detail-page">
+  <div class="page-header no-print">
+    <div>
+      <h1>Orden #{{ order.number }}</h1>
+      <span class="badge status-{{ order.status }}">{{ order.status }}</span>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/orders" class="btn btn-outline">← Volver</a>
+      <button class="btn btn-outline btn-sm" (click)="printOrder('production')" title="Para producción (sin precios)">
+        🏭 Imprimir Producción
+      </button>
+      <button class="btn btn-outline btn-sm" (click)="printOrder('customer')" title="Con todos los detalles">
+        🧾 Imprimir Cliente
+      </button>
+      <button *ngIf="order.status === 'ACTIVE'" class="btn btn-danger" (click)="cancelOrder()">
+        Anular Orden
+      </button>
+    </div>
+  </div>
+
+  <!-- Print Header (only visible when printing) -->
+  <div class="print-header" id="print-header">
+    <h2>{{ printMode === 'production' ? 'Orden de Producción' : 'Orden de Servicio' }}</h2>
+    <div class="print-meta">
+      <span><strong>Orden #{{ order.number }}</strong></span>
+      <span>Fecha: {{ order.orderDate | date:'dd/MM/yyyy' }}</span>
+      <span *ngIf="order.dueDate">Vence: {{ order.dueDate | date:'dd/MM/yyyy' }}</span>
+    </div>
+  </div>
+
+  <!-- O10: Operational Status Stepper -->
+  <div class="stepper-card" *ngIf="order.status === 'ACTIVE'">
+    <h4>Estado Operativo</h4>
+    <div class="stepper">
+      @for (step of operationalSteps; track step.key; let i = $index) {
+        <div class="step" [class.completed]="i < currentStepIndex" [class.active]="i === currentStepIndex" [class.pending]="i > currentStepIndex">
+          <div class="step-dot">
+            {{ i < currentStepIndex ? '✓' : (i + 1) }}
+          </div>
+          <span class="step-label">{{ step.label }}</span>
+        </div>
+        @if (i < operationalSteps.length - 1) {
+          <div class="step-connector" [class.completed]="i < currentStepIndex"></div>
+        }
+      }
+    </div>
+    <div class="stepper-actions" *ngIf="!updatingStatus">
+      <button class="btn btn-outline btn-sm" *ngIf="currentStepIndex > 0" (click)="changeOperationalStatus(-1)">
+        ← {{ operationalSteps[currentStepIndex - 1]?.label }}
+      </button>
+      <button class="btn btn-primary btn-sm" *ngIf="currentStepIndex < operationalSteps.length - 1" (click)="changeOperationalStatus(1)">
+        {{ operationalSteps[currentStepIndex + 1]?.label }} →
+      </button>
+    </div>
+    <div class="stepper-actions" *ngIf="updatingStatus">
+      <span class="text-muted">Actualizando...</span>
+    </div>
+  </div>
+
+  <!-- Info Grid -->
+  <div class="info-grid">
+    <div class="info-card">
+      <h4>Cliente</h4>
+      <p><strong>{{ order.customer?.name }}</strong></p>
+      <p class="sub">{{ order.customer?.identification }}</p>
+      <p class="sub" *ngIf="order.customer?.phone">📞 {{ order.customer.phone }}</p>
+    </div>
+    <div class="info-card" [class.hide-on-production]="printMode === 'production'">
+      <h4>Resumen</h4>
+      <div class="summary-row"><span>Subtotal</span><span>$ {{ order.subtotal | number:'1.0-0' }}</span></div>
+      <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>$ {{ order.taxAmount | number:'1.0-0' }}</span></div>
+      <div class="summary-row" *ngIf="order.discount > 0"><span>Descuento</span><span>-$ {{ order.discount | number:'1.0-0' }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>$ {{ order.total | number:'1.0-0' }}</span></div>
+      <div class="summary-row balance"><span>Saldo</span><span>$ {{ order.balance | number:'1.0-0' }}</span></div>
+    </div>
+    <div class="info-card">
+      <h4>Detalles</h4>
+      <p class="sub">Fecha: {{ order.orderDate | date:'dd/MM/yyyy' }}</p>
+      <p class="sub" *ngIf="order.dueDate">Vence: {{ order.dueDate | date:'dd/MM/yyyy' }}</p>
+      <p class="sub">Vendedor: {{ order.sellerName }}</p>
+      <p class="sub" *ngIf="order.notes">Notas: {{ order.notes }}</p>
+    </div>
+  </div>
+
+  <!-- Items -->
+  <div class="card section">
+    <h3>Items ({{ order.items?.length }})</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Descripción</th>
+          <th>Producto</th>
+          <th class="text-right">Cant.</th>
+          <th class="text-right hide-on-production">P. Unit.</th>
+          <th class="text-right hide-on-production">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of order.items; track item.id) {
+          <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.product?.name || '—' }}</td>
+            <td class="text-right">{{ item.quantity }}</td>
+            <td class="text-right hide-on-production">$ {{ item.unitPrice | number:'1.0-0' }}</td>
+            <td class="text-right hide-on-production">$ {{ item.lineTotal | number:'1.0-0' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Payments (no-print for production) -->
+  <div class="card section no-print-production">
+    <div class="section-header">
+      <h3>Pagos ({{ order.payments?.length }})</h3>
+      <button *ngIf="order.status === 'ACTIVE' && order.balance > 0" class="btn btn-primary btn-sm no-print" (click)="showPaymentForm = !showPaymentForm">
+        {{ showPaymentForm ? 'Cancelar' : '+ Registrar Pago' }}
+      </button>
+    </div>
+
+    <!-- Payment Form -->
+    <div class="form-inline no-print" *ngIf="showPaymentForm">
+      <select [(ngModel)]="newPayment.paymentMethodId">
+        <option value="">Medio de pago</option>
+        @for (m of paymentMethods; track m.id) {
+          <option [value]="m.id">{{ m.name }}</option>
+        }
+      </select>
+      <input type="number" [(ngModel)]="newPayment.amount" [max]="order.balance" placeholder="Monto" />
+      <input type="text" [(ngModel)]="newPayment.notes" placeholder="Nota (opcional)" />
+      <button class="btn btn-primary btn-sm" (click)="registerPayment()" [disabled]="savingPayment">
+        {{ savingPayment ? '...' : 'Guardar' }}
+      </button>
+    </div>
+
+    <table class="data-table" *ngIf="order.payments?.length > 0">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Medio</th>
+          <th class="text-right">Monto</th>
+          <th>Nota</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of order.payments; track p.id) {
+          <tr>
+            <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ p.paymentMethod?.name }}</td>
+            <td class="text-right">$ {{ p.amount | number:'1.0-0' }}</td>
+            <td>{{ p.notes || '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Print Footer -->
+  <div class="print-footer">
+    <div class="signature-line">
+      <span>Firma del cliente</span>
+    </div>
+    <p class="print-note">Documento generado el {{ today | date:'dd/MM/yyyy HH:mm' }}</p>
+  </div>
+</div>
+
+<div class="loading" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Cargando orden...</p>
+</div>

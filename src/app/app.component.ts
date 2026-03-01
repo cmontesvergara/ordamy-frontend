@@ -8,31 +8,7 @@ import { ToastService, Toast } from './core/services/toast/toast.service';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet],
-  template: `
-    <router-outlet></router-outlet>
-    
-    <!-- Global Loader -->
-    <div class="global-loader-overlay" *ngIf="loadingService.is()">
-      <img src="assets/ordamy_loader.svg" alt="Cargando..." class="loader-spinner" />
-    </div>
-
-    <!-- Global Toasts Container -->
-    <div class="toast-container" *ngIf="toastService.toasts$ | async as toasts">
-      <div 
-        *ngFor="let toast of toasts" 
-        class="toast" 
-        [ngClass]="'toast-' + toast.type"
-        (click)="toastService.remove(toast.id)"
-      >
-        <div class="toast-indicator"></div>
-        <div class="toast-content">
-          <strong>{{ toast.title }}</strong>
-          <p>{{ toast.message }}</p>
-        </div>
-        <button class="toast-close">&times;</button>
-      </div>
-    </div>
-  `,
+  templateUrl: './app.component.html',
   styles: [`
     :host { display: block; min-height: 100vh; }
     
