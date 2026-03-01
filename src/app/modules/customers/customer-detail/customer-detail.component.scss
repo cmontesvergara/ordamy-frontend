@@ -4,6 +4,49 @@
     max-width: 960px;
 }
 
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary, #64748b);
+        }
+
+        input:not([type="checkbox"]) {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
 .sub-id {
     font-size: 0.875rem;
     color: var(--text-secondary, #64748b);

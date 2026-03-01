@@ -35,4 +35,8 @@ export class CustomerService {
     update(id: string, data: any) {
         return this.http.put<any>(`${this.url}/${id}`, data, { withCredentials: true });
     }
+
+    delete(id: string) {
+        return this.http.delete<any>(`${this.url}/${id}`, { withCredentials: true });
+    }
 }

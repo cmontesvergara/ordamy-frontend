@@ -24,6 +24,11 @@ export class CustomerDetailComponent implements OnInit {
   dateFrom = '';
   dateTo = '';
 
+  // Edit customer
+  editingCustomer = false;
+  savingCustomer = false;
+  editData: any = {};
+
   operationalLabels: any = {
     PENDING: 'Pendiente',
     APPROVED: 'Aprobada',
@@ -84,5 +89,44 @@ export class CustomerDetailComponent implements OnInit {
     this.orderPage = p;
     this.loadingOrders = true;
     this.loadCustomer(this.customer.id);
+  }
+
+  // Edit customer
+  toggleEdit() {
+    this.editingCustomer = !this.editingCustomer;
+    if (this.editingCustomer) {
+      this.editData = {
+        name: this.customer.name || '',
+        phone: this.customer.phone || '',
+        email: this.customer.email || '',
+        address: this.customer.address || '',
+        notes: this.customer.notes || '',
+        isActive: this.customer.isActive !== false,
+      };
+    }
+  }
+
+  saveCustomerEdit() {
+    if (!this.editData.name?.trim()) return;
+    this.savingCustomer = true;
+    this.customerService.update(this.customer.id, this.editData).subscribe({
+      next: (res: any) => {
+        // Merge updated fields into customer
+        Object.assign(this.customer, res.data);
+        this.savingCustomer = false;
+        this.editingCustomer = false;
+      },
+      error: () => { this.savingCustomer = false; },
+    });
+  }
+
+  deleteCustomer() {
+    if (!confirm(`¿Eliminar al cliente "${this.customer.name}"? Esta acción no se puede deshacer.`)) return;
+    this.customerService.delete(this.customer.id).subscribe({
+      next: () => { this.router.navigate(['/customers']); },
+      error: (err: any) => {
+        alert(err.error?.error || 'Error al eliminar cliente');
+      },
+    });
   }
 }
