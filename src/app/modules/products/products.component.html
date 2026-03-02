@@ -1,0 +1,87 @@
+<div class="page-header">
+    <h1>Productos</h1>
+</div>
+
+<!-- Search -->
+<div class="search-bar">
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar producto..." (input)="loadProducts()" />
+</div>
+
+<!-- Create Form -->
+<div class="card section" *ngIf="canCreate">
+    <h3>Nuevo Producto</h3>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Nombre *</label>
+            <input [(ngModel)]="newProduct.name" placeholder="Ej: Banner 2x3m" />
+        </div>
+        <div class="form-group">
+            <label>Descripción</label>
+            <input [(ngModel)]="newProduct.description" placeholder="Descripción del producto" />
+        </div>
+        <div class="form-group">
+            <label>Precio base</label>
+            <input type="number" [(ngModel)]="newProduct.basePrice" placeholder="0" />
+        </div>
+        <div class="form-group">
+            <label>Unidad</label>
+            <input [(ngModel)]="newProduct.unit" placeholder="Ej: m², unidad, rollo" />
+        </div>
+    </div>
+    <div class="form-actions">
+        <button class="btn btn-primary" (click)="addProduct()" [disabled]="!newProduct.name">Agregar Producto</button>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th class="text-right">Precio base</th>
+                <th>Unidad</th>
+                <th class="text-center" *ngIf="canUpdate">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (p of products; track p.id) {
+            <tr>
+                <td>
+                    <input *ngIf="editing?.id === p.id" [(ngModel)]="editing.data.name" class="edit-input" />
+                    <strong *ngIf="editing?.id !== p.id">{{ p.name }}</strong>
+                </td>
+                <td>
+                    <input *ngIf="editing?.id === p.id" [(ngModel)]="editing.data.description" class="edit-input" />
+                    <span *ngIf="editing?.id !== p.id">{{ p.description || '—' }}</span>
+                </td>
+                <td class="text-right">
+                    <input *ngIf="editing?.id === p.id" type="number" [(ngModel)]="editing.data.basePrice"
+                        class="edit-input w-100" />
+                    <span *ngIf="editing?.id !== p.id">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
+                </td>
+                <td>
+                    <input *ngIf="editing?.id === p.id" [(ngModel)]="editing.data.unit" class="edit-input w-80" />
+                    <span *ngIf="editing?.id !== p.id">{{ p.unit || '—' }}</span>
+                </td>
+                <td class="text-center actions-cell" *ngIf="canUpdate">
+                    <ng-container *ngIf="editing?.id === p.id">
+                        <button class="btn btn-primary btn-xs" (click)="saveEdit()">Guardar</button>
+                        <button class="btn btn-outline btn-xs" (click)="cancelEdit()">Cancelar</button>
+                    </ng-container>
+                    <ng-container *ngIf="editing?.id !== p.id">
+                        <button class="btn-icon" (click)="startEdit(p)" title="Editar"><span
+                                class="icon icon-edit"></span></button>
+                    </ng-container>
+                </td>
+            </tr>
+            }
+            @if (products.length === 0) {
+            <tr>
+                <td [attr.colspan]="canUpdate ? 5 : 4" class="empty">No hay productos registrados</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

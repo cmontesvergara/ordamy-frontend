@@ -7,7 +7,7 @@
   <button class="tab" [class.active]="activeTab === 'categories'" (click)="activeTab = 'categories'">Categorías</button>
   <button class="tab" [class.active]="activeTab === 'suppliers'" (click)="activeTab = 'suppliers'">Proveedores</button>
   <button class="tab" [class.active]="activeTab === 'tax'" (click)="activeTab = 'tax'">Impuestos</button>
-  <button class="tab" [class.active]="activeTab === 'products'" (click)="activeTab = 'products'">Productos</button>
+
   <button class="tab" [class.active]="activeTab === 'financial'" (click)="activeTab = 'financial'">Financiero</button>
 </div>
 
@@ -261,65 +261,5 @@
     <div class="form-actions">
       <button class="btn btn-primary" (click)="saveFinancial()">Guardar</button>
     </div>
-  </div>
-</div>
-
-<!-- Products -->
-<div *ngIf="activeTab === 'products'">
-  <div class="inline-form">
-    <input [(ngModel)]="newProduct.name" placeholder="Nombre del producto *" />
-    <input [(ngModel)]="newProduct.description" placeholder="Descripción" />
-    <input type="number" [(ngModel)]="newProduct.basePrice" placeholder="Precio base" class="w-120" />
-    <input [(ngModel)]="newProduct.unit" placeholder="Unidad (ej: m², unidad)" class="w-120" />
-    <button class="btn btn-primary btn-sm" (click)="addProduct()" [disabled]="!newProduct.name">Agregar</button>
-  </div>
-  <div class="card">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th class="text-right">Precio base</th>
-          <th>Unidad</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (p of products; track p.id) {
-        <tr>
-          <td>
-            <input *ngIf="editing?.id === p.id && editing?.type === 'product'" [(ngModel)]="editing.data.name"
-              class="edit-input" />
-            <strong *ngIf="editing?.id !== p.id || editing?.type !== 'product'">{{ p.name }}</strong>
-          </td>
-          <td>
-            <input *ngIf="editing?.id === p.id && editing?.type === 'product'" [(ngModel)]="editing.data.description"
-              class="edit-input" />
-            <span *ngIf="editing?.id !== p.id || editing?.type !== 'product'">{{ p.description || '—' }}</span>
-          </td>
-          <td class="text-right">
-            <input *ngIf="editing?.id === p.id && editing?.type === 'product'" type="number"
-              [(ngModel)]="editing.data.basePrice" class="edit-input w-100" />
-            <span *ngIf="editing?.id !== p.id || editing?.type !== 'product'">{{ p.basePrice | number:'1.0-0' }}</span>
-          </td>
-          <td>
-            <input *ngIf="editing?.id === p.id && editing?.type === 'product'" [(ngModel)]="editing.data.unit"
-              class="edit-input w-80" />
-            <span *ngIf="editing?.id !== p.id || editing?.type !== 'product'">{{ p.unit || '—' }}</span>
-          </td>
-          <td class="text-center actions-cell">
-            <ng-container *ngIf="editing?.id === p.id && editing?.type === 'product'">
-              <button class="btn btn-primary btn-xs" (click)="saveEdit('product')">Guardar</button>
-              <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
-            </ng-container>
-            <ng-container *ngIf="editing?.id !== p.id || editing?.type !== 'product'">
-              <button class="btn-icon" (click)="startEdit('product', p)" title="Editar"><span
-                  class="icon icon-edit"></span></button>
-            </ng-container>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
   </div>
 </div>

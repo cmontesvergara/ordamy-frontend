@@ -16,9 +16,9 @@
           <input type="text" [(ngModel)]="customerSearch" (input)="searchCustomers()" placeholder="Nombre o NIT..." />
           <div class="dropdown" *ngIf="customerResults.length > 0">
             @for (c of customerResults; track c.id) {
-              <div class="dropdown-item" (click)="selectCustomer(c)">
-                <strong>{{ c.name }}</strong> <span>{{ c.identification }}</span>
-              </div>
+            <div class="dropdown-item" (click)="selectCustomer(c)">
+              <strong>{{ c.name }}</strong> <span>{{ c.identification }}</span>
+            </div>
             }
           </div>
         </div>
@@ -36,17 +36,23 @@
     <div class="card section">
       <div class="section-header">
         <h3>Items</h3>
-        <button class="btn btn-outline btn-sm" (click)="addItem()">+ Item</button>
+        <div class="section-actions">
+          <button class="btn btn-outline btn-sm" (click)="openProductPicker()">📦 Productos</button>
+          <button class="btn btn-outline btn-sm" (click)="addItem()">+ Item libre</button>
+        </div>
       </div>
       <div class="items-list">
         @for (item of items; track $index; let i = $index) {
-          <div class="item-row">
-            <input type="text" [(ngModel)]="item.description" placeholder="Descripción *" class="flex-2" />
-            <input type="number" [(ngModel)]="item.quantity" min="1" placeholder="Cant." class="w-80" />
-            <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120" />
-            <span class="item-total">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
-            <button class="btn-icon" (click)="removeItem(i)" *ngIf="items.length > 1"><span class="icon icon-delete"></span></button>
-          </div>
+        <div class="item-row" [class.locked-item]="!!item.productId">
+          <input type="text" [(ngModel)]="item.description" placeholder="Descripción *" class="flex-2"
+            [readonly]="!!item.productId" />
+          <input type="number" [(ngModel)]="item.quantity" min="1" placeholder="Cant." class="w-80" />
+          <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120"
+            [readonly]="!!item.productId" />
+          <span class="item-total">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
+          <button class="btn-icon" (click)="removeItem(i)" *ngIf="items.length > 1"><span
+              class="icon icon-delete"></span></button>
+        </div>
         }
       </div>
     </div>
@@ -84,7 +90,8 @@
 
     <div class="form-actions">
       <button class="btn btn-outline" (click)="cancel()">Cancelar</button>
-      <button class="btn btn-primary" (click)="createOrder()" [disabled]="saving || !selectedCustomer || items.length === 0">
+      <button class="btn btn-primary" (click)="createOrder()"
+        [disabled]="saving || !selectedCustomer || items.length === 0">
         {{ saving ? 'Guardando...' : 'Crear Orden' }}
       </button>
     </div>
@@ -125,9 +132,42 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" (click)="showCreateCustomer = false">Cancelar</button>
-      <button class="btn btn-primary" (click)="saveNewCustomer()" [disabled]="savingCustomer || !newCustomer.identification || !newCustomer.name">
+      <button class="btn btn-primary" (click)="saveNewCustomer()"
+        [disabled]="savingCustomer || !newCustomer.identification || !newCustomer.name">
         {{ savingCustomer ? 'Guardando...' : 'Crear y Seleccionar' }}
       </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Product Picker Modal -->
+<div class="modal-overlay" *ngIf="showProductPicker" (click)="showProductPicker = false">
+  <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Seleccionar Producto</h3>
+      <button class="btn-close" (click)="showProductPicker = false">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" [(ngModel)]="productSearch" (input)="searchProducts()" placeholder="Buscar producto..."
+        class="full-width" autofocus />
+      <div class="product-list">
+        @for (p of productResults; track p.id) {
+        <div class="product-item" (click)="addProductItem(p)">
+          <div class="product-info">
+            <strong>{{ p.name }}</strong>
+            <span class="product-desc" *ngIf="p.description">{{ p.description }}</span>
+          </div>
+          <div class="product-meta">
+            <span class="product-price">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
+            <span class="product-unit" *ngIf="p.unit">/ {{ p.unit }}</span>
+          </div>
+        </div>
+        }
+        @if (productResults.length === 0) {
+        <p class="empty">No se encontraron productos</p>
+        }
+      </div>
     </div>
   </div>
 </div>

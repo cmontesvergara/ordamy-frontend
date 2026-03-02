@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { OrderService } from '../../../core/services/order/order.service';
 import { CustomerService } from '../../../core/services/customer/customer.service';
 import { SettingsService } from '../../../core/services/settings/settings.service';
+import { ProductService } from '../../../core/services/product/product.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 
@@ -36,6 +37,12 @@ export class OrderCreateComponent implements OnInit {
   saving = false;
   searchTimeout: any;
 
+  // Product picker
+  showProductPicker = false;
+  productSearch = '';
+  productResults: any[] = [];
+  productSearchTimeout: any;
+
   // O3: Inline customer creation
   showCreateCustomer = false;
   savingCustomer = false;
@@ -51,6 +58,7 @@ export class OrderCreateComponent implements OnInit {
     private orderService: OrderService,
     private customerService: CustomerService,
     private settingsService: SettingsService,
+    private productService: ProductService,
     private authService: AuthService,
     public config: AppConfigService,
   ) { }
@@ -94,6 +102,35 @@ export class OrderCreateComponent implements OnInit {
 
   removeItem(i: number) {
     this.items.splice(i, 1);
+  }
+
+  // Product picker
+  openProductPicker() {
+    this.showProductPicker = true;
+    this.productSearch = '';
+    this.productResults = [];
+    this.searchProductsNow();
+  }
+
+  searchProducts() {
+    clearTimeout(this.productSearchTimeout);
+    this.productSearchTimeout = setTimeout(() => this.searchProductsNow(), 300);
+  }
+
+  searchProductsNow() {
+    this.productService.list(this.productSearch || undefined).subscribe({
+      next: (res: any) => { this.productResults = res.data; },
+    });
+  }
+
+  addProductItem(product: any) {
+    this.items.push({
+      description: product.name + (product.description ? ' — ' + product.description : ''),
+      quantity: 1,
+      unitPrice: parseFloat(product.basePrice) || 0,
+      productId: product.id,
+    });
+    this.showProductPicker = false;
   }
 
   cancel() {

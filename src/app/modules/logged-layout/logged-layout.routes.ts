@@ -68,6 +68,12 @@ export const LOGGED_ROUTES: Routes = [
                 canActivate: [hasPermissionGuard('reports', 'read')],
             },
             {
+                path: 'products',
+                loadComponent: () =>
+                    import('../products/products.component').then((m) => m.ProductsComponent),
+                canActivate: [hasPermissionGuard('products', 'read')],
+            },
+            {
                 path: 'settings',
                 loadComponent: () =>
                     import('../settings/settings.component').then((m) => m.SettingsComponent),
