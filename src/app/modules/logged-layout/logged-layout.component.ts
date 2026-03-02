@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { environment } from '../../../environments/environment';
+import { filter } from 'rxjs/operators';
 
 interface MenuItem {
   label: string;
@@ -54,6 +55,17 @@ export class LoggedLayoutComponent implements OnInit {
       },
     });
     this.appConfig.load();
+
+    // Update page title on navigation
+    this.updatePageTitle(this.router.url);
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+    ).subscribe(e => this.updatePageTitle(e.urlAfterRedirects || e.url));
+  }
+
+  private updatePageTitle(url: string) {
+    const match = this.menuItems.find(m => url === m.route || url.startsWith(m.route + '/'));
+    this.currentPageTitle = match?.label || 'Estadísticas';
   }
 
   logout() {
