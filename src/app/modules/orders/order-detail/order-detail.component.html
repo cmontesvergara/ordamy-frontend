@@ -260,23 +260,32 @@
   </div>
 
   <!-- Status History Timeline -->
-  <div class="card section no-print" *ngIf="order.statusHistory?.length > 0">
+  <div class="card section no-print" *ngIf="order.events?.length > 0">
     <div class="section-header clickable" (click)="historyOpen = !historyOpen">
-      <h3>Historial de cambios ({{ order.statusHistory.length }})</h3>
+      <h3>Historial de Movimientos ({{ order.events.length }})</h3>
       <span class="toggle-icon">{{ historyOpen ? '▲' : '▼' }}</span>
     </div>
     <div class="timeline" *ngIf="historyOpen">
-      @for (h of order.statusHistory; track h.id) {
+      @for (e of order.events; track e.id) {
       <div class="timeline-item">
-        <div class="timeline-dot" [class.cancelled]="h.toStatus === 'CANCELLED'"
-          [class.completed]="h.toStatus === 'COMPLETED'"></div>
+        <div class="timeline-dot" [class.cancelled]="e.toStatus === 'CANCELLED' || e.type === 'PAYMENT_DELETED'"
+          [class.completed]="e.toStatus === 'COMPLETED'" [class.payment]="e.type === 'PAYMENT_ADDED'"></div>
         <div class="timeline-content">
-          <span class="timeline-date">{{ h.createdAt | date:'dd/MM/yyyy HH:mm':config.timezone }}</span>
+          <span class="timeline-date">{{ e.createdAt | date:'dd/MM/yyyy HH:mm':config.timezone }} por <strong>{{
+              e.changedByName }}</strong></span>
           <span class="timeline-change">
-            <span class="badge badge-sm">{{ h.fromStatus || '—' }}</span> → <span class="badge badge-sm">{{ h.toStatus
-              }}</span>
+            <span *ngIf="e.type === 'STATUS_CHANGE'">
+              <span class="badge badge-sm">{{ e.fromStatus || '—' }}</span> → <span class="badge badge-sm">{{ e.toStatus
+                }}</span>
+            </span>
+            <span *ngIf="e.type === 'PAYMENT_ADDED'" class="text-success fw-bold">
+              💰 Abono Registrado
+            </span>
+            <span *ngIf="e.type === 'PAYMENT_DELETED'" class="text-danger fw-bold">
+              🚫 Abono Eliminado
+            </span>
           </span>
-          <span class="timeline-reason" *ngIf="h.reason">{{ h.reason }}</span>
+          <span class="timeline-reason" *ngIf="e.description">{{ e.description }}</span>
         </div>
       </div>
       }

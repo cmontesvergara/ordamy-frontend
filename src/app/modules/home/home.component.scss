@@ -1,0 +1,46 @@
+.home-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding: 2rem;
+    background-color: var(--background, #f8fafc);
+}
+
+.brand-content {
+    text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.tenant-name {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 800;
+    color: var(--foreground, #0f172a);
+    letter-spacing: -0.05em;
+    margin: 0;
+    line-height: 1.1;
+    text-transform: capitalize;
+}
+
+.by-ordamy {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    font-weight: 500;
+    color: var(--text-muted, #64748b);
+    margin-top: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    opacity: 0.8;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -459,6 +459,10 @@
     &.completed {
         background: hsl(142, 60%, 45%);
     }
+
+    &.payment {
+        background: hsl(45, 93%, 47%);
+    }
 }
 
 .timeline-content {

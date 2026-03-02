@@ -7,7 +7,12 @@ export const LOGGED_ROUTES: Routes = [
         path: '',
         component: LoggedLayoutComponent,
         children: [
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            { path: '', redirectTo: 'home', pathMatch: 'full' },
+            {
+                path: 'home',
+                loadComponent: () =>
+                    import('../home/home.component').then((m) => m.HomeComponent),
+            },
             {
                 path: 'dashboard',
                 loadComponent: () =>
