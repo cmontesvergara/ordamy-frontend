@@ -48,10 +48,10 @@
         <tr class="clickable" [routerLink]="['/orders', o.id]">
           <td class="mono">{{ o.number }}</td>
           <td><strong>{{ o.customer?.name }}</strong></td>
-          <td>{{ o.orderDate | date:'dd/MM/yyyy' }}</td>
+          <td>{{ o.orderDate | date:'dd/MM/yyyy':config.timezone }}</td>
           <td class="text-muted">{{ o.sellerName }}</td>
-          <td class="text-right">$ {{ o.total | number:'1.0-0' }}</td>
-          <td class="text-right" [class.debt]="o.balance > 0">$ {{ o.balance | number:'1.0-0' }}</td>
+          <td class="text-right">{{ config.currency }} {{ o.total | number:'1.0-0' }}</td>
+          <td class="text-right" [class.debt]="o.balance > 0">{{ config.currency }} {{ o.balance | number:'1.0-0' }}</td>
           <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
           <td><span class="badge op-{{ o.operationalStatus }}">{{ operationalLabels[o.operationalStatus] || '—' }}</span></td>
           <td>{{ o._count?.items || 0 }}</td>

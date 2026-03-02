@@ -44,7 +44,7 @@
             <input type="text" [(ngModel)]="item.description" placeholder="Descripción *" class="flex-2" />
             <input type="number" [(ngModel)]="item.quantity" min="1" placeholder="Cant." class="w-80" />
             <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120" />
-            <span class="item-total">$ {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
+            <span class="item-total">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
             <button class="btn-icon" (click)="removeItem(i)" *ngIf="items.length > 1"><span class="icon icon-delete"></span></button>
           </div>
         }
@@ -76,9 +76,9 @@
         </div>
       </div>
       <div class="total-bar">
-        <span>Subtotal: $ {{ subtotal | number:'1.0-0' }}</span>
-        <span>Descuento: $ {{ discount | number:'1.0-0' }}</span>
-        <strong>Total: $ {{ subtotal - discount | number:'1.0-0' }}</strong>
+        <span>Subtotal: {{ config.currency }} {{ subtotal | number:'1.0-0' }}</span>
+        <span>Descuento: {{ config.currency }} {{ discount | number:'1.0-0' }}</span>
+        <strong>Total: {{ config.currency }} {{ subtotal - discount | number:'1.0-0' }}</strong>
       </div>
     </div>
 

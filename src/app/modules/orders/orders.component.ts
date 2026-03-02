@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { OrderService } from '../../core/services/order/order.service';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
   selector: 'app-orders',
@@ -42,6 +43,7 @@ export class OrdersComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private router: Router,
+    public config: AppConfigService,
   ) {
     // Close menu on outside click
     document.addEventListener('click', () => { this.openMenuId = null; });

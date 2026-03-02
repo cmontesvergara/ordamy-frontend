@@ -46,8 +46,10 @@
               <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
             </ng-container>
             <ng-container *ngIf="editing?.id !== m.id || editing?.type !== 'payment'">
-              <button class="btn-icon" (click)="startEdit('payment', m)" title="Editar"><span class="icon icon-edit"></span></button>
-              <button class="btn-icon danger" (click)="deleteItem('payment', m)" title="Eliminar"><span class="icon icon-delete"></span></button>
+              <button class="btn-icon" (click)="startEdit('payment', m)" title="Editar"><span
+                  class="icon icon-edit"></span></button>
+              <button class="btn-icon danger" (click)="deleteItem('payment', m)" title="Eliminar"><span
+                  class="icon icon-delete"></span></button>
             </ng-container>
           </td>
         </tr>
@@ -98,8 +100,10 @@
               <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
             </ng-container>
             <ng-container *ngIf="editing?.id !== c.id || editing?.type !== 'category'">
-              <button class="btn-icon" (click)="startEdit('category', c)" title="Editar"><span class="icon icon-edit"></span></button>
-              <button class="btn-icon danger" (click)="deleteItem('category', c)" title="Eliminar"><span class="icon icon-delete"></span></button>
+              <button class="btn-icon" (click)="startEdit('category', c)" title="Editar"><span
+                  class="icon icon-edit"></span></button>
+              <button class="btn-icon danger" (click)="deleteItem('category', c)" title="Eliminar"><span
+                  class="icon icon-delete"></span></button>
             </ng-container>
           </td>
         </tr>
@@ -150,8 +154,10 @@
               <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
             </ng-container>
             <ng-container *ngIf="editing?.id !== s.id || editing?.type !== 'supplier'">
-              <button class="btn-icon" (click)="startEdit('supplier', s)" title="Editar"><span class="icon icon-edit"></span></button>
-              <button class="btn-icon danger" (click)="deleteItem('supplier', s)" title="Eliminar"><span class="icon icon-delete"></span></button>
+              <button class="btn-icon" (click)="startEdit('supplier', s)" title="Editar"><span
+                  class="icon icon-edit"></span></button>
+              <button class="btn-icon danger" (click)="deleteItem('supplier', s)" title="Eliminar"><span
+                  class="icon icon-delete"></span></button>
             </ng-container>
           </td>
         </tr>
@@ -203,8 +209,10 @@
               <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
             </ng-container>
             <ng-container *ngIf="editing?.id !== t.id || editing?.type !== 'tax'">
-              <button class="btn-icon" (click)="startEdit('tax', t)" title="Editar"><span class="icon icon-edit"></span></button>
-              <button class="btn-icon danger" (click)="deleteItem('tax', t)" title="Eliminar"><span class="icon icon-delete"></span></button>
+              <button class="btn-icon" (click)="startEdit('tax', t)" title="Editar"><span
+                  class="icon icon-edit"></span></button>
+              <button class="btn-icon danger" (click)="deleteItem('tax', t)" title="Eliminar"><span
+                  class="icon icon-delete"></span></button>
             </ng-container>
           </td>
         </tr>
@@ -219,16 +227,26 @@
   <div class="card form-card" *ngIf="financialConfig">
     <div class="form-grid">
       <div class="form-group">
-        <label>Moneda</label>
-        <input [(ngModel)]="financialConfig.currency" />
+        <label>Símbolo de moneda</label>
+        <input [(ngModel)]="financialConfig.currency" placeholder="$" />
       </div>
       <div class="form-group">
         <label>Zona horaria</label>
-        <input [(ngModel)]="financialConfig.timezone" />
-      </div>
-      <div class="form-group">
-        <label>Días de gracia</label>
-        <input type="number" [(ngModel)]="financialConfig.graceDays" />
+        <select [(ngModel)]="financialConfig.timezone">
+          <option value="America/Bogota">Colombia (America/Bogota)</option>
+          <option value="America/Mexico_City">México Central (America/Mexico_City)</option>
+          <option value="America/Lima">Perú (America/Lima)</option>
+          <option value="America/Santiago">Chile (America/Santiago)</option>
+          <option value="America/Argentina/Buenos_Aires">Argentina (America/Buenos_Aires)</option>
+          <option value="America/Caracas">Venezuela (America/Caracas)</option>
+          <option value="America/Guayaquil">Ecuador (America/Guayaquil)</option>
+          <option value="America/Panama">Panamá (America/Panama)</option>
+          <option value="America/Costa_Rica">Costa Rica (America/Costa_Rica)</option>
+          <option value="America/New_York">US Eastern (America/New_York)</option>
+          <option value="America/Chicago">US Central (America/Chicago)</option>
+          <option value="America/Los_Angeles">US Pacific (America/Los_Angeles)</option>
+          <option value="Europe/Madrid">España (Europe/Madrid)</option>
+        </select>
       </div>
     </div>
     <div class="form-actions">

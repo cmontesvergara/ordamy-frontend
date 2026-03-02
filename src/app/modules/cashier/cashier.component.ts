@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/services/account/account.service';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
     selector: 'app-cashier',
@@ -17,7 +18,7 @@ export class CashierComponent implements OnInit {
     dateFrom = '';
     dateTo = '';
 
-    constructor(private accountService: AccountService) { }
+    constructor(private accountService: AccountService, public config: AppConfigService) { }
 
     ngOnInit() {
         this.accountService.list().subscribe({

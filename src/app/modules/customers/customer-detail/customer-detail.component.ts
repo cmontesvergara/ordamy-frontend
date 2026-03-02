@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CustomerService } from '../../../core/services/customer/customer.service';
+import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 
 @Component({
   selector: 'app-customer-detail',
@@ -45,6 +46,7 @@ export class CustomerDetailComponent implements OnInit {
     private router: Router,
     private customerService: CustomerService,
     private el: ElementRef,
+    public config: AppConfigService,
   ) { }
 
   @HostListener('document:click', ['$event'])

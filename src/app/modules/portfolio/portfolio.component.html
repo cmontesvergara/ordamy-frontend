@@ -45,7 +45,7 @@
 <div class="summary-bar" *ngIf="totalDebt > 0">
   <div class="summary-left">
     <span>Total cartera pendiente:</span>
-    <strong>$ {{ totalDebt | number:'1.0-0' }}</strong>
+    <strong>{{ config.currency }} {{ totalDebt | number:'1.0-0' }}</strong>
   </div>
   <span class="summary-count">{{ orders.length }} {{ orders.length === 1 ? 'orden' : 'órdenes' }}</span>
 </div>
@@ -54,7 +54,7 @@
 <div class="card" id="portfolio-print-area">
   <div class="print-header">
     <h2>Reporte de Cartera</h2>
-    <p>Generado: {{ today | date:'dd/MM/yyyy HH:mm' }}</p>
+    <p>Generado: {{ today | date:'dd/MM/yyyy HH:mm':config.timezone }}</p>
     <p *ngIf="selectedCustomer">Cliente: {{ selectedCustomer.name }} ({{ selectedCustomer.identification }})</p>
     <p *ngIf="dateFrom || dateTo">Período: {{ dateFrom || '...' }} — {{ dateTo || '...' }}</p>
   </div>
@@ -78,11 +78,11 @@
         <tr [class.overdue]="o.daysOverdue > 0">
           <td class="mono"><a class="link" [routerLink]="['/orders', o.id]">{{ o.number }}</a></td>
           <td><a class="link-name" [routerLink]="['/customers', o.customer?.id]"><strong>{{ o.customer?.name }}</strong></a></td>
-          <td>{{ o.orderDate | date:'dd/MM/yyyy' }}</td>
+          <td>{{ o.orderDate | date:'dd/MM/yyyy':config.timezone }}</td>
           <td class="text-muted">{{ o.sellerName }}</td>
-          <td>{{ o.dueDate ? (o.dueDate | date:'dd/MM/yyyy') : '—' }}</td>
-          <td class="text-right">$ {{ o.total | number:'1.0-0' }}</td>
-          <td class="text-right debt">$ {{ o.balance | number:'1.0-0' }}</td>
+          <td>{{ o.dueDate ? (o.dueDate | date:'dd/MM/yyyy':config.timezone) : '—' }}</td>
+          <td class="text-right">{{ config.currency }} {{ o.total | number:'1.0-0' }}</td>
+          <td class="text-right debt">{{ config.currency }} {{ o.balance | number:'1.0-0' }}</td>
           <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
           <td class="no-print">
             <span class="badge" [class.overdue-badge]="o.daysOverdue > 0" [class.ok-badge]="o.daysOverdue <= 0">
@@ -99,7 +99,7 @@
       <tr class="total-row">
         <td colspan="5"></td>
         <td class="text-right"><strong>Total:</strong></td>
-        <td class="text-right debt"><strong>$ {{ totalDebt | number:'1.0-0' }}</strong></td>
+        <td class="text-right debt"><strong>{{ config.currency }} {{ totalDebt | number:'1.0-0' }}</strong></td>
         <td colspan="2"></td>
       </tr>
     </tfoot>

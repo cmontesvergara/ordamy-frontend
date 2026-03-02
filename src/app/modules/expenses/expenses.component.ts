@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../core/services/expense/expense.service';
 import { SettingsService } from '../../core/services/settings/settings.service';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
   selector: 'app-expenses',
@@ -37,6 +38,7 @@ export class ExpensesComponent implements OnInit {
   constructor(
     private expenseService: ExpenseService,
     private settingsService: SettingsService,
+    public config: AppConfigService,
   ) { }
 
   ngOnInit() {

@@ -9,15 +9,15 @@
           {{ data.salesChange >= 0 ? '↑' : '↓' }} {{ data.salesChange | number:'1.0-1' }}%
         </span>
       </div>
-      <span class="kpi-value">$ {{ data.profitThisMonth | number:'1.0-0' }}</span>
-      <span class="kpi-sub">Ventas: $ {{ data.salesThisMonth | number:'1.0-0' }} — Gastos: $ {{ data.expensesThisMonth |
+      <span class="kpi-value">{{ config.currency }} {{ data.profitThisMonth | number:'1.0-0' }}</span>
+      <span class="kpi-sub">Ventas: {{ config.currency }} {{ data.salesThisMonth | number:'1.0-0' }} — Gastos: {{ config.currency }} {{ data.expensesThisMonth |
         number:'1.0-0' }}</span>
     </div>
 
     <div class="kpi">
       <div class="kpi-header"><span class="kpi-label">Ventas este mes</span></div>
-      <span class="kpi-value green">$ {{ data.salesThisMonth | number:'1.0-0' }}</span>
-      <span class="kpi-sub">Mes anterior: $ {{ data.salesLastMonth | number:'1.0-0' }}</span>
+      <span class="kpi-value green">{{ config.currency }} {{ data.salesThisMonth | number:'1.0-0' }}</span>
+      <span class="kpi-sub">Mes anterior: {{ config.currency }} {{ data.salesLastMonth | number:'1.0-0' }}</span>
     </div>
 
     <div class="kpi">
@@ -28,8 +28,8 @@
           {{ data.expensesChange >= 0 ? '↑' : '↓' }} {{ data.expensesChange | number:'1.0-1' }}%
         </span>
       </div>
-      <span class="kpi-value red">$ {{ data.expensesThisMonth | number:'1.0-0' }}</span>
-      <span class="kpi-sub">Mes anterior: $ {{ data.expensesLastMonth | number:'1.0-0' }}</span>
+      <span class="kpi-value red">{{ config.currency }} {{ data.expensesThisMonth | number:'1.0-0' }}</span>
+      <span class="kpi-sub">Mes anterior: {{ config.currency }} {{ data.expensesLastMonth | number:'1.0-0' }}</span>
     </div>
 
     <div class="kpi">
@@ -39,7 +39,7 @@
 
     <div class="kpi">
       <div class="kpi-header"><span class="kpi-label">Cartera pendiente</span></div>
-      <span class="kpi-value amber">$ {{ data.portfolioBalance | number:'1.0-0' }}</span>
+      <span class="kpi-value amber">{{ config.currency }} {{ data.portfolioBalance | number:'1.0-0' }}</span>
     </div>
 
     <div class="kpi">
@@ -78,7 +78,7 @@
           @for (c of data.topClientsBySales; track c.id) {
           <tr>
             <td><strong>{{ c.name }}</strong></td>
-            <td class="text-right">$ {{ c.totalSales | number:'1.0-0' }}</td>
+            <td class="text-right">{{ config.currency }} {{ c.totalSales | number:'1.0-0' }}</td>
             <td class="text-right">{{ c.orderCount }}</td>
           </tr>
           }
@@ -106,7 +106,7 @@
           @for (c of data.topClientsWithDebt; track c.id) {
           <tr>
             <td><strong>{{ c.name }}</strong></td>
-            <td class="text-right debt">$ {{ c.totalDebt | number:'1.0-0' }}</td>
+            <td class="text-right debt">{{ config.currency }} {{ c.totalDebt | number:'1.0-0' }}</td>
             <td class="text-right">{{ c.orderCount }}</td>
           </tr>
           }
@@ -136,7 +136,7 @@
           @for (e of data.expensesByCategory; track e.categoryName) {
           <tr>
             <td>{{ e.categoryName }}</td>
-            <td class="text-right">$ {{ e.total | number:'1.0-0' }}</td>
+            <td class="text-right">{{ config.currency }} {{ e.total | number:'1.0-0' }}</td>
             <td class="text-right">{{ e.count }}</td>
           </tr>
           }
@@ -163,14 +163,14 @@
           @for (a of data.accounts; track a.id) {
           <tr>
             <td>{{ a.name }}</td>
-            <td class="text-right">$ {{ a.balance | number:'1.0-0' }}</td>
+            <td class="text-right">{{ config.currency }} {{ a.balance | number:'1.0-0' }}</td>
           </tr>
           }
         </tbody>
         <tfoot>
           <tr class="total-row">
             <td><strong>Total</strong></td>
-            <td class="text-right"><strong>$ {{ accountsTotal | number:'1.0-0' }}</strong></td>
+            <td class="text-right"><strong>{{ config.currency }} {{ accountsTotal | number:'1.0-0' }}</strong></td>
           </tr>
         </tfoot>
       </table>

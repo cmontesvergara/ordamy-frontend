@@ -20,15 +20,15 @@
     <div class="kpi-row">
       <div class="kpi-card income-card">
         <span class="kpi-label">Ingresos</span>
-        <span class="kpi-value">$ {{ dailyData.totalIncome | number:'1.0-0' }}</span>
+        <span class="kpi-value">{{ config.currency }} {{ dailyData.totalIncome | number:'1.0-0' }}</span>
       </div>
       <div class="kpi-card expense-card">
         <span class="kpi-label">Egresos</span>
-        <span class="kpi-value">$ {{ dailyData.totalExpense | number:'1.0-0' }}</span>
+        <span class="kpi-value">{{ config.currency }} {{ dailyData.totalExpense | number:'1.0-0' }}</span>
       </div>
       <div class="kpi-card net-card">
         <span class="kpi-label">Neto</span>
-        <span class="kpi-value">$ {{ dailyData.net | number:'1.0-0' }}</span>
+        <span class="kpi-value">{{ config.currency }} {{ dailyData.net | number:'1.0-0' }}</span>
       </div>
       <div class="kpi-card orders-card">
         <span class="kpi-label">Órdenes creadas</span>
@@ -46,11 +46,11 @@
             <tr>
               <td><strong>{{ m.method }}</strong></td>
               <td class="text-right">{{ m.count }}</td>
-              <td class="text-right text-green">$ {{ m.total | number:'1.0-0' }}</td>
+              <td class="text-right text-green">{{ config.currency }} {{ m.total | number:'1.0-0' }}</td>
             </tr>
           }
         </tbody>
-        <tfoot><tr class="total-row"><td><strong>Total</strong></td><td></td><td class="text-right"><strong>$ {{ dailyData.totalIncome | number:'1.0-0' }}</strong></td></tr></tfoot>
+        <tfoot><tr class="total-row"><td><strong>Total</strong></td><td></td><td class="text-right"><strong>{{ config.currency }} {{ dailyData.totalIncome | number:'1.0-0' }}</strong></td></tr></tfoot>
       </table>
     </div>
 
@@ -64,11 +64,11 @@
             <tr>
               <td><strong>{{ m.method }}</strong></td>
               <td class="text-right">{{ m.count }}</td>
-              <td class="text-right text-red">$ {{ m.total | number:'1.0-0' }}</td>
+              <td class="text-right text-red">{{ config.currency }} {{ m.total | number:'1.0-0' }}</td>
             </tr>
           }
         </tbody>
-        <tfoot><tr class="total-row"><td><strong>Total</strong></td><td></td><td class="text-right"><strong>$ {{ dailyData.totalExpense | number:'1.0-0' }}</strong></td></tr></tfoot>
+        <tfoot><tr class="total-row"><td><strong>Total</strong></td><td></td><td class="text-right"><strong>{{ config.currency }} {{ dailyData.totalExpense | number:'1.0-0' }}</strong></td></tr></tfoot>
       </table>
     </div>
 
@@ -83,7 +83,7 @@
               <td class="mono">{{ p.order?.number }}</td>
               <td>{{ p.order?.customer?.name }}</td>
               <td>{{ p.paymentMethod?.name }}</td>
-              <td class="text-right">$ {{ p.amount | number:'1.0-0' }}</td>
+              <td class="text-right">{{ config.currency }} {{ p.amount | number:'1.0-0' }}</td>
             </tr>
           }
           @if (dailyData.payments?.length === 0) {
@@ -105,7 +105,7 @@
               <td>{{ e.description }}</td>
               <td>{{ e.category?.name || '—' }}</td>
               <td>{{ e.paymentMethod?.name || '—' }}</td>
-              <td class="text-right text-red">$ {{ e.amount | number:'1.0-0' }}</td>
+              <td class="text-right text-red">{{ config.currency }} {{ e.amount | number:'1.0-0' }}</td>
             </tr>
           }
           @if (dailyData.expenses?.length === 0) {
@@ -137,19 +137,19 @@
     <div class="kpi-row">
       <div class="kpi-card income-card">
         <span class="kpi-label">Ingresos</span>
-        <span class="kpi-value">$ {{ monthlyData.totalIncome | number:'1.0-0' }}</span>
+        <span class="kpi-value">{{ config.currency }} {{ monthlyData.totalIncome | number:'1.0-0' }}</span>
       </div>
       <div class="kpi-card expense-card">
         <span class="kpi-label">Egresos</span>
-        <span class="kpi-value">$ {{ monthlyData.totalExpenses | number:'1.0-0' }}</span>
+        <span class="kpi-value">{{ config.currency }} {{ monthlyData.totalExpenses | number:'1.0-0' }}</span>
       </div>
       <div class="kpi-card net-card">
         <span class="kpi-label">Neto</span>
-        <span class="kpi-value">$ {{ monthlyData.netIncome | number:'1.0-0' }}</span>
+        <span class="kpi-value">{{ config.currency }} {{ monthlyData.netIncome | number:'1.0-0' }}</span>
       </div>
       <div class="kpi-card orders-card">
         <span class="kpi-label">Órdenes</span>
-        <span class="kpi-value">{{ monthlyData.ordersSummary?.count }} ($ {{ monthlyData.ordersSummary?.total | number:'1.0-0' }})</span>
+        <span class="kpi-value">{{ monthlyData.ordersSummary?.count }} ({{ config.currency }} {{ monthlyData.ordersSummary?.total | number:'1.0-0' }})</span>
       </div>
     </div>
 
@@ -163,11 +163,11 @@
             <tr>
               <td><strong>{{ m.name }}</strong></td>
               <td class="text-right">{{ m.count }}</td>
-              <td class="text-right text-green">$ {{ m.total | number:'1.0-0' }}</td>
+              <td class="text-right text-green">{{ config.currency }} {{ m.total | number:'1.0-0' }}</td>
             </tr>
           }
         </tbody>
-        <tfoot><tr class="total-row"><td><strong>Total</strong></td><td></td><td class="text-right"><strong>$ {{ monthlyData.totalIncome | number:'1.0-0' }}</strong></td></tr></tfoot>
+        <tfoot><tr class="total-row"><td><strong>Total</strong></td><td></td><td class="text-right"><strong>{{ config.currency }} {{ monthlyData.totalIncome | number:'1.0-0' }}</strong></td></tr></tfoot>
       </table>
     </div>
 
@@ -181,11 +181,11 @@
             <tr>
               <td><strong>{{ m.name }}</strong></td>
               <td class="text-right">{{ m.count }}</td>
-              <td class="text-right text-red">$ {{ m.total | number:'1.0-0' }}</td>
+              <td class="text-right text-red">{{ config.currency }} {{ m.total | number:'1.0-0' }}</td>
             </tr>
           }
         </tbody>
-        <tfoot><tr class="total-row"><td><strong>Total</strong></td><td></td><td class="text-right"><strong>$ {{ monthlyData.totalExpenses | number:'1.0-0' }}</strong></td></tr></tfoot>
+        <tfoot><tr class="total-row"><td><strong>Total</strong></td><td></td><td class="text-right"><strong>{{ config.currency }} {{ monthlyData.totalExpenses | number:'1.0-0' }}</strong></td></tr></tfoot>
       </table>
     </div>
 
@@ -199,7 +199,7 @@
             <tr>
               <td><strong>{{ c.name }}</strong></td>
               <td class="text-right">{{ c.count }}</td>
-              <td class="text-right">$ {{ c.total | number:'1.0-0' }}</td>
+              <td class="text-right">{{ config.currency }} {{ c.total | number:'1.0-0' }}</td>
             </tr>
           }
         </tbody>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportService } from '../../core/services/report/report.service';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
   selector: 'app-reports',
@@ -28,7 +29,7 @@ export class ReportsComponent implements OnInit {
 
   years = [2024, 2025, 2026];
 
-  constructor(private reportService: ReportService) { }
+  constructor(private reportService: ReportService, public config: AppConfigService) { }
 
   ngOnInit() {
     this.dailyDate = new Date().toISOString().split('T')[0];

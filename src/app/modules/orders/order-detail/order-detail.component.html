@@ -34,8 +34,8 @@
     <h2>{{ printMode === 'production' ? 'Orden de Producción' : 'Orden de Servicio' }}</h2>
     <div class="print-meta">
       <span><strong>Orden #{{ order.number }}</strong></span>
-      <span>Fecha: {{ order.orderDate | date:'dd/MM/yyyy' }}</span>
-      <span *ngIf="order.dueDate">Vence: {{ order.dueDate | date:'dd/MM/yyyy' }}</span>
+      <span>Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</span>
+      <span *ngIf="order.dueDate">Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</span>
     </div>
   </div>
 
@@ -79,18 +79,18 @@
     </div>
     <div class="info-card" [class.hide-on-production]="printMode === 'production'">
       <h4>Resumen</h4>
-      <div class="summary-row"><span>Subtotal</span><span>$ {{ order.subtotal | number:'1.0-0' }}</span></div>
-      <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>$ {{ order.taxAmount | number:'1.0-0'
+      <div class="summary-row"><span>Subtotal</span><span>{{ config.currency }} {{ order.subtotal | number:'1.0-0' }}</span></div>
+      <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>{{ config.currency }} {{ order.taxAmount | number:'1.0-0'
           }}</span></div>
-      <div class="summary-row" *ngIf="order.discount > 0"><span>Descuento</span><span>-$ {{ order.discount |
+      <div class="summary-row" *ngIf="order.discount > 0"><span>Descuento</span><span>-{{ config.currency }} {{ order.discount |
           number:'1.0-0' }}</span></div>
-      <div class="summary-row total"><span>Total</span><span>$ {{ order.total | number:'1.0-0' }}</span></div>
-      <div class="summary-row balance"><span>Saldo</span><span>$ {{ order.balance | number:'1.0-0' }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>{{ config.currency }} {{ order.total | number:'1.0-0' }}</span></div>
+      <div class="summary-row balance"><span>Saldo</span><span>{{ config.currency }} {{ order.balance | number:'1.0-0' }}</span></div>
     </div>
     <div class="info-card">
       <h4>Detalles</h4>
-      <p class="sub">Fecha: {{ order.orderDate | date:'dd/MM/yyyy' }}</p>
-      <p class="sub" *ngIf="order.dueDate">Vence: {{ order.dueDate | date:'dd/MM/yyyy' }}</p>
+      <p class="sub">Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</p>
+      <p class="sub" *ngIf="order.dueDate">Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</p>
       <p class="sub">Vendedor: {{ order.sellerName }}</p>
       <p class="sub" *ngIf="order.notes">Notas: {{ order.notes }}</p>
     </div>
@@ -130,7 +130,7 @@
                 (input)="recalcEditTotals()" /></td>
             <td><input type="number" [(ngModel)]="item.unitPrice" min="0" class="input-full text-right"
                 (input)="recalcEditTotals()" /></td>
-            <td class="text-right">$ {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
+            <td class="text-right">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
             <td class="text-center">
               <button class="btn-icon danger" (click)="removeEditItem(i)" title="Eliminar"><span
                   class="icon icon-close"></span></button>
@@ -141,7 +141,7 @@
         <tfoot>
           <tr>
             <td colspan="3" class="text-right"><strong>Subtotal</strong></td>
-            <td class="text-right"><strong>$ {{ editSubtotal | number:'1.0-0' }}</strong></td>
+            <td class="text-right"><strong>{{ config.currency }} {{ editSubtotal | number:'1.0-0' }}</strong></td>
             <td></td>
           </tr>
         </tfoot>
@@ -176,8 +176,8 @@
           <td>{{ item.description }}</td>
           <td>{{ item.product?.name || '—' }}</td>
           <td class="text-right">{{ item.quantity }}</td>
-          <td class="text-right hide-on-production">$ {{ item.unitPrice | number:'1.0-0' }}</td>
-          <td class="text-right hide-on-production">$ {{ item.lineTotal | number:'1.0-0' }}</td>
+          <td class="text-right hide-on-production">{{ config.currency }} {{ item.unitPrice | number:'1.0-0' }}</td>
+          <td class="text-right hide-on-production">{{ config.currency }} {{ item.lineTotal | number:'1.0-0' }}</td>
         </tr>
         }
       </tbody>
@@ -222,9 +222,9 @@
       <tbody>
         @for (p of order.payments; track p.id) {
         <tr>
-          <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm':config.timezone }}</td>
           <td>{{ p.paymentMethod?.name }}</td>
-          <td class="text-right">$ {{ p.amount | number:'1.0-0' }}</td>
+          <td class="text-right">{{ config.currency }} {{ p.amount | number:'1.0-0' }}</td>
           <td>{{ p.notes || '—' }}</td>
           <td class="text-center no-print" *ngIf="order.status !== 'CANCELLED'">
             <button class="btn-icon" title="Editar" (click)="startEditPayment(p)"><span
@@ -259,7 +259,7 @@
     <div class="signature-line">
       <span>Firma del cliente</span>
     </div>
-    <p class="print-note">Documento generado el {{ today | date:'dd/MM/yyyy HH:mm' }}</p>
+    <p class="print-note">Documento generado el {{ today | date:'dd/MM/yyyy HH:mm':config.timezone }}</p>
   </div>
 </div>
 

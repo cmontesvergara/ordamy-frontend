@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings/settings.service';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
     selector: 'app-settings',
@@ -26,7 +27,7 @@ export class SettingsComponent implements OnInit {
     // Generic inline edit state
     editing: any = null;
 
-    constructor(private settingsService: SettingsService) { }
+    constructor(private settingsService: SettingsService, private appConfig: AppConfigService) { }
 
     ngOnInit() {
         this.loadAll();
@@ -67,7 +68,7 @@ export class SettingsComponent implements OnInit {
 
     saveFinancial() {
         this.settingsService.updateFinancialConfig(this.financialConfig).subscribe({
-            next: () => { alert('Configuración guardada'); },
+            next: () => { this.appConfig.refresh(); alert('Configuración guardada'); },
         });
     }
 

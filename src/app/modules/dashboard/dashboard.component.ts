@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReportService } from '../../core/services/report/report.service';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +21,7 @@ export class DashboardComponent implements OnInit {
     { key: 'DELIVERED', label: 'Entregada' },
   ];
 
-  constructor(private reportService: ReportService) { }
+  constructor(private reportService: ReportService, public config: AppConfigService) { }
 
   ngOnInit() {
     this.reportService.getDashboard().subscribe({

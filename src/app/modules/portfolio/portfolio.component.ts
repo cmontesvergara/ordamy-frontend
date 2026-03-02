@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ReportService } from '../../core/services/report/report.service';
 import { CustomerService } from '../../core/services/customer/customer.service';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
   selector: 'app-portfolio',
@@ -30,6 +31,7 @@ export class PortfolioComponent implements OnInit {
   constructor(
     private reportService: ReportService,
     private customerService: CustomerService,
+    public config: AppConfigService,
   ) { }
 
   ngOnInit() { this.loadPortfolio(); }

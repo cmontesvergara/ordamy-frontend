@@ -6,6 +6,7 @@ import { OrderService } from '../../../core/services/order/order.service';
 import { CustomerService } from '../../../core/services/customer/customer.service';
 import { SettingsService } from '../../../core/services/settings/settings.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 
 interface OrderItem {
   description: string;
@@ -51,6 +52,7 @@ export class OrderCreateComponent implements OnInit {
     private customerService: CustomerService,
     private settingsService: SettingsService,
     private authService: AuthService,
+    public config: AppConfigService,
   ) { }
 
   ngOnInit() {

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../core/services/order/order.service';
 import { PaymentService } from '../../../core/services/payment/payment.service';
 import { SettingsService } from '../../../core/services/settings/settings.service';
+import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 
 @Component({
   selector: 'app-order-detail',
@@ -63,6 +64,7 @@ export class OrderDetailComponent implements OnInit {
     private paymentService: PaymentService,
     private settingsService: SettingsService,
     private el: ElementRef,
+    public config: AppConfigService,
   ) { }
 
   ngOnInit() {
