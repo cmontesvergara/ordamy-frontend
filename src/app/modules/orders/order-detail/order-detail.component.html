@@ -79,13 +79,18 @@
     </div>
     <div class="info-card" [class.hide-on-production]="printMode === 'production'">
       <h4>Resumen</h4>
-      <div class="summary-row"><span>Subtotal</span><span>{{ config.currency }} {{ order.subtotal | number:'1.0-0' }}</span></div>
-      <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>{{ config.currency }} {{ order.taxAmount | number:'1.0-0'
+      <div class="summary-row"><span>Subtotal</span><span>{{ config.currency }} {{ order.subtotal | number:'1.0-0'
           }}</span></div>
-      <div class="summary-row" *ngIf="order.discount > 0"><span>Descuento</span><span>-{{ config.currency }} {{ order.discount |
+      <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>{{ config.currency }} {{
+          order.taxAmount | number:'1.0-0'
+          }}</span></div>
+      <div class="summary-row" *ngIf="order.discount > 0"><span>Descuento</span><span>-{{ config.currency }} {{
+          order.discount |
           number:'1.0-0' }}</span></div>
-      <div class="summary-row total"><span>Total</span><span>{{ config.currency }} {{ order.total | number:'1.0-0' }}</span></div>
-      <div class="summary-row balance"><span>Saldo</span><span>{{ config.currency }} {{ order.balance | number:'1.0-0' }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>{{ config.currency }} {{ order.total | number:'1.0-0'
+          }}</span></div>
+      <div class="summary-row balance"><span>Saldo</span><span>{{ config.currency }} {{ order.balance | number:'1.0-0'
+          }}</span></div>
     </div>
     <div class="info-card">
       <h4>Detalles</h4>
@@ -254,6 +259,29 @@
     </div>
   </div>
 
+  <!-- Status History Timeline -->
+  <div class="card section no-print" *ngIf="order.statusHistory?.length > 0">
+    <div class="section-header clickable" (click)="historyOpen = !historyOpen">
+      <h3>Historial de cambios ({{ order.statusHistory.length }})</h3>
+      <span class="toggle-icon">{{ historyOpen ? '▲' : '▼' }}</span>
+    </div>
+    <div class="timeline" *ngIf="historyOpen">
+      @for (h of order.statusHistory; track h.id) {
+      <div class="timeline-item">
+        <div class="timeline-dot" [class.cancelled]="h.toStatus === 'CANCELLED'"
+          [class.completed]="h.toStatus === 'COMPLETED'"></div>
+        <div class="timeline-content">
+          <span class="timeline-date">{{ h.createdAt | date:'dd/MM/yyyy HH:mm':config.timezone }}</span>
+          <span class="timeline-change">
+            <span class="badge badge-sm">{{ h.fromStatus || '—' }}</span> → <span class="badge badge-sm">{{ h.toStatus
+              }}</span>
+          </span>
+          <span class="timeline-reason" *ngIf="h.reason">{{ h.reason }}</span>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
   <!-- Print Footer -->
   <div class="print-footer">
     <div class="signature-line">

@@ -26,6 +26,7 @@ export class OrderDetailComponent implements OnInit {
   today = new Date();
   updatingStatus = false;
   actionsOpen = false;
+  historyOpen = false;
 
   // Edit order
   editingOrder = false;

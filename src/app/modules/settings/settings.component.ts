@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings/settings.service';
+import { ProductService } from '../../core/services/product/product.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 
@@ -18,17 +19,19 @@ export class SettingsComponent implements OnInit {
     categories: any[] = [];
     suppliers: any[] = [];
     taxConfigs: any[] = [];
+    products: any[] = [];
     financialConfig: any = null;
 
     newPaymentMethod = '';
     newCategory = { name: '', type: 'EXPENSE' };
-    newSupplier = { name: '', phone: '' };
+    newSupplier = { name: '', identification: '', phone: '', email: '' };
     newTax = { name: '', rate: 0 };
+    newProduct = { name: '', description: '', basePrice: 0, unit: '' };
 
     // Generic inline edit state
     editing: any = null;
 
-    constructor(private settingsService: SettingsService, private appConfig: AppConfigService, private toast: ToastService) { }
+    constructor(private settingsService: SettingsService, private productService: ProductService, private appConfig: AppConfigService, private toast: ToastService) { }
 
     ngOnInit() {
         this.loadAll();
@@ -40,6 +43,7 @@ export class SettingsComponent implements OnInit {
         this.settingsService.getSuppliers().subscribe({ next: (res: any) => { this.suppliers = res.data; } });
         this.settingsService.getTaxConfigs().subscribe({ next: (res: any) => { this.taxConfigs = res.data; } });
         this.settingsService.getFinancialConfig().subscribe({ next: (res: any) => { this.financialConfig = res.data; } });
+        this.productService.list().subscribe({ next: (res: any) => { this.products = res.data; } });
     }
 
     // ─── Create ───
@@ -57,13 +61,20 @@ export class SettingsComponent implements OnInit {
 
     addSupplier() {
         this.settingsService.createSupplier(this.newSupplier).subscribe({
-            next: () => { this.newSupplier = { name: '', phone: '' }; this.loadAll(); },
+            next: () => { this.newSupplier = { name: '', identification: '', phone: '', email: '' }; this.loadAll(); },
         });
     }
 
     addTax() {
         this.settingsService.createTaxConfig(this.newTax).subscribe({
             next: () => { this.newTax = { name: '', rate: 0 }; this.loadAll(); },
+        });
+    }
+
+    addProduct() {
+        this.productService.create(this.newProduct).subscribe({
+            next: () => { this.newProduct = { name: '', description: '', basePrice: 0, unit: '' }; this.loadAll(); },
+            error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al crear producto'); },
         });
     }
 
@@ -85,7 +96,8 @@ export class SettingsComponent implements OnInit {
         const obs = type === 'payment' ? this.settingsService.updatePaymentMethod(id, data)
             : type === 'category' ? this.settingsService.updateCategory(id, data)
                 : type === 'supplier' ? this.settingsService.updateSupplier(id, data)
-                    : this.settingsService.updateTaxConfig(id, data);
+                    : type === 'product' ? this.productService.update(id, data)
+                        : this.settingsService.updateTaxConfig(id, data);
 
         obs.subscribe({
             next: () => { this.editing = null; this.loadAll(); },
@@ -95,7 +107,7 @@ export class SettingsComponent implements OnInit {
 
     // ─── Delete (generic) ───
     deleteItem(type: string, item: any) {
-        const labels: any = { payment: 'medio de pago', category: 'categoría', supplier: 'proveedor', tax: 'configuración de impuesto' };
+        const labels: any = { payment: 'medio de pago', category: 'categoría', supplier: 'proveedor', tax: 'configuración de impuesto', product: 'producto' };
         if (!confirm(`¿Eliminar ${labels[type]} "${item.name}"?`)) return;
 
         const obs = type === 'payment' ? this.settingsService.deletePaymentMethod(item.id)
