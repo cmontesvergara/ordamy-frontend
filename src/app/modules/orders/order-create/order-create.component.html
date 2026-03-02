@@ -45,7 +45,7 @@
             <input type="number" [(ngModel)]="item.quantity" min="1" placeholder="Cant." class="w-80" />
             <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120" />
             <span class="item-total">$ {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
-            <button class="btn-icon" (click)="removeItem(i)" *ngIf="items.length > 1">🗑️</button>
+            <button class="btn-icon" (click)="removeItem(i)" *ngIf="items.length > 1"><span class="icon icon-delete"></span></button>
           </div>
         }
       </div>

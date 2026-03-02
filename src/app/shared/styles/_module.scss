@@ -232,3 +232,96 @@
     font-size: 0.8rem;
     color: var(--text-secondary, #64748b);
 }
+
+// ─── Detail Bar (above page-header) ───────────────
+.detail-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+// ─── Actions Dropdown ─────────────────────────────
+.actions-dropdown {
+    position: relative;
+
+    .actions-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.4rem 0.75rem;
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 8px;
+        background: var(--card-bg, #fff);
+        color: var(--text-primary, #1e293b);
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+
+        &:hover {
+            background: var(--hover-bg, #f1f5f9);
+        }
+
+        .caret {
+            font-size: 0.6rem;
+            transition: transform 0.2s;
+        }
+    }
+
+    &.open .actions-toggle .caret {
+        transform: rotate(180deg);
+    }
+
+    .actions-menu {
+        position: absolute;
+        top: calc(100% + 4px);
+        right: 0;
+        min-width: 180px;
+        background: var(--card-bg, #fff);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        z-index: 100;
+        padding: 0.35rem;
+        display: none;
+    }
+
+    &.open .actions-menu {
+        display: block;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        border-radius: 6px;
+        background: none;
+        color: var(--text-primary, #1e293b);
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.15s;
+
+        &:hover {
+            background: var(--hover-bg, #f1f5f9);
+        }
+
+        &.danger {
+            color: #ef4444;
+
+            &:hover {
+                background: #fef2f2;
+            }
+        }
+    }
+
+    .action-separator {
+        height: 1px;
+        background: var(--border-color, #e2e8f0);
+        margin: 0.25rem 0;
+    }
+}

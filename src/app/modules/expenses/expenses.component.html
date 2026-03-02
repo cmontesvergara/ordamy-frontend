@@ -113,8 +113,8 @@
         <td class="text-right expense-amount">$ {{ e.amount | number:'1.0-0' }}</td>
         <td>{{ e.expenseDate | date:'dd/MM/yyyy' }}</td>
         <td class="actions-cell">
-          <button class="btn-icon" title="Editar" (click)="startEditExpense(e)">✏️</button>
-          <button class="btn-icon danger" title="Eliminar" (click)="deleteExpense(e.id)">🗑️</button>
+          <button class="btn-icon" title="Editar" (click)="startEditExpense(e)"><span class="icon icon-edit"></span></button>
+          <button class="btn-icon danger" title="Eliminar" (click)="deleteExpense(e.id)"><span class="icon icon-delete"></span></button>
         </td>
       </tr>
       }

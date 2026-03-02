@@ -26,18 +26,6 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
     }
-
-    &.positive {
-        border-left: 4px solid #22c55e;
-    }
-
-    &.negative {
-        border-left: 4px solid #ef4444;
-    }
-
-    &.warning {
-        border-left: 4px solid #f59e0b;
-    }
 }
 
 .kpi-header {

@@ -1,7 +1,7 @@
 <div class="stats-page" *ngIf="data">
   <!-- KPI Grid -->
   <div class="kpi-grid">
-    <div class="kpi" [class.positive]="data.profitThisMonth > 0" [class.negative]="data.profitThisMonth < 0">
+    <div class="kpi">
       <div class="kpi-header">
         <span class="kpi-label">Utilidad del mes</span>
         <span class="kpi-badge" *ngIf="data.salesChange !== null" [class.up]="data.salesChange >= 0"
@@ -37,7 +37,7 @@
       <span class="kpi-value">{{ data.activeOrders }}</span>
     </div>
 
-    <div class="kpi" [class.warning]="data.portfolioBalance > 0">
+    <div class="kpi">
       <div class="kpi-header"><span class="kpi-label">Cartera pendiente</span></div>
       <span class="kpi-value amber">$ {{ data.portfolioBalance | number:'1.0-0' }}</span>
     </div>
@@ -167,6 +167,12 @@
           </tr>
           }
         </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td><strong>Total</strong></td>
+            <td class="text-right"><strong>$ {{ accountsTotal | number:'1.0-0' }}</strong></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   </div>

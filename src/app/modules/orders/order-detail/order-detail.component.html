@@ -1,23 +1,31 @@
 <div *ngIf="order" class="detail-page">
+  <!-- Top Bar -->
+  <div class="detail-bar no-print">
+    <a routerLink="/orders" class="btn btn-outline btn-sm">← Volver</a>
+    <div class="actions-dropdown" [class.open]="actionsOpen">
+      <button class="actions-toggle" (click)="actionsOpen = !actionsOpen">
+        Acciones <span class="caret">▼</span>
+      </button>
+      <div class="actions-menu">
+        <button class="action-item" (click)="printOrder('production'); actionsOpen = false">Imprimir Producción</button>
+        <button class="action-item" (click)="printOrder('customer'); actionsOpen = false">Imprimir Cliente</button>
+        <button *ngIf="order.status !== 'CANCELLED'" class="action-item"
+          (click)="toggleEditOrder(); actionsOpen = false">
+          Editar Orden
+        </button>
+        <div *ngIf="order.status === 'ACTIVE'" class="action-separator"></div>
+        <button *ngIf="order.status === 'ACTIVE'" class="action-item danger"
+          (click)="cancelOrder(); actionsOpen = false">
+          Anular Orden
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="page-header no-print">
     <div>
       <h1>Orden #{{ order.number }}</h1>
       <span class="badge status-{{ order.status }}">{{ order.status }}</span>
-    </div>
-    <div class="header-actions">
-      <a routerLink="/orders" class="btn btn-outline">← Volver</a>
-      <button class="btn btn-outline btn-sm" (click)="printOrder('production')" title="Para producción (sin precios)">
-        🏭 Imprimir Producción
-      </button>
-      <button class="btn btn-outline btn-sm" (click)="printOrder('customer')" title="Con todos los detalles">
-        🧾 Imprimir Cliente
-      </button>
-      <button *ngIf="order.status !== 'CANCELLED'" class="btn btn-outline btn-sm" (click)="toggleEditOrder()">
-        ✏️ Editar Orden
-      </button>
-      <button *ngIf="order.status === 'ACTIVE'" class="btn btn-danger" (click)="cancelOrder()">
-        Anular Orden
-      </button>
     </div>
   </div>
 
@@ -124,7 +132,8 @@
                 (input)="recalcEditTotals()" /></td>
             <td class="text-right">$ {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
             <td class="text-center">
-              <button class="btn-icon danger" (click)="removeEditItem(i)" title="Eliminar">✕</button>
+              <button class="btn-icon danger" (click)="removeEditItem(i)" title="Eliminar"><span
+                  class="icon icon-close"></span></button>
             </td>
           </tr>
           }
@@ -218,8 +227,10 @@
           <td class="text-right">$ {{ p.amount | number:'1.0-0' }}</td>
           <td>{{ p.notes || '—' }}</td>
           <td class="text-center no-print" *ngIf="order.status !== 'CANCELLED'">
-            <button class="btn-icon" title="Editar" (click)="startEditPayment(p)">✏️</button>
-            <button class="btn-icon danger" title="Eliminar" (click)="deletePayment(p)">🗑️</button>
+            <button class="btn-icon" title="Editar" (click)="startEditPayment(p)"><span
+                class="icon icon-edit"></span></button>
+            <button class="btn-icon danger" title="Eliminar" (click)="deletePayment(p)"><span
+                class="icon icon-delete"></span></button>
           </td>
         </tr>
         }

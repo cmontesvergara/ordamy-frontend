@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -28,6 +28,7 @@ export class CustomerDetailComponent implements OnInit {
   editingCustomer = false;
   savingCustomer = false;
   editData: any = {};
+  actionsOpen = false;
 
   operationalLabels: any = {
     PENDING: 'Pendiente',
@@ -43,7 +44,15 @@ export class CustomerDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private customerService: CustomerService,
+    private el: ElementRef,
   ) { }
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(event: MouseEvent) {
+    if (this.actionsOpen && !this.el.nativeElement.querySelector('.actions-dropdown')?.contains(event.target)) {
+      this.actionsOpen = false;
+    }
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id')!;

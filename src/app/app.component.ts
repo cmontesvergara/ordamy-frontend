@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { LoadingService } from './core/services/loading/loading.service';
@@ -96,4 +96,13 @@ export class AppComponent {
     public loadingService: LoadingService,
     public toastService: ToastService
   ) { }
+
+  // Prevent scroll from changing number input values globally
+  @HostListener('wheel', ['$event'])
+  onWheel(event: WheelEvent) {
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'number') {
+      (target as HTMLInputElement).blur();
+    }
+  }
 }

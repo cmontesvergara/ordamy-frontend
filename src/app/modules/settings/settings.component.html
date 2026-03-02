@@ -46,8 +46,8 @@
               <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
             </ng-container>
             <ng-container *ngIf="editing?.id !== m.id || editing?.type !== 'payment'">
-              <button class="btn-icon" (click)="startEdit('payment', m)" title="Editar">✏️</button>
-              <button class="btn-icon danger" (click)="deleteItem('payment', m)" title="Eliminar">🗑️</button>
+              <button class="btn-icon" (click)="startEdit('payment', m)" title="Editar"><span class="icon icon-edit"></span></button>
+              <button class="btn-icon danger" (click)="deleteItem('payment', m)" title="Eliminar"><span class="icon icon-delete"></span></button>
             </ng-container>
           </td>
         </tr>
@@ -98,8 +98,8 @@
               <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
             </ng-container>
             <ng-container *ngIf="editing?.id !== c.id || editing?.type !== 'category'">
-              <button class="btn-icon" (click)="startEdit('category', c)" title="Editar">✏️</button>
-              <button class="btn-icon danger" (click)="deleteItem('category', c)" title="Eliminar">🗑️</button>
+              <button class="btn-icon" (click)="startEdit('category', c)" title="Editar"><span class="icon icon-edit"></span></button>
+              <button class="btn-icon danger" (click)="deleteItem('category', c)" title="Eliminar"><span class="icon icon-delete"></span></button>
             </ng-container>
           </td>
         </tr>
@@ -150,8 +150,8 @@
               <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
             </ng-container>
             <ng-container *ngIf="editing?.id !== s.id || editing?.type !== 'supplier'">
-              <button class="btn-icon" (click)="startEdit('supplier', s)" title="Editar">✏️</button>
-              <button class="btn-icon danger" (click)="deleteItem('supplier', s)" title="Eliminar">🗑️</button>
+              <button class="btn-icon" (click)="startEdit('supplier', s)" title="Editar"><span class="icon icon-edit"></span></button>
+              <button class="btn-icon danger" (click)="deleteItem('supplier', s)" title="Eliminar"><span class="icon icon-delete"></span></button>
             </ng-container>
           </td>
         </tr>
@@ -203,8 +203,8 @@
               <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
             </ng-container>
             <ng-container *ngIf="editing?.id !== t.id || editing?.type !== 'tax'">
-              <button class="btn-icon" (click)="startEdit('tax', t)" title="Editar">✏️</button>
-              <button class="btn-icon danger" (click)="deleteItem('tax', t)" title="Eliminar">🗑️</button>
+              <button class="btn-icon" (click)="startEdit('tax', t)" title="Editar"><span class="icon icon-edit"></span></button>
+              <button class="btn-icon danger" (click)="deleteItem('tax', t)" title="Eliminar"><span class="icon icon-delete"></span></button>
             </ng-container>
           </td>
         </tr>

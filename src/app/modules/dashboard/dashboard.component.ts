@@ -28,6 +28,11 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  get accountsTotal(): number {
+    if (!this.data?.accounts) return 0;
+    return this.data.accounts.reduce((sum: number, a: any) => sum + Number(a.balance || 0), 0);
+  }
+
   getOpCount(status: string): number {
     if (!this.data?.ordersByOperationalStatus) return 0;
     const found = this.data.ordersByOperationalStatus.find((o: any) => o.status === status);

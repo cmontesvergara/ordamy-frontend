@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -23,6 +23,7 @@ export class OrderDetailComponent implements OnInit {
   printMode: 'production' | 'customer' | null = null;
   today = new Date();
   updatingStatus = false;
+  actionsOpen = false;
 
   // Edit order
   editingOrder = false;
@@ -43,6 +44,14 @@ export class OrderDetailComponent implements OnInit {
     { key: 'DELIVERED', label: 'Entregada' },
   ];
 
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(event: MouseEvent) {
+    if (this.actionsOpen && !this.el.nativeElement.querySelector('.actions-dropdown')?.contains(event.target)) {
+      this.actionsOpen = false;
+    }
+  }
+
   get currentStepIndex(): number {
     return this.operationalSteps.findIndex(s => s.key === this.order?.operationalStatus) || 0;
   }
@@ -53,6 +62,7 @@ export class OrderDetailComponent implements OnInit {
     private orderService: OrderService,
     private paymentService: PaymentService,
     private settingsService: SettingsService,
+    private el: ElementRef,
   ) { }
 
   ngOnInit() {

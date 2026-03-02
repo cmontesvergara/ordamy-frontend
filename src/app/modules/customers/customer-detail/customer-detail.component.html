@@ -1,15 +1,25 @@
 <div *ngIf="customer" class="detail-page">
+  <!-- Top Bar -->
+  <div class="detail-bar">
+    <a routerLink="/customers" class="btn btn-outline btn-sm">← Volver</a>
+    <div class="actions-dropdown" [class.open]="actionsOpen">
+      <button class="actions-toggle" (click)="actionsOpen = !actionsOpen">
+        Acciones <span class="caret">▼</span>
+      </button>
+      <div class="actions-menu">
+        <button class="action-item" (click)="toggleEdit(); actionsOpen = false">
+          {{ editingCustomer ? 'Cancelar edición' : 'Editar' }}
+        </button>
+        <div class="action-separator"></div>
+        <button class="action-item danger" (click)="deleteCustomer(); actionsOpen = false">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="page-header">
     <div>
       <h1>{{ customer.name }}</h1>
       <span class="sub-id">{{ customer.identification }}</span>
-    </div>
-    <div class="header-actions">
-      <a routerLink="/customers" class="btn btn-outline">← Volver</a>
-      <button class="btn btn-outline btn-sm" (click)="toggleEdit()">
-        {{ editingCustomer ? 'Cancelar' : '✏️ Editar' }}
-      </button>
-      <button class="btn btn-danger btn-sm" (click)="deleteCustomer()">🗑️ Eliminar</button>
     </div>
   </div>
 
