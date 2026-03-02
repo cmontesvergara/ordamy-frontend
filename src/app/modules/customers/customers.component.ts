@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CustomerService } from '../../core/services/customer/customer.service';
+import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
   selector: 'app-customers',
@@ -26,7 +27,7 @@ export class CustomersComponent implements OnInit {
 
   get totalPages() { return Math.ceil(this.total / this.limit); }
 
-  constructor(private customerService: CustomerService) { }
+  constructor(private customerService: CustomerService, private toast: ToastService) { }
 
   ngOnInit() { this.loadCustomers(); }
 
@@ -65,7 +66,10 @@ export class CustomersComponent implements OnInit {
         this.newCustomer = { identification: '', name: '', phone: '', email: '', address: '' };
         this.loadCustomers();
       },
-      error: () => { this.saving = false; },
+      error: (err: any) => {
+        this.saving = false;
+        this.toast.error('Error', err.error?.error || 'Error al crear cliente');
+      },
     });
   }
 }

@@ -1,14 +1,16 @@
-<div class="page-header"><h1>Caja</h1></div>
+<div class="page-header">
+  <h1>Caja</h1>
+</div>
 
 <div class="accounts-grid">
   @for (account of accounts; track account.id) {
-    <div class="account-card" [class.selected]="selectedAccount?.id === account.id" (click)="selectAccount(account)">
-      <div class="account-icon">🏦</div>
-      <div class="account-info">
-        <span class="account-name">{{ account.paymentMethod?.name }}</span>
-        <span class="account-balance">{{ config.currency }} {{ account.balance | number:'1.0-0' }}</span>
-      </div>
+  <div class="account-card" [class.selected]="selectedAccount?.id === account.id" (click)="selectAccount(account)">
+    <div class="account-icon">🏦</div>
+    <div class="account-info">
+      <span class="account-name">{{ account.paymentMethod?.name }}</span>
+      <span class="account-balance">{{ config.currency }} {{ account.balance | number:'1.0-0' }}</span>
     </div>
+  </div>
   }
 </div>
 
@@ -32,21 +34,23 @@
     </thead>
     <tbody>
       @for (t of transactions; track t.id) {
-        <tr>
-          <td>{{ t.transactionDate | date:'dd/MM/yyyy HH:mm':config.timezone }}</td>
-          <td>
-            <span class="badge" [class.income]="t.type === 'INCOME'" [class.expense]="t.type === 'EXPENSE'">
-              {{ t.type === 'INCOME' ? 'Ingreso' : 'Egreso' }}
-            </span>
-          </td>
-          <td>{{ t.description }}</td>
-          <td class="text-right" [class.income-text]="t.type === 'INCOME'" [class.expense-text]="t.type === 'EXPENSE'">
-            {{ t.type === 'INCOME' ? '+' : '-' }}{{ config.currency }} {{ t.amount | number:'1.0-0' }}
-          </td>
-        </tr>
+      <tr>
+        <td>{{ t.transactionDate | date:'dd/MM/yyyy HH:mm':config.timezone }}</td>
+        <td>
+          <span class="badge" [class.income]="t.type === 'INCOME'" [class.expense]="t.type === 'EXPENSE'">
+            {{ t.type === 'INCOME' ? 'Ingreso' : 'Egreso' }}
+          </span>
+        </td>
+        <td>{{ t.description }}</td>
+        <td class="text-right" [class.income-text]="t.type === 'INCOME'" [class.expense-text]="t.type === 'EXPENSE'">
+          {{ config.currency }} {{ t.amount | number:'1.0-0' }}
+        </td>
+      </tr>
       }
       @if (transactions.length === 0) {
-        <tr><td colspan="4" class="empty">Sin transacciones</td></tr>
+      <tr>
+        <td colspan="4" class="empty">Sin transacciones</td>
+      </tr>
       }
     </tbody>
   </table>

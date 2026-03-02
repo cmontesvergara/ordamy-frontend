@@ -6,6 +6,7 @@ import { OrderService } from '../../../core/services/order/order.service';
 import { PaymentService } from '../../../core/services/payment/payment.service';
 import { SettingsService } from '../../../core/services/settings/settings.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'app-order-detail',
@@ -65,6 +66,7 @@ export class OrderDetailComponent implements OnInit {
     private settingsService: SettingsService,
     private el: ElementRef,
     public config: AppConfigService,
+    private toast: ToastService,
   ) { }
 
   ngOnInit() {
@@ -108,6 +110,7 @@ export class OrderDetailComponent implements OnInit {
     if (!reason) return;
     this.orderService.cancel(this.order.id, reason).subscribe({
       next: () => { this.loadOrder(this.order.id); },
+      error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al anular orden'); },
     });
   }
 
@@ -198,8 +201,8 @@ export class OrderDetailComponent implements OnInit {
     const nextStatus = this.operationalSteps[nextIndex].key;
     this.updatingStatus = true;
     this.orderService.updateOperationalStatus(this.order.id, nextStatus).subscribe({
-      next: (res: any) => {
-        this.order.operationalStatus = res.data.operationalStatus;
+      next: () => {
+        this.loadOrder(this.order.id);
         this.updatingStatus = false;
       },
       error: () => { this.updatingStatus = false; },

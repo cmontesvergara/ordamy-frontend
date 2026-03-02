@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CustomerService } from '../../../core/services/customer/customer.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'app-customer-detail',
@@ -47,6 +48,7 @@ export class CustomerDetailComponent implements OnInit {
     private customerService: CustomerService,
     private el: ElementRef,
     public config: AppConfigService,
+    private toast: ToastService,
   ) { }
 
   @HostListener('document:click', ['$event'])
@@ -136,7 +138,7 @@ export class CustomerDetailComponent implements OnInit {
     this.customerService.delete(this.customer.id).subscribe({
       next: () => { this.router.navigate(['/customers']); },
       error: (err: any) => {
-        alert(err.error?.error || 'Error al eliminar cliente');
+        this.toast.error('Error', err.error?.error || 'Error al eliminar cliente');
       },
     });
   }

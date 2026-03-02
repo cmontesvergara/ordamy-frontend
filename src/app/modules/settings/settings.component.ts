@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings/settings.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
     selector: 'app-settings',
@@ -27,7 +28,7 @@ export class SettingsComponent implements OnInit {
     // Generic inline edit state
     editing: any = null;
 
-    constructor(private settingsService: SettingsService, private appConfig: AppConfigService) { }
+    constructor(private settingsService: SettingsService, private appConfig: AppConfigService, private toast: ToastService) { }
 
     ngOnInit() {
         this.loadAll();
@@ -68,7 +69,7 @@ export class SettingsComponent implements OnInit {
 
     saveFinancial() {
         this.settingsService.updateFinancialConfig(this.financialConfig).subscribe({
-            next: () => { this.appConfig.refresh(); alert('Configuración guardada'); },
+            next: () => { this.appConfig.refresh(); this.toast.success('Guardado', 'Configuración guardada'); },
         });
     }
 
@@ -88,7 +89,7 @@ export class SettingsComponent implements OnInit {
 
         obs.subscribe({
             next: () => { this.editing = null; this.loadAll(); },
-            error: (err: any) => { alert(err.error?.error || 'Error al actualizar'); },
+            error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al actualizar'); },
         });
     }
 
@@ -104,7 +105,7 @@ export class SettingsComponent implements OnInit {
 
         obs.subscribe({
             next: () => { this.loadAll(); },
-            error: (err: any) => { alert(err.error?.error || 'Error al eliminar'); },
+            error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al eliminar'); },
         });
     }
 }
