@@ -105,4 +105,13 @@ export class AppComponent {
       (target as HTMLInputElement).blur();
     }
   }
+
+  // Auto-select content on number inputs for easier editing
+  @HostListener('focusin', ['$event'])
+  onFocusIn(event: FocusEvent) {
+    const target = event.target as HTMLInputElement;
+    if (target.tagName === 'INPUT' && target.type === 'number') {
+      setTimeout(() => target.select(), 0);
+    }
+  }
 }
