@@ -7,11 +7,12 @@ import { PaymentService } from '../../../core/services/payment/payment.service';
 import { SettingsService } from '../../../core/services/settings/settings.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, OverlayModule],
   templateUrl: './order-detail.component.html',
   styleUrl: './order-detail.component.scss',
 })

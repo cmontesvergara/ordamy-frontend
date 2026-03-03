@@ -208,7 +208,7 @@
       <select [(ngModel)]="newPayment.paymentMethodId">
         <option value="">Medio de pago</option>
         @for (m of paymentMethods; track m.id) {
-        <option [value]="m.id">{{ m.name }}</option>
+        <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
         }
       </select>
       <input type="number" [(ngModel)]="newPayment.amount" [max]="order.balance" placeholder="Monto" />
@@ -251,7 +251,7 @@
       <strong class="form-label">Editando pago:</strong>
       <select [(ngModel)]="editPaymentData.paymentMethodId">
         @for (m of paymentMethods; track m.id) {
-        <option [value]="m.id">{{ m.name }}</option>
+        <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
         }
       </select>
       <input type="number" [(ngModel)]="editPaymentData.amount" placeholder="Monto" />
