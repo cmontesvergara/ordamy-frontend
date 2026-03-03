@@ -49,7 +49,7 @@ export class CallbackComponent implements OnInit {
         this.authService.exchangeCode(code).subscribe({
             next: (response: any) => {
                 if (response.success) {
-                    this.router.navigate(['/dashboard']);
+                    this.router.navigate(['/home']);
                 } else {
                     console.error('Exchange failed:', response);
                     this.router.navigate(['/']);
