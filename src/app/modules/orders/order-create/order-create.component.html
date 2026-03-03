@@ -13,23 +13,17 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Buscar cliente</label>
-          <input type="text" [(ngModel)]="customerSearch" (input)="searchCustomers()" placeholder="Nombre o NIT..."
-            cdkOverlayOrigin #customerOrigin="cdkOverlayOrigin" />
+          <input type="text" [(ngModel)]="customerSearch" (input)="searchCustomers()" placeholder="Nombre o NIT..." />
 
-          <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="customerOrigin"
-            [cdkConnectedOverlayOpen]="customerResults.length > 0"
-            [cdkConnectedOverlayWidth]="customerOrigin.elementRef.nativeElement.offsetWidth"
-            (overlayOutsideClick)="closeCustomerDropdown()">
-            <div class="dropdown" style="display: block; position: static;">
-              @for (c of customerResults; track c.id) {
-              <div class="dropdown-item" [class.disabled]="!c.isActive" (click)="c.isActive && selectCustomer(c)">
-                <strong>{{ c.name }}</strong>
-                <span class="text-muted" style="margin: 0 5px">{{ c.identification }}</span>
-                <span *ngIf="!c.isActive" class="badge badge-sm inactive">Inactivo</span>
-              </div>
-              }
+          <div class="dropdown" *ngIf="customerResults.length > 0">
+            @for (c of customerResults; track c.id) {
+            <div class="dropdown-item" [class.disabled]="!c.isActive" (click)="c.isActive && selectCustomer(c)">
+              <strong>{{ c.name }}</strong>
+              <span class="text-muted" style="margin: 0 5px">{{ c.identification }}</span>
+              <span *ngIf="!c.isActive" class="badge badge-sm inactive">Inactivo</span>
             </div>
-          </ng-template>
+            }
+          </div>
         </div>
         <div class="form-group" *ngIf="selectedCustomer">
           <label>Seleccionado</label>

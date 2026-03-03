@@ -8,7 +8,6 @@ import { SettingsService } from '../../../core/services/settings/settings.servic
 import { ProductService } from '../../../core/services/product/product.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
-import { OverlayModule } from '@angular/cdk/overlay';
 
 interface OrderItem {
   description: string;
@@ -20,7 +19,7 @@ interface OrderItem {
 @Component({
   selector: 'app-order-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, OverlayModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './order-create.component.html',
   styleUrl: './order-create.component.scss',
 })

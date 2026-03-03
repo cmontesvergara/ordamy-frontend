@@ -28,6 +28,12 @@ export class PortfolioComponent implements OnInit {
   dateTo = '';
   searchTimeout: any;
 
+  // Pagination
+  page = 1;
+  limit = 20;
+  totalPages = 1;
+  totalOrders = 0;
+
   constructor(
     private reportService: ReportService,
     private customerService: CustomerService,
@@ -43,14 +49,33 @@ export class PortfolioComponent implements OnInit {
       dateTo: this.dateTo,
       customerId: this.selectedCustomer?.id,
       status: this.statusFilter,
+      page: this.page,
+      limit: this.limit
     }).subscribe({
       next: (res: any) => {
         this.orders = res.data;
         this.totalDebt = res.totalBalance || 0;
+        this.totalOrders = res.count || 0;
+        this.totalPages = res.pages || 1;
+        this.page = res.page || 1;
         this.loading = false;
       },
       error: () => { this.loading = false; },
     });
+  }
+
+  nextPage() {
+    if (this.page < this.totalPages) {
+      this.page++;
+      this.loadPortfolio();
+    }
+  }
+
+  prevPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.loadPortfolio();
+    }
   }
 
   // Customer autocomplete
@@ -80,6 +105,7 @@ export class PortfolioComponent implements OnInit {
   }
 
   onFilter() {
+    this.page = 1;
     this.loadPortfolio();
   }
 
@@ -88,6 +114,7 @@ export class PortfolioComponent implements OnInit {
     this.dateTo = '';
     this.selectedCustomer = null;
     this.statusFilter = '';
+    this.page = 1;
     this.loadPortfolio();
   }
 

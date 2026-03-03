@@ -6,12 +6,13 @@
 <!-- Filters (CA1) -->
 <div class="filters">
   <div class="form-group filter-customer">
-    <input type="text" [(ngModel)]="customerSearch" (input)="searchCustomers()" placeholder="🔍 Filtrar por cliente..." />
+    <input type="text" [(ngModel)]="customerSearch" (input)="searchCustomers()"
+      placeholder="🔍 Filtrar por cliente..." />
     <div class="dropdown" *ngIf="customerResults.length > 0">
       @for (c of customerResults; track c.id) {
-        <div class="dropdown-item" (click)="selectCustomer(c)">
-          <strong>{{ c.name }}</strong> <span>{{ c.identification }}</span>
-        </div>
+      <div class="dropdown-item" (click)="selectCustomer(c)">
+        <strong>{{ c.name }}</strong> <span>{{ c.identification }}</span>
+      </div>
       }
     </div>
   </div>
@@ -32,7 +33,8 @@
     <label>Hasta</label>
     <input type="date" [(ngModel)]="dateTo" (change)="onFilter()" />
   </div>
-  <button class="btn btn-outline btn-sm" *ngIf="dateFrom || dateTo || selectedCustomer" (click)="clearFilters()">✕ Limpiar filtros</button>
+  <button class="btn btn-outline btn-sm" *ngIf="dateFrom || dateTo || selectedCustomer" (click)="clearFilters()">✕
+    Limpiar filtros</button>
 </div>
 
 <!-- Selected customer tag -->
@@ -75,24 +77,27 @@
     </thead>
     <tbody>
       @for (o of orders; track o.id) {
-        <tr [class.overdue]="o.daysOverdue > 0">
-          <td class="mono"><a class="link" [routerLink]="['/orders', o.id]">{{ o.number }}</a></td>
-          <td><a class="link-name" [routerLink]="['/customers', o.customer?.id]"><strong>{{ o.customer?.name }}</strong></a></td>
-          <td>{{ o.orderDate | date:'dd/MM/yyyy':config.timezone }}</td>
-          <td class="text-muted">{{ o.sellerName }}</td>
-          <td>{{ o.dueDate ? (o.dueDate | date:'dd/MM/yyyy':config.timezone) : '—' }}</td>
-          <td class="text-right">{{ config.currency }} {{ o.total | number:'1.0-0' }}</td>
-          <td class="text-right debt">{{ config.currency }} {{ o.balance | number:'1.0-0' }}</td>
-          <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
-          <td class="no-print">
-            <span class="badge" [class.overdue-badge]="o.daysOverdue > 0" [class.ok-badge]="o.daysOverdue <= 0">
-              {{ o.daysOverdue > 0 ? o.daysOverdue + ' vencidos' : 'Al día' }}
-            </span>
-          </td>
-        </tr>
+      <tr [class.overdue]="o.daysOverdue > 0">
+        <td class="mono"><a class="link" [routerLink]="['/orders', o.id]">{{ o.number }}</a></td>
+        <td><a class="link-name" [routerLink]="['/customers', o.customer?.id]"><strong>{{ o.customer?.name
+              }}</strong></a></td>
+        <td>{{ o.orderDate | date:'dd/MM/yyyy':config.timezone }}</td>
+        <td class="text-muted">{{ o.sellerName }}</td>
+        <td>{{ o.dueDate ? (o.dueDate | date:'dd/MM/yyyy':config.timezone) : '—' }}</td>
+        <td class="text-right">{{ config.currency }} {{ o.total | number:'1.0-0' }}</td>
+        <td class="text-right debt">{{ config.currency }} {{ o.balance | number:'1.0-0' }}</td>
+        <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
+        <td class="no-print">
+          <span class="badge" [class.overdue-badge]="o.daysOverdue > 0" [class.ok-badge]="o.daysOverdue <= 0">
+            {{ o.daysOverdue > 0 ? o.daysOverdue + ' vencidos' : 'Al día' }}
+          </span>
+        </td>
+      </tr>
       }
       @if (orders.length === 0 && !loading) {
-        <tr><td colspan="9" class="empty">Sin cartera pendiente 🎉</td></tr>
+      <tr>
+        <td colspan="9" class="empty">Sin cartera pendiente 🎉</td>
+      </tr>
       }
     </tbody>
     <tfoot *ngIf="orders.length > 0">
@@ -104,4 +109,11 @@
       </tr>
     </tfoot>
   </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination" *ngIf="totalPages > 1">
+  <button class="btn btn-outline btn-sm" [disabled]="page === 1" (click)="prevPage()">Anterior</button>
+  <span class="page-info">Página {{ page }} de {{ totalPages }} ({{ totalOrders }} órdenes)</span>
+  <button class="btn btn-outline btn-sm" [disabled]="page === totalPages" (click)="nextPage()">Siguiente</button>
 </div>
