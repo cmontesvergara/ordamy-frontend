@@ -49,7 +49,7 @@
     <span>Total cartera pendiente:</span>
     <strong>{{ config.currency }} {{ totalDebt | number:'1.0-0' }}</strong>
   </div>
-  <span class="summary-count">{{ orders.length }} {{ orders.length === 1 ? 'orden' : 'órdenes' }}</span>
+  <span class="summary-count">{{ totalOrders }} {{ totalOrders === 1 ? 'orden' : 'órdenes' }}</span>
 </div>
 
 <!-- Table -->
@@ -100,14 +100,6 @@
       </tr>
       }
     </tbody>
-    <tfoot *ngIf="orders.length > 0">
-      <tr class="total-row">
-        <td colspan="5"></td>
-        <td class="text-right"><strong>Total:</strong></td>
-        <td class="text-right debt"><strong>{{ config.currency }} {{ totalDebt | number:'1.0-0' }}</strong></td>
-        <td colspan="2"></td>
-      </tr>
-    </tfoot>
   </table>
 </div>
 
