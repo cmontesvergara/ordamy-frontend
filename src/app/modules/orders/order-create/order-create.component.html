@@ -16,8 +16,10 @@
           <input type="text" [(ngModel)]="customerSearch" (input)="searchCustomers()" placeholder="Nombre o NIT..." />
           <div class="dropdown" *ngIf="customerResults.length > 0">
             @for (c of customerResults; track c.id) {
-            <div class="dropdown-item" (click)="selectCustomer(c)">
-              <strong>{{ c.name }}</strong> <span>{{ c.identification }}</span>
+            <div class="dropdown-item" [class.disabled]="!c.isActive" (click)="c.isActive && selectCustomer(c)">
+              <strong>{{ c.name }}</strong>
+              <span class="text-muted" style="margin: 0 5px">{{ c.identification }}</span>
+              <span *ngIf="!c.isActive" class="badge badge-sm inactive">Inactivo</span>
             </div>
             }
           </div>

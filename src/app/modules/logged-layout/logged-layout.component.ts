@@ -5,6 +5,7 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { environment } from '../../../environments/environment';
 import { filter } from 'rxjs/operators';
+import packageJson from '../../../../package.json';
 
 interface MenuItem {
   label: string;
@@ -23,8 +24,9 @@ export class LoggedLayoutComponent implements OnInit {
   sidebarCollapsed = false;
   userName = '';
   tenantName = '';
-  currentPageTitle = 'Estadísticas';
+  currentPageTitle = 'Inicio';
   ssoUrl = environment.ssoUrl;
+  appVersion = packageJson.version;
 
   menuItems: MenuItem[] = [
     { label: 'Estadísticas', icon: 'dashboard', route: '/dashboard' },
@@ -36,6 +38,7 @@ export class LoggedLayoutComponent implements OnInit {
     { label: 'Reportes', icon: 'reports', route: '/reports' },
     { label: 'Productos', icon: 'products', route: '/products' },
     { label: 'Configuración', icon: 'settings', route: '/settings' },
+    { label: 'Soporte', icon: 'support', route: '/support' },
   ];
 
   constructor(
@@ -65,8 +68,12 @@ export class LoggedLayoutComponent implements OnInit {
   }
 
   private updatePageTitle(url: string) {
+    if (url === '/home' || url === '/') {
+      this.currentPageTitle = 'Inicio';
+      return;
+    }
     const match = this.menuItems.find(m => url === m.route || url.startsWith(m.route + '/'));
-    this.currentPageTitle = match?.label || 'Estadísticas';
+    this.currentPageTitle = match?.label || 'Ordamy';
   }
 
   logout() {

@@ -73,7 +73,11 @@
   <div class="info-grid">
     <div class="info-card">
       <h4>Cliente</h4>
-      <p><strong>{{ order.customer?.name }}</strong></p>
+      <p>
+        <strong>{{ order.customer?.name }}</strong>
+        <span *ngIf="order.customer && !order.customer.isActive" class="badge badge-sm inactive"
+          style="margin-left: 8px;">Inactivo</span>
+      </p>
       <p class="sub">{{ order.customer?.identification }}</p>
       <p class="sub" *ngIf="order.customer?.phone">📞 {{ order.customer.phone }}</p>
     </div>

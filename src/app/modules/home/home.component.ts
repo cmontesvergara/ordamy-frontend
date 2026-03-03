@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth/auth.service';
 
+import { RouterModule } from '@angular/router';
+
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterModule],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss',
 })

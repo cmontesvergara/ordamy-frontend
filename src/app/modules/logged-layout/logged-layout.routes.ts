@@ -84,6 +84,11 @@ export const LOGGED_ROUTES: Routes = [
                     import('../settings/settings.component').then((m) => m.SettingsComponent),
                 canActivate: [hasPermissionGuard('settings', 'read')],
             },
+            {
+                path: 'support',
+                loadComponent: () =>
+                    import('../support/support.component').then((m) => m.SupportComponent),
+            },
         ],
     },
 ];

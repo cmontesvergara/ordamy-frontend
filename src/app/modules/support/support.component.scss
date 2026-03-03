@@ -1,6 +1,6 @@
 @use '../../shared/styles/module';
 
-.home-page {
+.support-page {
     width: 100%;
     min-height: 100%;
     background-color: var(--background, #f8fafc);
@@ -13,7 +13,7 @@
    ========================================= */
 .hero-section {
     width: 100%;
-    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     padding: 4rem 2rem;
     color: white;
     display: flex;
@@ -44,7 +44,7 @@
     .by-ordamy {
         font-size: clamp(1rem, 1.5vw, 1.25rem);
         font-weight: 500;
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(255, 255, 255, 0.8);
         margin-top: 0.75rem;
         letter-spacing: 0.05em;
     }
@@ -57,6 +57,7 @@
     flex: 1;
     max-width: 1000px;
     margin: -3rem auto 2rem auto;
+    /* Overlaps with hero section */
     width: 100%;
     padding: 0 1.5rem;
     display: flex;
@@ -107,15 +108,15 @@
 }
 
 /* =========================================
-   Action Grid
+   Support Grid
    ========================================= */
-.action-grid {
+.support-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
-.action-card {
+.support-card {
     text-decoration: none;
     color: inherit;
     display: flex;
@@ -193,6 +194,20 @@
 }
 
 /* =========================================
+   Footer Info
+   ========================================= */
+.footer-info {
+    text-align: center;
+    margin-top: 2rem;
+    animation: fadeIn 1s ease 0.4s backwards;
+
+    p {
+        color: var(--text-muted, #94a3b8);
+        font-size: 0.875rem;
+    }
+}
+
+/* =========================================
    Animations
    ========================================= */
 @keyframes fadeInDown {
@@ -216,6 +231,16 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
     }
 }
 
