@@ -199,3 +199,40 @@ html,
 body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+// ─── CDK Overlay Dropdown (global because CDK renders outside component scope) ──
+.cdk-dropdown {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-height: 250px;
+    overflow-y: auto;
+
+    .dropdown-item {
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        display: flex;
+        justify-content: space-between;
+
+        &:hover {
+            background: var(--hover-bg, #f1f5f9);
+        }
+
+        span {
+            color: var(--text-secondary, #64748b);
+            font-size: 0.8rem;
+        }
+
+        &.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--bg-secondary, #f8fafc);
+
+            strong {
+                color: var(--text-muted, #94a3b8);
+            }
+        }
+    }
+}
