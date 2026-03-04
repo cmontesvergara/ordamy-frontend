@@ -23,8 +23,8 @@ export const isLoggedGuard: CanActivateFn = (route, state) => {
 };
 
 function redirectToSSO(): void {
-    const ssoUrl = environment.ssoUrl;
+    const ssoPortalUrl = environment.ssoPortalUrl;
     const appId = environment.appId;
-    const redirectUri = encodeURIComponent(environment.callbackUrl);
-    window.location.href = `${ssoUrl}?app_id=${appId}&redirect_uri=${redirectUri}`;
+    const redirectUri = encodeURIComponent(environment.baseUrl + environment.callbackUrl);
+    window.location.href = `${ssoPortalUrl}?app_id=${appId}&redirect_uri=${redirectUri}`;
 }

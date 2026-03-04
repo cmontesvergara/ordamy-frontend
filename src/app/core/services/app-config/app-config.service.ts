@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AppConfigService {
-    private url = `${environment.authApiUrl}/api/settings/financial`;
+    private url = `${environment.middlewareBaseUrl}/api/settings/financial`;
 
     currency$ = new BehaviorSubject<string>('$');
     timezone$ = new BehaviorSubject<string>('America/Bogota');

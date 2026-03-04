@@ -25,7 +25,7 @@ export class LoggedLayoutComponent implements OnInit {
   userName = '';
   tenantName = '';
   currentPageTitle = 'Inicio';
-  ssoUrl = environment.ssoUrl;
+  ssoPortalUrl = environment.ssoPortalUrl;
   appVersion = packageJson.version;
 
   menuItems: MenuItem[] = [

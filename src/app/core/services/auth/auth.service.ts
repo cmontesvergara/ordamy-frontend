@@ -14,7 +14,7 @@ export class AuthService {
      */
     exchangeCode(code: string) {
         return this.http.post(
-            `${environment.authApiUrl}/api/auth/exchange`,
+            `${environment.middlewareBaseUrl}/api/auth/exchange`,
             { code },
             { withCredentials: true },
         );
@@ -42,7 +42,7 @@ export class AuthService {
                 }
             });
         }
-        return this.http.get(`${environment.authApiUrl}/api/auth/session`, {
+        return this.http.get(`${environment.middlewareBaseUrl}/api/auth/session`, {
             withCredentials: true,
         });
     }
@@ -52,7 +52,7 @@ export class AuthService {
      */
     logout() {
         return this.http.post(
-            `${environment.authApiUrl}/api/auth/logout`,
+            `${environment.middlewareBaseUrl}/api/auth/logout`,
             {},
             { withCredentials: true },
         );

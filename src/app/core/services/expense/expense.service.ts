@@ -4,7 +4,7 @@ import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ExpenseService {
-    private url = `${environment.authApiUrl}/api/expenses`;
+    private url = `${environment.middlewareBaseUrl}/api/expenses`;
 
     constructor(private http: HttpClient) { }
 
