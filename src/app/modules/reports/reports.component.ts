@@ -32,7 +32,8 @@ export class ReportsComponent implements OnInit {
   constructor(private reportService: ReportService, public config: AppConfigService) { }
 
   ngOnInit() {
-    this.dailyDate = new Date().toISOString().split('T')[0];
+    const d = new Date();
+    this.dailyDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     this.loadDaily();
   }
 
