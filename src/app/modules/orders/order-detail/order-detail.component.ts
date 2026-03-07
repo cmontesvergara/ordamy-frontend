@@ -213,14 +213,14 @@ export class OrderDetailComponent implements OnInit {
 
   // Print order
   printOrder(mode: 'production' | 'customer') {
-    this.printMode = mode;
-    document.body.classList.add('printing', `print-${mode}`);
-    setTimeout(() => {
-      window.print();
-      setTimeout(() => {
-        document.body.classList.remove('printing', `print-${mode}`);
-        this.printMode = null;
-      }, 500);
-    }, 100);
+    const title = mode === 'production' ? 'Voucher de Producción' : 'Cuenta de Cobro';
+    this.toast.show('info', 'Generando', `Descargando ${title}...`);
+    this.orderService.downloadPdf(this.order.id, mode).subscribe({
+      next: (blob: Blob) => {
+        const fileURL = URL.createObjectURL(blob);
+        window.open(fileURL, '_blank');
+      },
+      error: () => this.toast.error('Error', 'No se pudo generar el PDF')
+    });
   }
 }

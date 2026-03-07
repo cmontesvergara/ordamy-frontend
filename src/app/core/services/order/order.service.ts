@@ -37,4 +37,11 @@ export class OrderService {
     updateOperationalStatus(id: string, operationalStatus: string) {
         return this.http.put<any>(`${this.url}/${id}/operational-status`, { operationalStatus }, { withCredentials: true });
     }
+
+    downloadPdf(id: string, mode: 'production' | 'customer') {
+        return this.http.get(`${this.url}/${id}/pdf?mode=${mode}`, {
+            responseType: 'blob',
+            withCredentials: true
+        });
+    }
 }
