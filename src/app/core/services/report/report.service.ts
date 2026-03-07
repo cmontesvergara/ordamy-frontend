@@ -34,4 +34,17 @@ export class ReportService {
         if (month) params = params.set('month', month.toString());
         return this.http.get<any>(`${this.url}/monthly`, { params, withCredentials: true });
     }
+
+    downloadDailyPdf(date?: string) {
+        let params = new HttpParams();
+        if (date) params = params.set('date', date);
+        return this.http.get(`${this.url}/daily/pdf`, { params, responseType: 'blob', withCredentials: true });
+    }
+
+    downloadMonthlyPdf(year?: number, month?: number) {
+        let params = new HttpParams();
+        if (year) params = params.set('year', year.toString());
+        if (month) params = params.set('month', month.toString());
+        return this.http.get(`${this.url}/monthly/pdf`, { params, responseType: 'blob', withCredentials: true });
+    }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportService } from '../../core/services/report/report.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
   selector: 'app-reports',
@@ -29,7 +30,11 @@ export class ReportsComponent implements OnInit {
 
   years = [2024, 2025, 2026];
 
-  constructor(private reportService: ReportService, public config: AppConfigService) { }
+  constructor(
+    private reportService: ReportService,
+    public config: AppConfigService,
+    private toast: ToastService
+  ) { }
 
   ngOnInit() {
     const d = new Date();
@@ -50,6 +55,21 @@ export class ReportsComponent implements OnInit {
   }
 
   printReport() {
-    window.print();
+    const isDaily = this.activeTab === 'daily';
+    const message = isDaily ? 'Descargando Corte Diario...' : 'Descargando Corte Mensual...';
+
+    this.toast.show('info', 'Generando', message);
+
+    const request$ = isDaily
+      ? this.reportService.downloadDailyPdf(this.dailyDate)
+      : this.reportService.downloadMonthlyPdf(this.selectedYear, this.selectedMonth);
+
+    request$.subscribe({
+      next: (blob: Blob) => {
+        const fileURL = URL.createObjectURL(blob);
+        window.open(fileURL, '_blank');
+      },
+      error: () => this.toast.error('Error', 'No se pudo generar el PDF')
+    });
   }
 }
