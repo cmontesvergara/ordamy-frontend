@@ -1,0 +1,16 @@
+{
+    "name": "Ordamy",
+    "short_name": "Ordamy",
+    "theme_color": "#6366f1",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "icons": [
+        {
+            "src": "assets/ordamy_icon_512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
