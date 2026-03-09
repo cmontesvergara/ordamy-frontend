@@ -154,6 +154,20 @@
     width: 100%;
     border-collapse: collapse;
 
+    @media (max-width: 768px) {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+
+        /* Ocultar barra de scroll para un diseño más limpio nativo, pero permitiendo el arrastre */
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
     th,
     td {
         padding: 0.625rem 1rem;
