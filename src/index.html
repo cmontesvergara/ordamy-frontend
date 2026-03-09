@@ -12,10 +12,66 @@
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    /* Loader base styles */
+    .pwa-loader-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #f8fafc; /* Light background for the splash */
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    /* Only show if the PWA is launched in standalone mode and Angular hasn't replaced app-root yet */
+    @media (display-mode: standalone) {
+      .pwa-loader-container {
+        display: flex;
+      }
+    }
+
+    .pwa-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(99, 102, 241, 0.2);
+      border-top-color: #6366f1; /* Brand color */
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    .pwa-text {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #334155;
+      letter-spacing: 0.5px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+  </style>
 </head>
 
 <body>
-  <app-root></app-root>
+  <app-root>
+    <div class="pwa-loader-container">
+      <div class="pwa-spinner"></div>
+      <div class="pwa-text">Iniciando Ordamy...</div>
+    </div>
+  </app-root>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
