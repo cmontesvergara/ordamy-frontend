@@ -22,6 +22,11 @@ interface MenuItem {
 })
 export class LoggedLayoutComponent implements OnInit {
   sidebarCollapsed = false;
+  leftMenuOpen = false;
+  rightMenuOpen = false;
+  private touchStartX = 0;
+  private touchEndX = 0;
+
   userName = '';
   tenantName = '';
   currentPageTitle = 'Inicio';
@@ -85,5 +90,46 @@ export class LoggedLayoutComponent implements OnInit {
         window.location.href = '/';
       },
     });
+  }
+
+  onTouchStart(e: TouchEvent) {
+    this.touchStartX = e.changedTouches[0].screenX;
+  }
+
+  onTouchEnd(e: TouchEvent) {
+    this.touchEndX = e.changedTouches[0].screenX;
+    this.handleSwipe();
+  }
+
+  private handleSwipe() {
+    const swipeDistance = this.touchEndX - this.touchStartX;
+    const threshold = 50;
+
+    // Swipe Left
+    if (swipeDistance < -threshold) {
+      if (this.leftMenuOpen) {
+        this.leftMenuOpen = false;
+      } else if (!this.rightMenuOpen) {
+        if (this.touchStartX > window.innerWidth - 50) {
+          this.rightMenuOpen = true;
+        }
+      }
+    }
+
+    // Swipe Right
+    if (swipeDistance > threshold) {
+      if (this.rightMenuOpen) {
+        this.rightMenuOpen = false;
+      } else if (!this.leftMenuOpen) {
+        if (this.touchStartX < 50) {
+          this.leftMenuOpen = true;
+        }
+      }
+    }
+  }
+
+  closeMenus() {
+    this.leftMenuOpen = false;
+    this.rightMenuOpen = false;
   }
 }
