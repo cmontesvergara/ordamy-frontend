@@ -58,8 +58,10 @@
           <input type="text" [(ngModel)]="item.description" placeholder="Descripción *" class="flex-2"
             [readonly]="!!item.productId" />
           <input type="number" [(ngModel)]="item.quantity" min="1" placeholder="Cant." class="w-80" />
-          <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120" />
-          <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales">🧮</button>
+          <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120"
+            [readonly]="!!item.productId" />
+          <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
+            *ngIf="!item.productId">🧮</button>
           <span class="item-total">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
           <button class="btn-icon" (click)="removeItem(i)" *ngIf="items.length > 1"><span
               class="icon icon-delete"></span></button>
@@ -195,7 +197,7 @@
       <div class="calc-search">
         <input type="text" [(ngModel)]="calcMaterialSearch" (input)="searchCalcMaterials()"
           placeholder="Buscar material para agregar..." class="full-width" autofocus />
-        <div class="calc-search-results" *ngIf="calcMaterialResults.length > 0">
+        <div class="calc-search-results" *ngIf="calcMaterialSearch.length > 0 && calcMaterialResults.length > 0">
           @for (m of calcMaterialResults; track m.id) {
           <div class="calc-search-item" (click)="addCalcMaterial(m)">
             <strong>{{ m.name }}</strong>

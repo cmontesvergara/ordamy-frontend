@@ -220,7 +220,6 @@ export class OrderCreateComponent implements OnInit {
     this.calcMaterialSearch = '';
     this.calcMaterialResults = [];
     this.showMaterialCalc = true;
-    this.searchCalcMaterialsNow();
   }
 
   searchCalcMaterials() {
