@@ -42,6 +42,7 @@ export class LoggedLayoutComponent implements OnInit {
     { label: 'Cartera', icon: 'portfolio', route: '/portfolio' },
     { label: 'Reportes', icon: 'reports', route: '/reports' },
     { label: 'Productos', icon: 'products', route: '/products' },
+    { label: 'Materiales', icon: 'products', route: '/materials' },
     { label: 'Configuración', icon: 'settings', route: '/settings' },
     { label: 'Soporte', icon: 'support', route: '/support' },
   ];

@@ -335,3 +335,134 @@
 .full-width {
     width: 100%;
 }
+
+// Modal XL for calculator
+.modal-xl {
+    max-width: 720px;
+}
+
+// Calculator button
+.calc-btn {
+    font-size: 1.1rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.15s;
+
+    &:hover {
+        background: var(--hover-bg, #f1f5f9);
+    }
+}
+
+// Calculator search
+.calc-search {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.calc-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.calc-search-item {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+        background: var(--hover-bg, #f1f5f9);
+    }
+}
+
+.calc-search-price {
+    margin-left: auto;
+    font-weight: 600;
+    color: var(--primary, hsl(24, 90%, 50%));
+    white-space: nowrap;
+}
+
+// Calculator table
+.calc-table-wrapper {
+    overflow-x: auto;
+}
+
+.calc-table {
+    .w-120 {
+        width: 120px;
+    }
+
+    .w-100 {
+        width: 100px;
+    }
+
+    .w-50 {
+        width: 50px;
+    }
+}
+
+.calc-input {
+    width: 100%;
+    min-width: 60px;
+}
+
+.calc-resolved {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--primary, hsl(24, 90%, 50%));
+    margin-top: 2px;
+}
+
+.calc-unit {
+    font-size: 0.75rem;
+}
+
+// Calculator empty
+.calc-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+// Calculator totals
+.calc-totals {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.calc-totals-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.375rem 0;
+    font-size: 0.875rem;
+}
+
+.calc-factor-row {
+    label {
+        font-size: 0.875rem;
+    }
+
+    input {
+        text-align: right;
+    }
+}
+
+.calc-total-final {
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+    border-top: 2px solid var(--primary, hsl(24, 90%, 50%));
+    font-size: 1rem;
+}
