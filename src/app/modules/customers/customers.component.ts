@@ -58,6 +58,13 @@ export class CustomersComponent implements OnInit {
 
   createCustomer() {
     if (!this.newCustomer.identification || !this.newCustomer.name) return;
+
+    const phone = this.newCustomer.phone?.trim();
+    if (phone && !/^3\d{9}$/.test(phone)) {
+      this.toast.error('Error', 'El teléfono debe tener 10 dígitos, empezar por 3 y no contener espacios');
+      return;
+    }
+
     this.saving = true;
     this.customerService.create(this.newCustomer).subscribe({
       next: () => {

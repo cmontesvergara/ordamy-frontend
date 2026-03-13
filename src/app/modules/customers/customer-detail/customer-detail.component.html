@@ -63,12 +63,13 @@
     <h3>Editar Cliente</h3>
     <div class="form-grid">
       <div class="form-group">
-        <label>Nombre *</label>
+        <label>Nombre <span class="required-asterisk">*</span></label>
         <input [(ngModel)]="editData.name" placeholder="Nombre" />
       </div>
       <div class="form-group">
         <label>Teléfono</label>
-        <input [(ngModel)]="editData.phone" placeholder="Teléfono" />
+        <input type="text" [(ngModel)]="editData.phone" placeholder="Ej: 3001234567" pattern="^3[0-9]{9}$"
+          maxlength="10" title="Debe ser un número de 10 dígitos que empiece por 3 sin espacios" />
       </div>
       <div class="form-group">
         <label>Email</label>
@@ -147,7 +148,8 @@
           <td>{{ o.orderDate | date:'dd/MM/yyyy':config.timezone }}</td>
           <td class="text-muted">{{ o.sellerName }}</td>
           <td class="text-right">{{ config.currency }} {{ o.total | number:'1.0-0' }}</td>
-          <td class="text-right" [class.debt]="o.balance > 0">{{ config.currency }} {{ o.balance | number:'1.0-0' }}</td>
+          <td class="text-right" [class.debt]="o.balance > 0">{{ config.currency }} {{ o.balance | number:'1.0-0' }}
+          </td>
           <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
           <td><span class="badge op-{{ o.operationalStatus }}">{{ operationalLabels[o.operationalStatus] ||
               o.operationalStatus }}</span></td>

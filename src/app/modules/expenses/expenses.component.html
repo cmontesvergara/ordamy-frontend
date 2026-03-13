@@ -9,15 +9,15 @@
   <h3>Nuevo Egreso</h3>
   <div class="form-grid">
     <div class="form-group">
-      <label>Descripción *</label>
+      <label>Descripción <span class="required-asterisk">*</span></label>
       <input [(ngModel)]="newExpense.description" placeholder="Descripción" />
     </div>
     <div class="form-group">
-      <label>Monto *</label>
+      <label>Monto <span class="required-asterisk">*</span></label>
       <input type="number" [(ngModel)]="newExpense.amount" placeholder="0" />
     </div>
     <div class="form-group">
-      <label>Categoría *</label>
+      <label>Categoría <span class="required-asterisk">*</span></label>
       <select [(ngModel)]="newExpense.categoryId">
         <option value="">Seleccionar...</option>
         @for (c of categories; track c.id) {
@@ -35,7 +35,7 @@
       </select>
     </div>
     <div class="form-group">
-      <label>Medio de pago *</label>
+      <label>Medio de pago <span class="required-asterisk">*</span></label>
       <select [(ngModel)]="newExpense.paymentMethodId">
         <option value="">Seleccionar...</option>
         @for (m of paymentMethods; track m.id) {
@@ -133,11 +133,11 @@
     <h3>Editar Egreso #{{ editingExpense.number }}</h3>
     <div class="form-grid">
       <div class="form-group">
-        <label>Descripción *</label>
+        <label>Descripción <span class="required-asterisk">*</span></label>
         <input [(ngModel)]="editData.description" placeholder="Descripción" />
       </div>
       <div class="form-group">
-        <label>Monto *</label>
+        <label>Monto <span class="required-asterisk">*</span></label>
         <input type="number" [(ngModel)]="editData.amount" placeholder="0" />
       </div>
       <div class="form-group">

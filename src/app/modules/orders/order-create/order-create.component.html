@@ -121,16 +121,17 @@
     <div class="modal-body">
       <div class="form-grid">
         <div class="form-group">
-          <label>Identificación (NIT/CC) *</label>
+          <label>Identificación (NIT/CC) <span class="required-asterisk">*</span></label>
           <input type="text" [(ngModel)]="newCustomer.identification" placeholder="Ej: 900123456-1" />
         </div>
         <div class="form-group">
-          <label>Nombre / Razón Social *</label>
+          <label>Nombre / Razón Social <span class="required-asterisk">*</span></label>
           <input type="text" [(ngModel)]="newCustomer.name" placeholder="Nombre del cliente" />
         </div>
         <div class="form-group">
           <label>Teléfono</label>
-          <input type="text" [(ngModel)]="newCustomer.phone" placeholder="Teléfono" />
+          <input type="text" [(ngModel)]="newCustomer.phone" placeholder="Ej: 3001234567" pattern="^3[0-9]{9}$"
+            maxlength="10" title="Debe ser un número de 10 dígitos que empiece por 3 sin espacios" />
         </div>
         <div class="form-group">
           <label>Email</label>
