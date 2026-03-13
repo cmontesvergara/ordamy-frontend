@@ -9,8 +9,7 @@
       <div class="actions-menu">
         <button class="action-item" (click)="printOrder('production'); actionsOpen = false">Imprimir Producción</button>
         <button class="action-item" (click)="printOrder('customer'); actionsOpen = false">Imprimir Cliente</button>
-        <button *ngIf="order.status !== 'CANCELLED'" class="action-item"
-          (click)="toggleEditOrder(); actionsOpen = false">
+        <button *ngIf="order.status === 'ACTIVE'" class="action-item" (click)="toggleEditOrder(); actionsOpen = false">
           Editar Orden
         </button>
         <div *ngIf="order.status === 'ACTIVE'" class="action-separator"></div>
