@@ -18,6 +18,7 @@ export class MaterialsComponent implements OnInit {
     newMaterial = { name: '', description: '', price: 0, unit: '' };
     editing: any = null;
     searchTerm = '';
+    showCreateForm = false;
 
     canCreate = false;
     canUpdate = false;
@@ -59,11 +60,17 @@ export class MaterialsComponent implements OnInit {
         this.materialService.create(this.newMaterial).subscribe({
             next: () => {
                 this.newMaterial = { name: '', description: '', price: 0, unit: '' };
+                this.showCreateForm = false;
                 this.loadMaterials();
                 this.toast.success('Creado', 'Material agregado');
             },
             error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al crear material'); },
         });
+    }
+
+    cancelCreate() {
+        this.newMaterial = { name: '', description: '', price: 0, unit: '' };
+        this.showCreateForm = false;
     }
 
     startEdit(item: any) {

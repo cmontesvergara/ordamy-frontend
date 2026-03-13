@@ -3,12 +3,13 @@
 </div>
 
 <!-- Search -->
-<div class="search-bar">
+<div class="search-bar" *ngIf="!showCreateForm">
     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar producto..." (input)="loadProducts()" />
+    <button class="btn btn-primary btn-sm" (click)="showCreateForm = true" *ngIf="canCreate">+ Nuevo</button>
 </div>
 
 <!-- Create Form -->
-<div class="card section" *ngIf="canCreate">
+<div class="card section p-4 mb-2" *ngIf="canCreate && showCreateForm">
     <h3>Nuevo Producto</h3>
     <div class="form-grid">
         <div class="form-group">
@@ -29,6 +30,7 @@
         </div>
     </div>
     <div class="form-actions">
+        <button class="btn btn-outline" (click)="cancelCreate()">Cancelar</button>
         <button class="btn btn-primary" (click)="addProduct()" [disabled]="!newProduct.name">Agregar Producto</button>
     </div>
 </div>

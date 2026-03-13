@@ -49,7 +49,7 @@
         <h3>Items</h3>
         <div class="section-actions">
           <button class="btn btn-outline btn-sm" (click)="openProductPicker()">📦 Productos</button>
-          <button class="btn btn-outline btn-sm" (click)="addItem()">+ Item libre</button>
+          <button class="btn btn-outline btn-sm" (click)="addItem()">Nuevo Item</button>
         </div>
       </div>
       <div class="items-list">
@@ -61,7 +61,7 @@
           <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120"
             [readonly]="!!item.productId" />
           <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
-            *ngIf="!item.productId">🧮</button>
+            *ngIf="!item.productId">🔢</button>
           <span class="item-total">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
           <button class="btn-icon" (click)="removeItem(i)" *ngIf="items.length > 1"><span
               class="icon icon-delete"></span></button>

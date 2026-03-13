@@ -18,6 +18,7 @@ export class ProductsComponent implements OnInit {
     newProduct = { name: '', description: '', basePrice: 0, unit: '' };
     editing: any = null;
     searchTerm = '';
+    showCreateForm = false;
 
     canCreate = false;
     canUpdate = false;
@@ -57,11 +58,17 @@ export class ProductsComponent implements OnInit {
         this.productService.create(this.newProduct).subscribe({
             next: () => {
                 this.newProduct = { name: '', description: '', basePrice: 0, unit: '' };
+                this.showCreateForm = false;
                 this.loadProducts();
                 this.toast.success('Creado', 'Producto agregado');
             },
             error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al crear producto'); },
         });
+    }
+
+    cancelCreate() {
+        this.newProduct = { name: '', description: '', basePrice: 0, unit: '' };
+        this.showCreateForm = false;
     }
 
     startEdit(item: any) {
