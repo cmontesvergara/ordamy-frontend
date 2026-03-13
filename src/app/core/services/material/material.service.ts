@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 
@@ -11,6 +11,13 @@ export class MaterialService {
     list(search?: string) {
         const params = search ? `?search=${encodeURIComponent(search)}&limit=100` : '?limit=100';
         return this.http.get<any>(`${this.url}${params}`, { withCredentials: true });
+    }
+
+    /** Silent list — does not trigger the global loader */
+    listSilent(search?: string) {
+        const params = search ? `?search=${encodeURIComponent(search)}&limit=100` : '?limit=100';
+        const headers = new HttpHeaders({ 'X-Skip-Loading': '1' });
+        return this.http.get<any>(`${this.url}${params}`, { withCredentials: true, headers });
     }
 
     create(data: any) {

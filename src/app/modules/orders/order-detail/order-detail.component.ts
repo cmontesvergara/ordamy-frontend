@@ -5,14 +5,16 @@ import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../core/services/order/order.service';
 import { PaymentService } from '../../../core/services/payment/payment.service';
 import { SettingsService } from '../../../core/services/settings/settings.service';
+import { ProductService } from '../../../core/services/product/product.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
+import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
 import { OverlayModule } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, OverlayModule],
+  imports: [CommonModule, FormsModule, RouterLink, OverlayModule, MaterialCalculatorComponent],
   templateUrl: './order-detail.component.html',
   styleUrl: './order-detail.component.scss',
 })
@@ -38,6 +40,16 @@ export class OrderDetailComponent implements OnInit {
   // Edit payment
   editingPayment: any = null;
   editPaymentData: any = { paymentMethodId: '', amount: 0, notes: '' };
+
+  // Product picker (for edit)
+  showProductPicker = false;
+  productSearch = '';
+  productResults: any[] = [];
+  productSearchTimeout: any;
+
+  // Material calculator (for edit)
+  showMaterialCalc = false;
+  calcItemIndex = -1;
 
   // O10: Operational status steps
   operationalSteps = [
@@ -66,6 +78,7 @@ export class OrderDetailComponent implements OnInit {
     private orderService: OrderService,
     private paymentService: PaymentService,
     private settingsService: SettingsService,
+    private productService: ProductService,
     private el: ElementRef,
     public config: AppConfigService,
     private toast: ToastService,
@@ -223,4 +236,53 @@ export class OrderDetailComponent implements OnInit {
       error: () => this.toast.error('Error', 'No se pudo generar el PDF')
     });
   }
+
+  // Product picker (for edit)
+  openProductPicker() {
+    this.showProductPicker = true;
+    this.productSearch = '';
+    this.productResults = [];
+    this.searchProductsNow();
+  }
+
+  searchProducts() {
+    clearTimeout(this.productSearchTimeout);
+    this.productSearchTimeout = setTimeout(() => this.searchProductsNow(), 300);
+  }
+
+  searchProductsNow() {
+    this.productService.list(this.productSearch || undefined).subscribe({
+      next: (res: any) => { this.productResults = res.data; },
+    });
+  }
+
+  addProductToEdit(product: any) {
+    this.editOrderData.items.push({
+      productId: product.id,
+      description: product.name + (product.description ? ' — ' + product.description : ''),
+      quantity: 1,
+      unitPrice: parseFloat(product.basePrice) || 0,
+    });
+    this.showProductPicker = false;
+    this.recalcEditTotals();
+  }
+
+  // Material calculator (for edit)
+  openMaterialCalc(index: number) {
+    this.calcItemIndex = index;
+    this.showMaterialCalc = true;
+  }
+
+  onCalcPriceApplied(price: number) {
+    if (this.calcItemIndex >= 0 && this.calcItemIndex < this.editOrderData.items.length) {
+      this.editOrderData.items[this.calcItemIndex].unitPrice = price;
+      this.recalcEditTotals();
+    }
+    this.showMaterialCalc = false;
+  }
+
+  closeMaterialCalc() {
+    this.showMaterialCalc = false;
+  }
 }
+

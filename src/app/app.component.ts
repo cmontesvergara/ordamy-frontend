@@ -3,32 +3,15 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { LoadingService } from './core/services/loading/loading.service';
 import { ToastService, Toast } from './core/services/toast/toast.service';
+import { LoaderOverlayComponent } from './shared/components/loader-overlay/loader-overlay.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, LoaderOverlayComponent],
   templateUrl: './app.component.html',
   styles: [`
     :host { display: block; min-height: 100vh; }
-    
-    /* Global Loader */
-    .global-loader-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .loader-spinner {
-      width: 64px;
-      height: 64px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
 
     /* Toasts */
     .toast-container {

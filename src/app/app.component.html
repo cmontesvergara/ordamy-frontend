@@ -1,18 +1,12 @@
 <router-outlet></router-outlet>
 
 <!-- Global Loader -->
-<div class="global-loader-overlay" *ngIf="loadingService.is()">
-  <img src="assets/ordamy_loader.svg" alt="Cargando..." class="loader-spinner" />
-</div>
+<app-loader-overlay *ngIf="loadingService.is()" mode="fixed"></app-loader-overlay>
 
 <!-- Global Toasts Container -->
 <div class="toast-container" *ngIf="toastService.toasts$ | async as toasts">
-  <div 
-    *ngFor="let toast of toasts" 
-    class="toast" 
-    [ngClass]="'toast-' + toast.type"
-    (click)="toastService.remove(toast.id)"
-  >
+  <div *ngFor="let toast of toasts" class="toast" [ngClass]="'toast-' + toast.type"
+    (click)="toastService.remove(toast.id)">
     <div class="toast-indicator"></div>
     <div class="toast-content">
       <strong>{{ toast.title }}</strong>

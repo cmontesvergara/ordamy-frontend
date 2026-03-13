@@ -39,7 +39,7 @@
   </div>
 
   <!-- O10: Operational Status Stepper -->
-  <div class="stepper-card" *ngIf="order.status === 'ACTIVE'">
+  <div class="stepper-card" *ngIf="order.status === 'ACTIVE' && !editingOrder">
     <h4>Estado Operativo</h4>
     <div class="stepper">
       @for (step of operationalSteps; track step.key; let i = $index) {
@@ -69,7 +69,7 @@
   </div>
 
   <!-- Info Grid -->
-  <div class="info-grid">
+  <div class="info-grid" *ngIf="!editingOrder">
     <div class="info-card">
       <h4>Cliente</h4>
       <p>
@@ -119,13 +119,20 @@
         </div>
       </div>
 
-      <h4>Items</h4>
+      <div class="section-header" style="margin-bottom: 0.75rem;">
+        <h4>Items</h4>
+        <div class="section-actions">
+          <button class="btn btn-outline btn-sm" (click)="openProductPicker()">📦 Productos</button>
+          <button class="btn btn-outline btn-sm" (click)="addEditItem()">Nuevo Item</button>
+        </div>
+      </div>
       <table class="data-table edit-items-table">
         <thead>
           <tr>
             <th>Descripción</th>
             <th style="width:100px">Cant.</th>
             <th style="width:120px">P. Unit.</th>
+            <th style="width:40px"></th>
             <th style="width:100px" class="text-right">Total</th>
             <th style="width:40px"></th>
           </tr>
@@ -133,11 +140,16 @@
         <tbody>
           @for (item of editOrderData.items; track $index; let i = $index) {
           <tr>
-            <td><input type="text" [(ngModel)]="item.description" class="input-full" /></td>
+            <td><input type="text" [(ngModel)]="item.description" class="input-full" [readonly]="!!item.productId" />
+            </td>
             <td><input type="number" [(ngModel)]="item.quantity" min="1" class="input-full text-right"
                 (input)="recalcEditTotals()" /></td>
             <td><input type="number" [(ngModel)]="item.unitPrice" min="0" class="input-full text-right"
-                (input)="recalcEditTotals()" /></td>
+                (input)="recalcEditTotals()" [readonly]="!!item.productId" /></td>
+            <td class="text-center">
+              <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
+                *ngIf="!item.productId">🔢</button>
+            </td>
             <td class="text-right">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
             <td class="text-center">
               <button class="btn-icon danger" (click)="removeEditItem(i)" title="Eliminar"><span
@@ -148,13 +160,12 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="3" class="text-right"><strong>Subtotal</strong></td>
+            <td colspan="4" class="text-right"><strong>Subtotal</strong></td>
             <td class="text-right"><strong>{{ config.currency }} {{ editSubtotal | number:'1.0-0' }}</strong></td>
             <td></td>
           </tr>
         </tfoot>
       </table>
-      <button class="btn btn-outline btn-sm" (click)="addEditItem()">+ Agregar Item</button>
 
       <div class="form-actions">
         <button class="btn btn-outline btn-sm" (click)="editingOrder = false">Cancelar</button>
@@ -166,7 +177,7 @@
   </div>
 
   <!-- Items -->
-  <div class="card section">
+  <div class="card section" *ngIf="!editingOrder">
     <h3>Items ({{ order.items?.length }})</h3>
     <table class="data-table">
       <thead>
@@ -193,7 +204,7 @@
   </div>
 
   <!-- Payments (no-print for production) -->
-  <div class="card section no-print-production">
+  <div class="card section no-print-production" *ngIf="!editingOrder">
     <div class="section-header">
       <h3>Pagos ({{ order.payments?.length }})</h3>
       <button *ngIf="order.status === 'ACTIVE' && order.balance > 0" class="btn btn-primary btn-sm no-print"
@@ -263,7 +274,7 @@
   </div>
 
   <!-- Status History Timeline -->
-  <div class="card section no-print" *ngIf="order.events?.length > 0">
+  <div class="card section no-print" *ngIf="order.events?.length > 0 && !editingOrder">
     <div class="section-header clickable" (click)="historyOpen = !historyOpen">
       <h3>Historial de Movimientos ({{ order.events.length }})</h3>
       <span class="toggle-icon">{{ historyOpen ? '▲' : '▼' }}</span>
@@ -307,3 +318,41 @@
   <div class="spinner"></div>
   <p>Cargando orden...</p>
 </div>
+
+<!-- Product Picker Modal -->
+<div class="modal-overlay" *ngIf="showProductPicker" (click)="showProductPicker = false">
+  <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Seleccionar Producto</h3>
+      <button class="btn-close" (click)="showProductPicker = false">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" [(ngModel)]="productSearch" (input)="searchProducts()" placeholder="Buscar producto..."
+        class="full-width" autofocus />
+      <div class="product-list">
+        @for (p of productResults; track p.id) {
+        <div class="product-item" (click)="addProductToEdit(p)">
+          <div class="product-info">
+            <strong>{{ p.name }}</strong>
+            <span class="product-desc" *ngIf="p.description">{{ p.description }}</span>
+          </div>
+          <div class="product-meta">
+            <span class="product-price">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
+            <span class="product-unit" *ngIf="p.unit">/ {{ p.unit }}</span>
+          </div>
+        </div>
+        }
+        @if (productResults.length === 0) {
+        <p class="empty">No se encontraron productos</p>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Material Calculator -->
+<app-material-calculator
+  [(visible)]="showMaterialCalc"
+  (priceApplied)="onCalcPriceApplied($event)">
+</app-material-calculator>
