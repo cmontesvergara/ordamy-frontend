@@ -20,6 +20,7 @@ export class WelcomeComponent {
             debug: !environment.production,
             theme: 'light',
             timeout: 60000,
+            redirectUri: `${environment.baseUrl}/auth/callback`,
         });
     }
 
