@@ -7,4 +7,5 @@ export const environment = {
     callbackUrl: '/auth/callback',
     middlewareBaseUrl: 'http://localhost:4300',    // ordamy-middleware
     mockAuth: true,                         // true = bypass SSO & Permissions locally
+    jwksUrl: 'http://localhost:3000/.well-known/jwks.json',
 };

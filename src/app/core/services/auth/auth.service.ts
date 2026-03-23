@@ -10,7 +10,18 @@ export class AuthService {
     constructor(private readonly http: HttpClient) { }
 
     /**
-     * Exchange authorization code for session token via middleware
+     * Exchange signed payload (JWS) for session token via middleware (v2.3)
+     */
+    exchangePayload(signedPayload: string) {
+        return this.http.post(
+            `${environment.middlewareBaseUrl}/api/auth/exchange-v2`,
+            { payload: signedPayload },
+            { withCredentials: true },
+        );
+    }
+
+    /**
+     * Exchange authorization code for session token via middleware (v1.0 legacy / fallback)
      */
     exchangeCode(code: string) {
         return this.http.post(

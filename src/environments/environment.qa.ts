@@ -6,4 +6,5 @@ export const environment = {
     baseUrl: 'https://ordamy-qa.bigso.co',
     callbackUrl: '/auth/callback',
     middlewareBaseUrl: 'https://ordamy-middleware-qa.bigso.co',
+    jwksUrl: 'https://sso-core-qa.bigso.co/.well-known/jwks.json',
 };

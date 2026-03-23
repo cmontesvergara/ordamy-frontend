@@ -38,27 +38,48 @@ export class CallbackComponent implements OnInit {
     ) { }
 
     ngOnInit() {
+        const payload = this.route.snapshot.queryParamMap.get('payload');
         const code = this.route.snapshot.queryParamMap.get('code');
 
-        if (!code) {
-            console.error('No authorization code received');
-            this.router.navigate(['/']);
+        // Flujo v2.3: signed_payload (JWS) del SDK
+        if (payload) {
+            this.authService.exchangePayload(payload).subscribe({
+                next: (response: any) => {
+                    if (response.success) {
+                        this.router.navigate(['/home']);
+                    } else {
+                        console.error('Exchange payload failed:', response);
+                        this.router.navigate(['/']);
+                    }
+                },
+                error: (error: any) => {
+                    console.error('Exchange payload error:', error);
+                    this.router.navigate(['/']);
+                },
+            });
             return;
         }
 
-        this.authService.exchangeCode(code).subscribe({
-            next: (response: any) => {
-                if (response.success) {
-                    this.router.navigate(['/home']);
-                } else {
-                    console.error('Exchange failed:', response);
+        // Flujo legacy v1.0: código de autorización directo (fallback redirect)
+        if (code) {
+            this.authService.exchangeCode(code).subscribe({
+                next: (response: any) => {
+                    if (response.success) {
+                        this.router.navigate(['/home']);
+                    } else {
+                        console.error('Exchange failed:', response);
+                        this.router.navigate(['/']);
+                    }
+                },
+                error: (error: any) => {
+                    console.error('Exchange error:', error);
                     this.router.navigate(['/']);
-                }
-            },
-            error: (error: any) => {
-                console.error('Exchange error:', error);
-                this.router.navigate(['/']);
-            },
-        });
+                },
+            });
+            return;
+        }
+
+        console.error('No authorization code or payload received');
+        this.router.navigate(['/']);
     }
 }
