@@ -19,6 +19,7 @@ export class WelcomeComponent {
             jwksUrl: environment.jwksUrl,
             debug: !environment.production,
             theme: 'light',
+            timeout: 60000,
         });
     }
 
