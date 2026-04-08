@@ -85,9 +85,11 @@ export class LoggedLayoutComponent implements OnInit {
   logout() {
     this.authService.logout().subscribe({
       next: () => {
+        this.authService.handleLogout();
         window.location.href = '/';
       },
       error: () => {
+        this.authService.handleLogout();
         window.location.href = '/';
       },
     });

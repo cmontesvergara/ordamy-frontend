@@ -29,9 +29,10 @@ export class WelcomeComponent {
             const result = await this.auth.login();
             console.log('[Ordamy] SSO login exitoso:', result);
 
-            // Navegar al callback con el signed_payload para que el middleware lo valide
             this.router.navigate(['/auth/callback'], {
-                queryParams: { payload: result.signed_payload || JSON.stringify(result) }
+                queryParams: {
+                    payload: result.signed_payload,
+                }
             });
         } catch (error: any) {
             if (error?.message === 'Login aborted' || error?.message === 'Login cancelled by user') {
@@ -39,7 +40,6 @@ export class WelcomeComponent {
                 return;
             }
             console.error('[Ordamy] SSO login error:', error);
-            // Fallback: el SDK ya maneja el redirect en caso de timeout
         }
     }
 }

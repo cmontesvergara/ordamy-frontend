@@ -40,12 +40,13 @@ export class CallbackComponent implements OnInit {
     ngOnInit() {
         const payload = this.route.snapshot.queryParamMap.get('payload');
         const code = this.route.snapshot.queryParamMap.get('code');
+        const codeVerifier = this.route.snapshot.queryParamMap.get('codeVerifier');
 
-        // Flujo v2.3: signed_payload (JWS) del SDK
         if (payload) {
             this.authService.exchangePayload(payload).subscribe({
                 next: (response: any) => {
                     if (response.success) {
+                        this.authService.handleLoginResponse(response);
                         this.router.navigate(['/home']);
                     } else {
                         console.error('Exchange payload failed:', response);
@@ -60,11 +61,11 @@ export class CallbackComponent implements OnInit {
             return;
         }
 
-        // Flujo legacy v1.0: código de autorización directo (fallback redirect)
-        if (code) {
-            this.authService.exchangeCode(code).subscribe({
+        if (code && codeVerifier) {
+            this.authService.exchangeCode(code, codeVerifier).subscribe({
                 next: (response: any) => {
                     if (response.success) {
+                        this.authService.handleLoginResponse(response);
                         this.router.navigate(['/home']);
                     } else {
                         console.error('Exchange failed:', response);

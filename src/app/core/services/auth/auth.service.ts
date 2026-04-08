@@ -1,39 +1,50 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { of } from 'rxjs';
+import { of, BehaviorSubject } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
-    constructor(private readonly http: HttpClient) { }
+    private accessTokenKey = 'ordamy_access_token';
+    private authState$ = new BehaviorSubject<boolean>(false);
 
-    /**
-     * Exchange signed payload (JWS) for session token via middleware (v2.3)
-     */
+    constructor(private readonly http: HttpClient) {
+        this.authState$.next(!!this.getAccessToken());
+    }
+
+    get isAuthenticated$() {
+        return this.authState$.asObservable();
+    }
+
+    getAccessToken(): string | null {
+        return localStorage.getItem(this.accessTokenKey);
+    }
+
+    private setAccessToken(token: string | null) {
+        if (token) {
+            localStorage.setItem(this.accessTokenKey, token);
+        } else {
+            localStorage.removeItem(this.accessTokenKey);
+        }
+        this.authState$.next(!!token);
+    }
+
     exchangePayload(signedPayload: string) {
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/exchange-v2`,
             { payload: signedPayload },
-            { withCredentials: true },
         );
     }
 
-    /**
-     * Exchange authorization code for session token via middleware (v1.0 legacy / fallback)
-     */
-    exchangeCode(code: string) {
+    exchangeCode(code: string, codeVerifier: string) {
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/exchange`,
-            { code },
-            { withCredentials: true },
+            { code, codeVerifier },
         );
     }
 
-    /**
-     * Get current session info (validates cookie via middleware → SSO)
-     */
     getSession() {
         if ((environment as any).mockAuth) {
             return of({
@@ -43,29 +54,42 @@ export class AuthService {
                     email: 'admin@ordamy.local',
                     firstName: 'Admin',
                     lastName: 'LocalBypass',
-                    isSuperAdmin: true,
                 },
                 tenant: {
                     id: 'local-tenant',
                     name: 'Ordamy Local',
                     slug: 'ordamy-local',
-                    permissions: []
                 }
             });
         }
-        return this.http.get(`${environment.middlewareBaseUrl}/api/auth/session`, {
-            withCredentials: true,
-        });
+        return this.http.get(`${environment.middlewareBaseUrl}/api/auth/session`);
     }
 
-    /**
-     * Logout: revoke session in SSO and clear cookie
-     */
+    refreshTokens() {
+        return this.http.post(
+            `${environment.middlewareBaseUrl}/api/auth/refresh`,
+            {},
+        );
+    }
+
     logout() {
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/logout`,
             {},
-            { withCredentials: true },
         );
+    }
+
+    handleLogout() {
+        this.setAccessToken(null);
+    }
+
+    clearSession() {
+        this.setAccessToken(null);
+    }
+
+    handleLoginResponse(response: any) {
+        if (response?.success && response?.tokens?.accessToken) {
+            this.setAccessToken(response.tokens.accessToken);
+        }
     }
 }
