@@ -32,6 +32,7 @@ export class WelcomeComponent {
             this.router.navigate(['/auth/callback'], {
                 queryParams: {
                     payload: result.signed_payload,
+                    codeVerifier: result.codeVerifier,
                 }
             });
         } catch (error: any) {
