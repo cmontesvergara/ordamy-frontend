@@ -35,6 +35,7 @@ export class AuthService {
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/exchange-v2`,
             { payload: signedPayload, codeVerifier },
+            { withCredentials: true }
         );
     }
 
@@ -42,6 +43,7 @@ export class AuthService {
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/exchange`,
             { code, codeVerifier },
+            { withCredentials: true }
         );
     }
 
@@ -69,6 +71,7 @@ export class AuthService {
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/refresh`,
             {},
+            { withCredentials: true }
         );
     }
 
