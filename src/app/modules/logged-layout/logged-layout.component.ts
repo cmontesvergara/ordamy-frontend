@@ -6,6 +6,7 @@ import { AppConfigService } from '../../core/services/app-config/app-config.serv
 import { environment } from '../../../environments/environment';
 import { filter } from 'rxjs/operators';
 import packageJson from '../../../../package.json';
+import { TenantSelectorComponent, Tenant } from '../../shared/components/tenant-selector.component';
 
 interface MenuItem {
   label: string;
@@ -17,7 +18,7 @@ interface MenuItem {
 @Component({
   selector: 'app-logged-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TenantSelectorComponent],
   templateUrl: './logged-layout.component.html',
 })
 export class LoggedLayoutComponent implements OnInit {
@@ -32,6 +33,10 @@ export class LoggedLayoutComponent implements OnInit {
   currentPageTitle = 'Inicio';
   ssoPortalUrl = environment.ssoPortalUrl;
   appVersion = packageJson.version;
+
+  // Multi-tenant selector
+  tenants: Tenant[] = [];
+  currentTenant: Tenant | null = null;
 
   menuItems: MenuItem[] = [
     { label: 'Estadísticas', icon: 'dashboard', route: '/dashboard' },
@@ -61,6 +66,12 @@ export class LoggedLayoutComponent implements OnInit {
         }
         if (session?.tenant) {
           this.tenantName = session.tenant.name;
+        }
+        // Load tenants from token payload
+        if (session?.tokenPayload?.tenants) {
+          this.tenants = session.tokenPayload.tenants;
+          // Set current tenant (first one or the one matching tenantId)
+          this.currentTenant = this.tenants[0] || null;
         }
       },
     });
@@ -134,5 +145,16 @@ export class LoggedLayoutComponent implements OnInit {
   closeMenus() {
     this.leftMenuOpen = false;
     this.rightMenuOpen = false;
+  }
+
+  // Handler for tenant selection from TenantSelectorComponent
+  onTenantSelected(tenant: Tenant) {
+    this.currentTenant = tenant;
+    // TODO: Implement actual tenant switch logic (reload session or redirect to SSO)
+    console.log('Selected tenant:', tenant);
+    // Option 1: Reload page to get new session with updated tenant
+    // window.location.reload();
+    // Option 2: Call service to switch tenant and reload session
+    // this.authService.switchTenant(tenant.id).subscribe(() => window.location.reload());
   }
 }
