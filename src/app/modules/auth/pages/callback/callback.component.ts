@@ -43,7 +43,7 @@ export class CallbackComponent implements OnInit {
         const codeVerifier = this.route.snapshot.queryParamMap.get('codeVerifier');
 
         if (payload) {
-            this.authService.exchangePayload(payload).subscribe({
+            this.authService.exchangePayload(payload, codeVerifier as string).subscribe({
                 next: (response: any) => {
                     if (response.success) {
                         this.authService.handleLoginResponse(response);

@@ -31,10 +31,10 @@ export class AuthService {
         this.authState$.next(!!token);
     }
 
-    exchangePayload(signedPayload: string) {
+    exchangePayload(signedPayload: string, codeVerifier?: string) {
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/exchange-v2`,
-            { payload: signedPayload },
+            { payload: signedPayload, codeVerifier },
         );
     }
 
