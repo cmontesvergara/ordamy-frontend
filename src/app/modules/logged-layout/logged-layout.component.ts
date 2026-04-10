@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { environment } from '../../../environments/environment';
-import { filter } from 'rxjs/operators';
 import packageJson from '../../../../package.json';
 import { TenantSelectorComponent, Tenant } from '../../shared/components/tenant-selector.component';
 
@@ -21,12 +22,13 @@ interface MenuItem {
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TenantSelectorComponent],
   templateUrl: './logged-layout.component.html',
 })
-export class LoggedLayoutComponent implements OnInit {
+export class LoggedLayoutComponent implements OnInit, OnDestroy {
   sidebarCollapsed = false;
   leftMenuOpen = false;
   rightMenuOpen = false;
   private touchStartX = 0;
   private touchEndX = 0;
+  private destroy$ = new Subject<void>();
 
   userName = '';
   tenantName = '';
@@ -59,10 +61,13 @@ export class LoggedLayoutComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.authService.getSession().subscribe({
+    // Usar getSessionWithAutoRefresh para manejar refreshRequired automáticamente
+    this.authService.getSessionWithAutoRefresh().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (session: any) => {
         if (session?.user) {
-          this.userName = `${session.user.firstName} ${session.user.lastName}`;
+          this.userName = `${session.user.firstName || ''} ${session.user.lastName || ''}`.trim() || session.user.userId;
         }
         if (session?.tenant) {
           this.tenantName = session.tenant.name;
@@ -74,14 +79,27 @@ export class LoggedLayoutComponent implements OnInit {
           this.currentTenant = this.tenants[0] || null;
         }
       },
+      error: (err) => {
+        console.error('Failed to get session:', err);
+        // Si hay error 401/403, redirigir a login
+        if (err.status === 401 || err.status === 403) {
+          this.router.navigate(['/auth/login']);
+        }
+      }
     });
     this.appConfig.load();
 
     // Update page title on navigation
     this.updatePageTitle(this.router.url);
     this.router.events.pipe(
-      filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      takeUntil(this.destroy$)
     ).subscribe(e => this.updatePageTitle(e.urlAfterRedirects || e.url));
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private updatePageTitle(url: string) {

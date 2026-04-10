@@ -17,7 +17,8 @@ export function hasPermissionGuard(
         const authService = inject(AuthService);
         const toastService = inject(ToastService);
 
-        return authService.getSession().pipe(
+        // Usar getSessionWithAutoRefresh para manejar refreshRequired automáticamente
+        return authService.getSessionWithAutoRefresh().pipe(
             map((session: any) => {
                 if (!session?.tenant?.permissions) {
                     toastService.error('Autenticación', 'No hay datos de sesión o permisos disponibles.');

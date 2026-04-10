@@ -13,7 +13,8 @@ export const isLoggedGuard: CanActivateFn = (route, state) => {
         return of(false);
     }
 
-    return authService.getSession().pipe(
+    // Usar getSessionWithAutoRefresh para manejar refreshRequired automáticamente
+    return authService.getSessionWithAutoRefresh().pipe(
         map((session: any) => {
             if (session && session.user && session.user.userId) {
                 return true;

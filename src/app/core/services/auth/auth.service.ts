@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { of, BehaviorSubject } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -64,7 +65,36 @@ export class AuthService {
                 }
             });
         }
-        return this.http.get(`${environment.middlewareBaseUrl}/api/auth/session`);
+        return this.http.get(`${environment.middlewareBaseUrl}/api/auth/session`, { withCredentials: true });
+    }
+
+    /**
+     * Get session with automatic refresh handling.
+     * If the response contains refreshRequired: true, it will automatically
+     * call refreshTokens() and then retry getting the session.
+     * This is useful for components that need to ensure the token is fresh.
+     */
+    getSessionWithAutoRefresh() {
+        return this.getSession().pipe(
+            switchMap((response: any) => {
+                if (response?.refreshRequired) {
+                    console.log('🔄 Session indicates refresh required, refreshing token...');
+                    return this.refreshTokens().pipe(
+                        switchMap(() => {
+                            // After successful refresh, get session again
+                            return this.getSession();
+                        }),
+                        catchError((error) => {
+                            console.error('❌ Token refresh failed:', error);
+                            // If refresh fails, return the original response
+                            // The caller can decide what to do
+                            return of(response);
+                        })
+                    );
+                }
+                return of(response);
+            })
+        );
     }
 
     refreshTokens() {
