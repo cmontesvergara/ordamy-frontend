@@ -72,11 +72,11 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
         if (session?.tenant) {
           this.tenantName = session.tenant.name;
         }
-        // Load tenants from token payload
-        if (session?.tokenPayload?.tenants) {
-          this.tenants = session.tokenPayload.tenants;
+        // Load tenants from response (backend now sends tenants array directly)
+        if (session?.tenants) {
+          this.tenants = session.tenants;
           // Set current tenant (first one or the one matching tenantId)
-          this.currentTenant = this.tenants[0] || null;
+          this.currentTenant = this.tenants.find((t: Tenant) => t.id === session.tenant?.tenantId) || this.tenants[0] || null;
         }
       },
       error: (err) => {
