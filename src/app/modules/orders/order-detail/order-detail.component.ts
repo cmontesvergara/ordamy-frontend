@@ -12,11 +12,10 @@ import { MaterialCalculatorComponent } from '../../../shared/components/material
 import { OverlayModule } from '@angular/cdk/overlay';
 
 @Component({
-  selector: 'app-order-detail',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, OverlayModule, MaterialCalculatorComponent],
-  templateUrl: './order-detail.component.html',
-  styleUrl: './order-detail.component.scss',
+    selector: 'app-order-detail',
+    imports: [CommonModule, FormsModule, RouterLink, OverlayModule, MaterialCalculatorComponent],
+    templateUrl: './order-detail.component.html',
+    styleUrl: './order-detail.component.scss'
 })
 export class OrderDetailComponent implements OnInit {
   order: any = null;

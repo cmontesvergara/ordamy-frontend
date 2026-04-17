@@ -6,11 +6,10 @@ import { AppConfigService } from '../../core/services/app-config/app-config.serv
 import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
-  selector: 'app-reports',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './reports.component.html',
-  styleUrl: './reports.component.scss',
+    selector: 'app-reports',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './reports.component.html',
+    styleUrl: './reports.component.scss'
 })
 export class ReportsComponent implements OnInit {
   activeTab = 'daily';

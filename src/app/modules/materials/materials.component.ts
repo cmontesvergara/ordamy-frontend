@@ -8,10 +8,9 @@ import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
     selector: 'app-materials',
-    standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './materials.component.html',
-    styleUrl: './materials.component.scss',
+    styleUrl: './materials.component.scss'
 })
 export class MaterialsComponent implements OnInit {
     materials: any[] = [];

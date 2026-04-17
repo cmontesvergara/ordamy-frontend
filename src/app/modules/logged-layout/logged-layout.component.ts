@@ -17,10 +17,9 @@ interface MenuItem {
 }
 
 @Component({
-  selector: 'app-logged-layout',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TenantSelectorComponent],
-  templateUrl: './logged-layout.component.html',
+    selector: 'app-logged-layout',
+    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TenantSelectorComponent],
+    templateUrl: './logged-layout.component.html'
 })
 export class LoggedLayoutComponent implements OnInit, OnDestroy {
   sidebarCollapsed = false;

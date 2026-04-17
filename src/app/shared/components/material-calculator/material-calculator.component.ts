@@ -15,10 +15,9 @@ interface CalcMaterial {
 
 @Component({
     selector: 'app-material-calculator',
-    standalone: true,
     imports: [CommonModule, FormsModule, LoaderOverlayComponent],
     templateUrl: './material-calculator.component.html',
-    styleUrl: './material-calculator.component.scss',
+    styleUrl: './material-calculator.component.scss'
 })
 export class MaterialCalculatorComponent {
     @Input() set visible(val: boolean) {

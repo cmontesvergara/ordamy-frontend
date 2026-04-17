@@ -7,11 +7,10 @@ import { CustomerService } from '../../core/services/customer/customer.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
-  selector: 'app-portfolio',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './portfolio.component.html',
-  styleUrl: './portfolio.component.scss',
+    selector: 'app-portfolio',
+    imports: [CommonModule, FormsModule, RouterLink],
+    templateUrl: './portfolio.component.html',
+    styleUrl: './portfolio.component.scss'
 })
 export class PortfolioComponent implements OnInit {
   orders: any[] = [];

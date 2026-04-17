@@ -6,11 +6,10 @@ import { CustomerService } from '../../core/services/customer/customer.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
-  selector: 'app-customers',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './customers.component.html',
-  styleUrl: './customers.component.scss',
+    selector: 'app-customers',
+    imports: [CommonModule, FormsModule, RouterLink],
+    templateUrl: './customers.component.html',
+    styleUrl: './customers.component.scss'
 })
 export class CustomersComponent implements OnInit {
   customers: any[] = [];

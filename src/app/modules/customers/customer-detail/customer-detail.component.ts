@@ -7,11 +7,10 @@ import { AppConfigService } from '../../../core/services/app-config/app-config.s
 import { ToastService } from '../../../core/services/toast/toast.service';
 
 @Component({
-  selector: 'app-customer-detail',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './customer-detail.component.html',
-  styleUrl: './customer-detail.component.scss',
+    selector: 'app-customer-detail',
+    imports: [CommonModule, FormsModule, RouterLink],
+    templateUrl: './customer-detail.component.html',
+    styleUrl: './customer-detail.component.scss'
 })
 export class CustomerDetailComponent implements OnInit {
   customer: any = null;

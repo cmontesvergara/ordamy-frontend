@@ -8,10 +8,9 @@ import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
     selector: 'app-settings',
-    standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './settings.component.html',
-    styleUrl: './settings.component.scss',
+    styleUrl: './settings.component.scss'
 })
 export class SettingsComponent implements OnInit {
     activeTab = 'payment';

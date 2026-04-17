@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-loader-overlay',
-    standalone: true,
     imports: [CommonModule],
     template: `
     <div class="loader-overlay" [class.loader-fixed]="mode === 'fixed'" [class.loader-absolute]="mode === 'absolute'">
@@ -39,7 +38,7 @@ import { CommonModule } from '@angular/common';
             height: 64px;
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-    `],
+    `]
 })
 export class LoaderOverlayComponent {
     /** 'fixed' for full-screen global loader, 'absolute' for scoped within a parent */

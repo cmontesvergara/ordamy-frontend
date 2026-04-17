@@ -10,10 +10,9 @@ export interface Tenant {
 }
 
 @Component({
-  selector: 'app-tenant-selector',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-tenant-selector',
+    imports: [CommonModule],
+    template: `
     <div class="relative" *ngIf="tenants.length > 0">
       <!-- Botón del Tenant Actual -->
       <button 
@@ -87,7 +86,7 @@ export interface Tenant {
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     :host {
       display: block;
     }

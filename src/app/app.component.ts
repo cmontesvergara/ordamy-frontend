@@ -6,11 +6,10 @@ import { ToastService, Toast } from './core/services/toast/toast.service';
 import { LoaderOverlayComponent } from './shared/components/loader-overlay/loader-overlay.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, LoaderOverlayComponent],
-  templateUrl: './app.component.html',
-  styles: [`
+    selector: 'app-root',
+    imports: [CommonModule, RouterOutlet, LoaderOverlayComponent],
+    templateUrl: './app.component.html',
+    styles: [`
     :host { display: block; min-height: 100vh; }
 
     /* Toasts */
@@ -72,7 +71,7 @@ import { LoaderOverlayComponent } from './shared/components/loader-overlay/loade
       cursor: pointer;
     }
     .toast-close:hover { color: #1e293b; }
-  `],
+  `]
 })
 export class AppComponent {
   constructor(

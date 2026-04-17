@@ -6,10 +6,9 @@ import { AppConfigService } from '../../core/services/app-config/app-config.serv
 
 @Component({
     selector: 'app-cashier',
-    standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './cashier.component.html',
-    styleUrl: './cashier.component.scss',
+    styleUrl: './cashier.component.scss'
 })
 export class CashierComponent implements OnInit {
     accounts: any[] = [];

@@ -19,11 +19,10 @@ interface OrderItem {
 }
 
 @Component({
-  selector: 'app-order-create',
-  standalone: true,
-  imports: [CommonModule, FormsModule, OverlayModule, MaterialCalculatorComponent],
-  templateUrl: './order-create.component.html',
-  styleUrl: './order-create.component.scss',
+    selector: 'app-order-create',
+    imports: [CommonModule, FormsModule, OverlayModule, MaterialCalculatorComponent],
+    templateUrl: './order-create.component.html',
+    styleUrl: './order-create.component.scss'
 })
 export class OrderCreateComponent implements OnInit {
   customerSearch = '';

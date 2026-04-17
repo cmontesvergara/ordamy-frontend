@@ -6,11 +6,10 @@ import { SettingsService } from '../../core/services/settings/settings.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
-  selector: 'app-expenses',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './expenses.component.html',
-  styleUrl: './expenses.component.scss',
+    selector: 'app-expenses',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './expenses.component.html',
+    styleUrl: './expenses.component.scss'
 })
 export class ExpensesComponent implements OnInit {
   expenses: any[] = [];

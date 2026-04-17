@@ -6,10 +6,9 @@ import { RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-home',
-    standalone: true,
     imports: [CommonModule, RouterModule],
     templateUrl: './home.component.html',
-    styleUrl: './home.component.scss',
+    styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
     tenantName = '';

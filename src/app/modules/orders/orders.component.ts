@@ -6,11 +6,10 @@ import { OrderService } from '../../core/services/order/order.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 
 @Component({
-  selector: 'app-orders',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './orders.component.html',
-  styleUrl: './orders.component.scss',
+    selector: 'app-orders',
+    imports: [CommonModule, FormsModule, RouterLink],
+    templateUrl: './orders.component.html',
+    styleUrl: './orders.component.scss'
 })
 export class OrdersComponent implements OnInit {
   orders: any[] = [];

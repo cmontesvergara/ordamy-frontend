@@ -8,10 +8,9 @@ import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
     selector: 'app-products',
-    standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './products.component.html',
-    styleUrl: './products.component.scss',
+    styleUrl: './products.component.scss'
 })
 export class ProductsComponent implements OnInit {
     products: any[] = [];
