@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { of, BehaviorSubject } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { BehaviorSubject, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -34,19 +34,13 @@ export class AuthService {
 
     exchangePayload(signedPayload: string, codeVerifier?: string) {
         return this.http.post(
-            `${environment.middlewareBaseUrl}/api/auth/exchange-v2`,
+            `${environment.middlewareBaseUrl}/api/auth/exchange`,
             { payload: signedPayload, codeVerifier },
             { withCredentials: true }
         );
     }
 
-    exchangeCode(code: string, codeVerifier: string) {
-        return this.http.post(
-            `${environment.middlewareBaseUrl}/api/auth/exchange`,
-            { code, codeVerifier },
-            { withCredentials: true }
-        );
-    }
+
 
     getSession() {
         if ((environment as any).mockAuth) {

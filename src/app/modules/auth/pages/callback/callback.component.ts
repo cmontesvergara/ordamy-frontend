@@ -61,25 +61,6 @@ export class CallbackComponent implements OnInit {
             return;
         }
 
-        if (code && codeVerifier) {
-            this.authService.exchangeCode(code, codeVerifier).subscribe({
-                next: (response: any) => {
-                    if (response.success) {
-                        this.authService.handleLoginResponse(response);
-                        this.router.navigate(['/home']);
-                    } else {
-                        console.error('Exchange failed:', response);
-                        this.router.navigate(['/']);
-                    }
-                },
-                error: (error: any) => {
-                    console.error('Exchange error:', error);
-                    this.router.navigate(['/']);
-                },
-            });
-            return;
-        }
-
         console.error('No authorization code or payload received');
         this.router.navigate(['/']);
     }
