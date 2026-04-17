@@ -1,17 +1,23 @@
 <router-outlet></router-outlet>
 
 <!-- Global Loader -->
-<app-loader-overlay *ngIf="loadingService.is()" mode="fixed"></app-loader-overlay>
+@if (loadingService.is()) {
+  <app-loader-overlay mode="fixed"></app-loader-overlay>
+}
 
 <!-- Global Toasts Container -->
-<div class="toast-container" *ngIf="toastService.toasts$ | async as toasts">
-  <div *ngFor="let toast of toasts" class="toast" [ngClass]="'toast-' + toast.type"
-    (click)="toastService.remove(toast.id)">
-    <div class="toast-indicator"></div>
-    <div class="toast-content">
-      <strong>{{ toast.title }}</strong>
-      <p>{{ toast.message }}</p>
-    </div>
-    <button class="toast-close">&times;</button>
+@if (toastService.toasts$ | async; as toasts) {
+  <div class="toast-container">
+    @for (toast of toasts; track toast) {
+      <div class="toast" [ngClass]="'toast-' + toast.type"
+        (click)="toastService.remove(toast.id)">
+        <div class="toast-indicator"></div>
+        <div class="toast-content">
+          <strong>{{ toast.title }}</strong>
+          <p>{{ toast.message }}</p>
+        </div>
+        <button class="toast-close">&times;</button>
+      </div>
+    }
   </div>
-</div>
+}

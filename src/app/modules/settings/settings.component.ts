@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings/settings.service';
 
@@ -8,7 +8,7 @@ import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
     selector: 'app-settings',
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss'
 })

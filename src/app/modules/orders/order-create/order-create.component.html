@@ -24,22 +24,26 @@
             (backdropClick)="closeCustomerDropdown()">
             <div class="cdk-dropdown">
               @for (c of customerResults; track c.id) {
-              <div class="dropdown-item" [class.disabled]="!c.isActive" (click)="c.isActive && selectCustomer(c)">
-                <strong>{{ c.name }}</strong>
-                <span class="text-muted" style="margin: 0 5px">{{ c.identification }}</span>
-                <span *ngIf="!c.isActive" class="badge badge-sm inactive">Inactivo</span>
-              </div>
+                <div class="dropdown-item" [class.disabled]="!c.isActive" (click)="c.isActive && selectCustomer(c)">
+                  <strong>{{ c.name }}</strong>
+                  <span class="text-muted" style="margin: 0 5px">{{ c.identification }}</span>
+                  @if (!c.isActive) {
+                    <span class="badge badge-sm inactive">Inactivo</span>
+                  }
+                </div>
               }
             </div>
           </ng-template>
         </div>
-        <div class="form-group" *ngIf="selectedCustomer">
-          <label>Seleccionado</label>
-          <div class="selected-tag">
-            {{ selectedCustomer.name }} ({{ selectedCustomer.identification }})
-            <button class="tag-remove" (click)="selectedCustomer = null">×</button>
+        @if (selectedCustomer) {
+          <div class="form-group">
+            <label>Seleccionado</label>
+            <div class="selected-tag">
+              {{ selectedCustomer.name }} ({{ selectedCustomer.identification }})
+              <button class="tag-remove" (click)="selectedCustomer = null">×</button>
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
 
@@ -54,18 +58,22 @@
       </div>
       <div class="items-list">
         @for (item of items; track $index; let i = $index) {
-        <div class="item-row" [class.locked-item]="!!item.productId">
-          <input type="text" [(ngModel)]="item.description" placeholder="Descripción *" class="flex-2"
-            [readonly]="!!item.productId" />
-          <input type="number" [(ngModel)]="item.quantity" min="1" placeholder="Cant." class="w-80" />
-          <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120"
-            [readonly]="!!item.productId" />
-          <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
-            *ngIf="!item.productId">🔢</button>
-          <span class="item-total">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
-          <button class="btn-icon" (click)="removeItem(i)" *ngIf="items.length > 1"><span
+          <div class="item-row" [class.locked-item]="!!item.productId">
+            <input type="text" [(ngModel)]="item.description" placeholder="Descripción *" class="flex-2"
+              [readonly]="!!item.productId" />
+            <input type="number" [(ngModel)]="item.quantity" min="1" placeholder="Cant." class="w-80" />
+            <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120"
+              [readonly]="!!item.productId" />
+            @if (!item.productId) {
+              <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
+              >🔢</button>
+            }
+            <span class="item-total">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</span>
+            @if (items.length > 1) {
+              <button class="btn-icon" (click)="removeItem(i)"><span
               class="icon icon-delete"></span></button>
-        </div>
+            }
+          </div>
         }
       </div>
     </div>
@@ -85,10 +93,12 @@
           <label>Fecha de vencimiento</label>
           <input type="date" [(ngModel)]="dueDate" />
         </div>
-        <div class="form-group" *ngIf="canApplyDiscount">
-          <label>Descuento</label>
-          <input type="number" [(ngModel)]="discount" min="0" placeholder="0" />
-        </div>
+        @if (canApplyDiscount) {
+          <div class="form-group">
+            <label>Descuento</label>
+            <input type="number" [(ngModel)]="discount" min="0" placeholder="0" />
+          </div>
+        }
         <div class="form-group full-width">
           <label>Notas</label>
           <textarea [(ngModel)]="notes" rows="2" placeholder="Notas opcionales..."></textarea>
@@ -112,79 +122,89 @@
 </div>
 
 <!-- Create Customer Modal (O3) -->
-<div class="modal-overlay" *ngIf="showCreateCustomer" (click)="showCreateCustomer = false">
-  <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Crear Nuevo Cliente</h3>
-      <button class="btn-close" (click)="showCreateCustomer = false">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Identificación (NIT/CC) <span class="required-asterisk">*</span></label>
-          <input type="text" [(ngModel)]="newCustomer.identification" placeholder="Ej: 900123456-1" />
-        </div>
-        <div class="form-group">
-          <label>Nombre / Razón Social <span class="required-asterisk">*</span></label>
-          <input type="text" [(ngModel)]="newCustomer.name" placeholder="Nombre del cliente" />
-        </div>
-        <div class="form-group">
-          <label>Teléfono</label>
-          <input type="text" [(ngModel)]="newCustomer.phone" placeholder="Ej: 3001234567" pattern="^3[0-9]{9}$"
-            maxlength="10" title="Debe ser un número de 10 dígitos que empiece por 3 sin espacios" />
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="newCustomer.email" placeholder="email@ejemplo.com" />
-        </div>
-        <div class="form-group full-width">
-          <label>Dirección</label>
-          <input type="text" [(ngModel)]="newCustomer.address" placeholder="Dirección" />
-        </div>
+@if (showCreateCustomer) {
+  <div class="modal-overlay" (click)="showCreateCustomer = false">
+    <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Crear Nuevo Cliente</h3>
+        <button class="btn-close" (click)="showCreateCustomer = false">×</button>
       </div>
-      <p class="error-msg" *ngIf="createCustomerError">{{ createCustomerError }}</p>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" (click)="showCreateCustomer = false">Cancelar</button>
-      <button class="btn btn-primary" (click)="saveNewCustomer()"
-        [disabled]="savingCustomer || !newCustomer.identification || !newCustomer.name">
-        {{ savingCustomer ? 'Guardando...' : 'Crear y Seleccionar' }}
-      </button>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Identificación (NIT/CC) <span class="required-asterisk">*</span></label>
+            <input type="text" [(ngModel)]="newCustomer.identification" placeholder="Ej: 900123456-1" />
+          </div>
+          <div class="form-group">
+            <label>Nombre / Razón Social <span class="required-asterisk">*</span></label>
+            <input type="text" [(ngModel)]="newCustomer.name" placeholder="Nombre del cliente" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" [(ngModel)]="newCustomer.phone" placeholder="Ej: 3001234567" pattern="^3[0-9]{9}$"
+              maxlength="10" title="Debe ser un número de 10 dígitos que empiece por 3 sin espacios" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="newCustomer.email" placeholder="email@ejemplo.com" />
+          </div>
+          <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" [(ngModel)]="newCustomer.address" placeholder="Dirección" />
+          </div>
+        </div>
+        @if (createCustomerError) {
+          <p class="error-msg">{{ createCustomerError }}</p>
+        }
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" (click)="showCreateCustomer = false">Cancelar</button>
+        <button class="btn btn-primary" (click)="saveNewCustomer()"
+          [disabled]="savingCustomer || !newCustomer.identification || !newCustomer.name">
+          {{ savingCustomer ? 'Guardando...' : 'Crear y Seleccionar' }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}
 
 
 <!-- Product Picker Modal -->
-<div class="modal-overlay" *ngIf="showProductPicker" (click)="showProductPicker = false">
-  <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Seleccionar Producto</h3>
-      <button class="btn-close" (click)="showProductPicker = false">×</button>
-    </div>
-    <div class="modal-body">
-      <input type="text" [(ngModel)]="productSearch" (input)="searchProducts()" placeholder="Buscar producto..."
-        class="full-width" autofocus />
-      <div class="product-list">
-        @for (p of productResults; track p.id) {
-        <div class="product-item" (click)="addProductItem(p)">
-          <div class="product-info">
-            <strong>{{ p.name }}</strong>
-            <span class="product-desc" *ngIf="p.description">{{ p.description }}</span>
-          </div>
-          <div class="product-meta">
-            <span class="product-price">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
-            <span class="product-unit" *ngIf="p.unit">/ {{ p.unit }}</span>
-          </div>
+@if (showProductPicker) {
+  <div class="modal-overlay" (click)="showProductPicker = false">
+    <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Seleccionar Producto</h3>
+        <button class="btn-close" (click)="showProductPicker = false">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" [(ngModel)]="productSearch" (input)="searchProducts()" placeholder="Buscar producto..."
+          class="full-width" autofocus />
+        <div class="product-list">
+          @for (p of productResults; track p.id) {
+            <div class="product-item" (click)="addProductItem(p)">
+              <div class="product-info">
+                <strong>{{ p.name }}</strong>
+                @if (p.description) {
+                  <span class="product-desc">{{ p.description }}</span>
+                }
+              </div>
+              <div class="product-meta">
+                <span class="product-price">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
+                @if (p.unit) {
+                  <span class="product-unit">/ {{ p.unit }}</span>
+                }
+              </div>
+            </div>
+          }
+          @if (productResults.length === 0) {
+            <p class="empty">No se encontraron productos</p>
+          }
         </div>
-        }
-        @if (productResults.length === 0) {
-        <p class="empty">No se encontraron productos</p>
-        }
       </div>
     </div>
   </div>
-</div>
+}
 
 <!-- Material Calculator -->
 <app-material-calculator [(visible)]="showMaterialCalc" (priceApplied)="onCalcPriceApplied($event)">

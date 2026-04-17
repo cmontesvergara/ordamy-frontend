@@ -1,184 +1,184 @@
-<div class="stats-page" *ngIf="data">
-  <!-- KPI Grid -->
-  <div class="kpi-grid">
-    <div class="kpi">
-      <div class="kpi-header">
-        <span class="kpi-label">Utilidad del mes</span>
-        <span class="kpi-badge" *ngIf="data.salesChange !== null" [class.up]="data.salesChange >= 0"
-          [class.down]="data.salesChange < 0">
-          {{ data.salesChange >= 0 ? '↑' : '↓' }} {{ data.salesChange | number:'1.0-1' }}%
-        </span>
-      </div>
-      <span class="kpi-value">{{ config.currency }} {{ data.profitThisMonth | number:'1.0-0' }}</span>
-      <span class="kpi-sub">Ventas: {{ config.currency }} {{ data.salesThisMonth | number:'1.0-0' }} — Gastos: {{ config.currency }} {{ data.expensesThisMonth |
+@if (data) {
+  <div class="stats-page">
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-header">
+          <span class="kpi-label">Utilidad del mes</span>
+          @if (data.salesChange !== null) {
+            <span class="kpi-badge" [class.up]="data.salesChange >= 0"
+              [class.down]="data.salesChange < 0">
+              {{ data.salesChange >= 0 ? '↑' : '↓' }} {{ data.salesChange | number:'1.0-1' }}%
+            </span>
+          }
+        </div>
+        <span class="kpi-value">{{ config.currency }} {{ data.profitThisMonth | number:'1.0-0' }}</span>
+        <span class="kpi-sub">Ventas: {{ config.currency }} {{ data.salesThisMonth | number:'1.0-0' }} — Gastos: {{ config.currency }} {{ data.expensesThisMonth |
         number:'1.0-0' }}</span>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-header"><span class="kpi-label">Ventas este mes</span></div>
-      <span class="kpi-value green">{{ config.currency }} {{ data.salesThisMonth | number:'1.0-0' }}</span>
-      <span class="kpi-sub">Mes anterior: {{ config.currency }} {{ data.salesLastMonth | number:'1.0-0' }}</span>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-header">
-        <span class="kpi-label">Egresos este mes</span>
-        <span class="kpi-badge" *ngIf="data.expensesChange !== null" [class.up]="data.expensesChange < 0"
-          [class.down]="data.expensesChange >= 0">
-          {{ data.expensesChange >= 0 ? '↑' : '↓' }} {{ data.expensesChange | number:'1.0-1' }}%
-        </span>
       </div>
-      <span class="kpi-value red">{{ config.currency }} {{ data.expensesThisMonth | number:'1.0-0' }}</span>
-      <span class="kpi-sub">Mes anterior: {{ config.currency }} {{ data.expensesLastMonth | number:'1.0-0' }}</span>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-header"><span class="kpi-label">Órdenes activas</span></div>
-      <span class="kpi-value">{{ data.activeOrders }}</span>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-header"><span class="kpi-label">Cartera pendiente</span></div>
-      <span class="kpi-value amber">{{ config.currency }} {{ data.portfolioBalance | number:'1.0-0' }}</span>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-header"><span class="kpi-label">Clientes este mes</span></div>
-      <span class="kpi-value">{{ data.customersThisMonth }}</span>
-    </div>
-  </div>
-
-  <!-- Operational Status Pipeline -->
-  <div class="card section" *ngIf="data.ordersByOperationalStatus?.length">
-    <h3>Pipeline Operativo</h3>
-    <div class="pipeline">
-      @for (step of operationalSteps; track step.key) {
-      <div class="pipeline-step">
-        <span class="step-count">{{ getOpCount(step.key) }}</span>
-        <span class="step-label">{{ step.label }}</span>
+      <div class="kpi">
+        <div class="kpi-header"><span class="kpi-label">Ventas este mes</span></div>
+        <span class="kpi-value green">{{ config.currency }} {{ data.salesThisMonth | number:'1.0-0' }}</span>
+        <span class="kpi-sub">Mes anterior: {{ config.currency }} {{ data.salesLastMonth | number:'1.0-0' }}</span>
       </div>
-      }
+      <div class="kpi">
+        <div class="kpi-header">
+          <span class="kpi-label">Egresos este mes</span>
+          @if (data.expensesChange !== null) {
+            <span class="kpi-badge" [class.up]="data.expensesChange < 0"
+              [class.down]="data.expensesChange >= 0">
+              {{ data.expensesChange >= 0 ? '↑' : '↓' }} {{ data.expensesChange | number:'1.0-1' }}%
+            </span>
+          }
+        </div>
+        <span class="kpi-value red">{{ config.currency }} {{ data.expensesThisMonth | number:'1.0-0' }}</span>
+        <span class="kpi-sub">Mes anterior: {{ config.currency }} {{ data.expensesLastMonth | number:'1.0-0' }}</span>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header"><span class="kpi-label">Órdenes activas</span></div>
+        <span class="kpi-value">{{ data.activeOrders }}</span>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header"><span class="kpi-label">Cartera pendiente</span></div>
+        <span class="kpi-value amber">{{ config.currency }} {{ data.portfolioBalance | number:'1.0-0' }}</span>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header"><span class="kpi-label">Clientes este mes</span></div>
+        <span class="kpi-value">{{ data.customersThisMonth }}</span>
+      </div>
+    </div>
+    <!-- Operational Status Pipeline -->
+    @if (data.ordersByOperationalStatus?.length) {
+      <div class="card section">
+        <h3>Pipeline Operativo</h3>
+        <div class="pipeline">
+          @for (step of operationalSteps; track step.key) {
+            <div class="pipeline-step">
+              <span class="step-count">{{ getOpCount(step.key) }}</span>
+              <span class="step-label">{{ step.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+    <!-- Two column layout -->
+    <div class="two-col">
+      <!-- Top Clients by Sales -->
+      <div class="card section">
+        <h3>Top Clientes — Ventas del mes</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th class="text-right">Total</th>
+              <th class="text-right">Órdenes</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of data.topClientsBySales; track c.id) {
+              <tr>
+                <td><strong>{{ c.name }}</strong></td>
+                <td class="text-right">{{ config.currency }} {{ c.totalSales | number:'1.0-0' }}</td>
+                <td class="text-right">{{ c.orderCount }}</td>
+              </tr>
+            }
+            @if (data.topClientsBySales?.length === 0) {
+              <tr>
+                <td colspan="3" class="empty">Sin datos</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <!-- Top Clients with Debt -->
+      <div class="card section">
+        <h3>Top Clientes — Deuda</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th class="text-right">Deuda</th>
+              <th class="text-right">Órdenes</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of data.topClientsWithDebt; track c.id) {
+              <tr>
+                <td><strong>{{ c.name }}</strong></td>
+                <td class="text-right debt">{{ config.currency }} {{ c.totalDebt | number:'1.0-0' }}</td>
+                <td class="text-right">{{ c.orderCount }}</td>
+              </tr>
+            }
+            @if (data.topClientsWithDebt?.length === 0) {
+              <tr>
+                <td colspan="3" class="empty">Sin deuda</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="two-col">
+      <!-- Expenses by Category -->
+      <div class="card section">
+        <h3>Egresos por Categoría — Este mes</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Categoría</th>
+              <th class="text-right">Total</th>
+              <th class="text-right">Cant.</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of data.expensesByCategory; track e.categoryName) {
+              <tr>
+                <td>{{ e.categoryName }}</td>
+                <td class="text-right">{{ config.currency }} {{ e.total | number:'1.0-0' }}</td>
+                <td class="text-right">{{ e.count }}</td>
+              </tr>
+            }
+            @if (data.expensesByCategory?.length === 0) {
+              <tr>
+                <td colspan="3" class="empty">Sin egresos</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <!-- Accounts -->
+      <div class="card section">
+        <h3>Cuentas</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Medio de pago</th>
+              <th class="text-right">Saldo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of data.accounts; track a.id) {
+              <tr>
+                <td>{{ a.name }}</td>
+                <td class="text-right">{{ config.currency }} {{ a.balance | number:'1.0-0' }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td><strong>Total</strong></td>
+              <td class="text-right"><strong>{{ config.currency }} {{ accountsTotal | number:'1.0-0' }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   </div>
+}
 
-  <!-- Two column layout -->
-  <div class="two-col">
-    <!-- Top Clients by Sales -->
-    <div class="card section">
-      <h3>Top Clientes — Ventas del mes</h3>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th class="text-right">Total</th>
-            <th class="text-right">Órdenes</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (c of data.topClientsBySales; track c.id) {
-          <tr>
-            <td><strong>{{ c.name }}</strong></td>
-            <td class="text-right">{{ config.currency }} {{ c.totalSales | number:'1.0-0' }}</td>
-            <td class="text-right">{{ c.orderCount }}</td>
-          </tr>
-          }
-          @if (data.topClientsBySales?.length === 0) {
-          <tr>
-            <td colspan="3" class="empty">Sin datos</td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Top Clients with Debt -->
-    <div class="card section">
-      <h3>Top Clientes — Deuda</h3>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th class="text-right">Deuda</th>
-            <th class="text-right">Órdenes</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (c of data.topClientsWithDebt; track c.id) {
-          <tr>
-            <td><strong>{{ c.name }}</strong></td>
-            <td class="text-right debt">{{ config.currency }} {{ c.totalDebt | number:'1.0-0' }}</td>
-            <td class="text-right">{{ c.orderCount }}</td>
-          </tr>
-          }
-          @if (data.topClientsWithDebt?.length === 0) {
-          <tr>
-            <td colspan="3" class="empty">Sin deuda</td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+@if (!data) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando estadísticas...</p>
   </div>
-
-  <div class="two-col">
-    <!-- Expenses by Category -->
-    <div class="card section">
-      <h3>Egresos por Categoría — Este mes</h3>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Categoría</th>
-            <th class="text-right">Total</th>
-            <th class="text-right">Cant.</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (e of data.expensesByCategory; track e.categoryName) {
-          <tr>
-            <td>{{ e.categoryName }}</td>
-            <td class="text-right">{{ config.currency }} {{ e.total | number:'1.0-0' }}</td>
-            <td class="text-right">{{ e.count }}</td>
-          </tr>
-          }
-          @if (data.expensesByCategory?.length === 0) {
-          <tr>
-            <td colspan="3" class="empty">Sin egresos</td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Accounts -->
-    <div class="card section">
-      <h3>Cuentas</h3>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Medio de pago</th>
-            <th class="text-right">Saldo</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (a of data.accounts; track a.id) {
-          <tr>
-            <td>{{ a.name }}</td>
-            <td class="text-right">{{ config.currency }} {{ a.balance | number:'1.0-0' }}</td>
-          </tr>
-          }
-        </tbody>
-        <tfoot>
-          <tr class="total-row">
-            <td><strong>Total</strong></td>
-            <td class="text-right"><strong>{{ config.currency }} {{ accountsTotal | number:'1.0-0' }}</strong></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div class="loading" *ngIf="!data">
-  <div class="spinner"></div>
-  <p>Cargando estadísticas...</p>
-</div>
+}

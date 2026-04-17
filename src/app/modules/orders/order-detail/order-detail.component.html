@@ -1,111 +1,138 @@
-<div *ngIf="order" class="detail-page">
-  <!-- Top Bar -->
-  <div class="detail-bar no-print">
-    <a routerLink="/orders" class="btn btn-outline btn-sm">← Volver</a>
-    <div class="actions-dropdown" [class.open]="actionsOpen">
-      <button class="actions-toggle" (click)="actionsOpen = !actionsOpen">
-        Acciones <span class="caret">▼</span>
-      </button>
-      <div class="actions-menu">
-        <button class="action-item" (click)="printOrder('production'); actionsOpen = false">Imprimir Producción</button>
-        <button class="action-item" (click)="printOrder('customer'); actionsOpen = false">Imprimir Cliente</button>
-        <button *ngIf="order.status === 'ACTIVE'" class="action-item" (click)="toggleEditOrder(); actionsOpen = false">
-          Editar Orden
+@if (order) {
+  <div class="detail-page">
+    <!-- Top Bar -->
+    <div class="detail-bar no-print">
+      <a routerLink="/orders" class="btn btn-outline btn-sm">← Volver</a>
+      <div class="actions-dropdown" [class.open]="actionsOpen">
+        <button class="actions-toggle" (click)="actionsOpen = !actionsOpen">
+          Acciones <span class="caret">▼</span>
         </button>
-        <div *ngIf="order.status === 'ACTIVE'" class="action-separator"></div>
-        <button *ngIf="order.status === 'ACTIVE'" class="action-item danger"
-          (click)="cancelOrder(); actionsOpen = false">
-          Anular Orden
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="page-header no-print">
-    <div>
-      <h1>Orden #{{ order.number }}</h1>
-      <span class="badge status-{{ order.status }}">{{ order.status }}</span>
-    </div>
-  </div>
-
-  <!-- Print Header (only visible when printing) -->
-  <div class="print-header" id="print-header">
-    <h2>{{ printMode === 'production' ? 'Orden de Producción' : 'Orden de Servicio' }}</h2>
-    <div class="print-meta">
-      <span><strong>Orden #{{ order.number }}</strong></span>
-      <span>Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</span>
-      <span *ngIf="order.dueDate">Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</span>
-    </div>
-  </div>
-
-  <!-- O10: Operational Status Stepper -->
-  <div class="stepper-card" *ngIf="order.status === 'ACTIVE' && !editingOrder">
-    <h4>Estado Operativo</h4>
-    <div class="stepper">
-      @for (step of operationalSteps; track step.key; let i = $index) {
-      <div class="step" [class.completed]="i < currentStepIndex" [class.active]="i === currentStepIndex"
-        [class.pending]="i > currentStepIndex">
-        <div class="step-dot">
-          {{ i < currentStepIndex ? '✓' : (i + 1) }} </div>
-            <span class="step-label">{{ step.label }}</span>
+        <div class="actions-menu">
+          <button class="action-item" (click)="printOrder('production'); actionsOpen = false">Imprimir Producción</button>
+          <button class="action-item" (click)="printOrder('customer'); actionsOpen = false">Imprimir Cliente</button>
+          @if (order.status === 'ACTIVE') {
+            <button class="action-item" (click)="toggleEditOrder(); actionsOpen = false">
+              Editar Orden
+            </button>
+          }
+          @if (order.status === 'ACTIVE') {
+            <div class="action-separator"></div>
+          }
+          @if (order.status === 'ACTIVE') {
+            <button class="action-item danger"
+              (click)="cancelOrder(); actionsOpen = false">
+              Anular Orden
+            </button>
+          }
         </div>
-        @if (i < operationalSteps.length - 1) { <div class="step-connector" [class.completed]="i < currentStepIndex">
       </div>
+    </div>
+    <div class="page-header no-print">
+      <div>
+        <h1>Orden #{{ order.number }}</h1>
+        <span class="badge status-{{ order.status }}">{{ order.status }}</span>
+      </div>
+    </div>
+    <!-- Print Header (only visible when printing) -->
+    <div class="print-header" id="print-header">
+      <h2>{{ printMode === 'production' ? 'Orden de Producción' : 'Orden de Servicio' }}</h2>
+      <div class="print-meta">
+        <span><strong>Orden #{{ order.number }}</strong></span>
+        <span>Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</span>
+        @if (order.dueDate) {
+          <span>Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</span>
+        }
+      </div>
+    </div>
+    <!-- O10: Operational Status Stepper -->
+    @if (order.status === 'ACTIVE' && !editingOrder) {
+      <div class="stepper-card">
+        <h4>Estado Operativo</h4>
+        <div class="stepper">
+          @for (step of operationalSteps; track step.key; let i = $index) {
+            <div class="step" [class.completed]="i < currentStepIndex" [class.active]="i === currentStepIndex"
+              [class.pending]="i > currentStepIndex">
+              <div class="step-dot">
+              {{ i < currentStepIndex ? '✓' : (i + 1) }} </div>
+              <span class="step-label">{{ step.label }}</span>
+            </div>
+            @if (i < operationalSteps.length - 1) { <div class="step-connector" [class.completed]="i < currentStepIndex">
+            </div>
+          }
+        }
+      </div>
+      @if (!updatingStatus) {
+        <div class="stepper-actions">
+          @if (currentStepIndex > 0) {
+            <button class="btn btn-outline btn-sm" (click)="changeOperationalStatus(-1)">
+              ← {{ operationalSteps[currentStepIndex - 1].label }}
+            </button>
+          }
+          @if (currentStepIndex < operationalSteps.length - 1) {
+            <button class="btn btn-primary btn-sm"
+              (click)="changeOperationalStatus(1)">
+              {{ operationalSteps[currentStepIndex + 1].label }} →
+            </button>
+          }
+        </div>
       }
+      @if (updatingStatus) {
+        <div class="stepper-actions">
+          <span class="text-muted">Actualizando...</span>
+        </div>
       }
     </div>
-    <div class="stepper-actions" *ngIf="!updatingStatus">
-      <button class="btn btn-outline btn-sm" *ngIf="currentStepIndex > 0" (click)="changeOperationalStatus(-1)">
-        ← {{ operationalSteps[currentStepIndex - 1].label }}
-      </button>
-      <button class="btn btn-primary btn-sm" *ngIf="currentStepIndex < operationalSteps.length - 1"
-        (click)="changeOperationalStatus(1)">
-        {{ operationalSteps[currentStepIndex + 1].label }} →
-      </button>
-    </div>
-    <div class="stepper-actions" *ngIf="updatingStatus">
-      <span class="text-muted">Actualizando...</span>
-    </div>
-  </div>
-
+  }
   <!-- Info Grid -->
-  <div class="info-grid" *ngIf="!editingOrder">
-    <div class="info-card">
-      <h4>Cliente</h4>
-      <p>
-        <strong>{{ order.customer?.name }}</strong>
-        <span *ngIf="order.customer && !order.customer.isActive" class="badge badge-sm inactive"
-          style="margin-left: 8px;">Inactivo</span>
-      </p>
-      <p class="sub">{{ order.customer?.identification }}</p>
-      <p class="sub" *ngIf="order.customer?.phone">📞 {{ order.customer.phone }}</p>
-    </div>
-    <div class="info-card" [class.hide-on-production]="printMode === 'production'">
-      <h4>Resumen</h4>
-      <div class="summary-row"><span>Subtotal</span><span>{{ config.currency }} {{ order.subtotal | number:'1.0-0'
-          }}</span></div>
+  @if (!editingOrder) {
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Cliente</h4>
+        <p>
+          <strong>{{ order.customer?.name }}</strong>
+          @if (order.customer && !order.customer.isActive) {
+            <span class="badge badge-sm inactive"
+            style="margin-left: 8px;">Inactivo</span>
+          }
+        </p>
+        <p class="sub">{{ order.customer?.identification }}</p>
+        @if (order.customer?.phone) {
+          <p class="sub">📞 {{ order.customer.phone }}</p>
+        }
+      </div>
+      <div class="info-card" [class.hide-on-production]="printMode === 'production'">
+        <h4>Resumen</h4>
+        <div class="summary-row"><span>Subtotal</span><span>{{ config.currency }} {{ order.subtotal | number:'1.0-0'
+      }}</span></div>
       <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>{{ config.currency }} {{
-          order.taxAmount | number:'1.0-0'
-          }}</span></div>
-      <div class="summary-row" *ngIf="order.discount > 0"><span>Descuento</span><span>-{{ config.currency }} {{
-          order.discount |
-          number:'1.0-0' }}</span></div>
-      <div class="summary-row total"><span>Total</span><span>{{ config.currency }} {{ order.total | number:'1.0-0'
-          }}</span></div>
-      <div class="summary-row balance"><span>Saldo</span><span>{{ config.currency }} {{ order.balance | number:'1.0-0'
-          }}</span></div>
-    </div>
-    <div class="info-card">
-      <h4>Detalles</h4>
-      <p class="sub">Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</p>
-      <p class="sub" *ngIf="order.dueDate">Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</p>
-      <p class="sub">Vendedor: {{ order.sellerName }}</p>
-      <p class="sub" *ngIf="order.notes">Notas: {{ order.notes }}</p>
-    </div>
-  </div>
-
-  <!-- Edit Order Form -->
-  <div class="card section no-print" *ngIf="editingOrder">
+      order.taxAmount | number:'1.0-0'
+    }}</span></div>
+    @if (order.discount > 0) {
+      <div class="summary-row"><span>Descuento</span><span>-{{ config.currency }} {{
+      order.discount |
+    number:'1.0-0' }}</span></div>
+  }
+  <div class="summary-row total"><span>Total</span><span>{{ config.currency }} {{ order.total | number:'1.0-0'
+}}</span></div>
+<div class="summary-row balance"><span>Saldo</span><span>{{ config.currency }} {{ order.balance | number:'1.0-0'
+}}</span></div>
+</div>
+<div class="info-card">
+  <h4>Detalles</h4>
+  <p class="sub">Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</p>
+  @if (order.dueDate) {
+    <p class="sub">Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</p>
+  }
+  <p class="sub">Vendedor: {{ order.sellerName }}</p>
+  @if (order.notes) {
+    <p class="sub">Notas: {{ order.notes }}</p>
+  }
+</div>
+</div>
+}
+<!-- Edit Order Form -->
+@if (editingOrder) {
+  <div class="card section no-print">
     <h3>Editar Orden</h3>
     <div class="edit-form">
       <div class="form-row">
@@ -118,7 +145,6 @@
           <input type="text" [(ngModel)]="editOrderData.notes" placeholder="Notas..." />
         </div>
       </div>
-
       <div class="section-header" style="margin-bottom: 0.75rem;">
         <h4>Items</h4>
         <div class="section-actions">
@@ -139,23 +165,25 @@
         </thead>
         <tbody>
           @for (item of editOrderData.items; track $index; let i = $index) {
-          <tr>
-            <td><input type="text" [(ngModel)]="item.description" class="input-full" [readonly]="!!item.productId" />
-            </td>
-            <td><input type="number" [(ngModel)]="item.quantity" min="1" class="input-full text-right"
-                (input)="recalcEditTotals()" /></td>
-            <td><input type="number" [(ngModel)]="item.unitPrice" min="0" class="input-full text-right"
-                (input)="recalcEditTotals()" [readonly]="!!item.productId" /></td>
-            <td class="text-center">
-              <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
-                *ngIf="!item.productId">🔢</button>
-            </td>
-            <td class="text-right">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
-            <td class="text-center">
-              <button class="btn-icon danger" (click)="removeEditItem(i)" title="Eliminar"><span
-                  class="icon icon-close"></span></button>
-            </td>
-          </tr>
+            <tr>
+              <td><input type="text" [(ngModel)]="item.description" class="input-full" [readonly]="!!item.productId" />
+              </td>
+              <td><input type="number" [(ngModel)]="item.quantity" min="1" class="input-full text-right"
+              (input)="recalcEditTotals()" /></td>
+              <td><input type="number" [(ngModel)]="item.unitPrice" min="0" class="input-full text-right"
+              (input)="recalcEditTotals()" [readonly]="!!item.productId" /></td>
+              <td class="text-center">
+                @if (!item.productId) {
+                  <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
+                  >🔢</button>
+                }
+              </td>
+              <td class="text-right">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
+              <td class="text-center">
+                <button class="btn-icon danger" (click)="removeEditItem(i)" title="Eliminar"><span
+                class="icon icon-close"></span></button>
+              </td>
+            </tr>
           }
         </tbody>
         <tfoot>
@@ -166,7 +194,6 @@
           </tr>
         </tfoot>
       </table>
-
       <div class="form-actions">
         <button class="btn btn-outline btn-sm" (click)="editingOrder = false">Cancelar</button>
         <button class="btn btn-primary btn-sm" (click)="saveOrderEdit()" [disabled]="savingOrder">
@@ -175,9 +202,10 @@
       </div>
     </div>
   </div>
-
-  <!-- Items -->
-  <div class="card section" *ngIf="!editingOrder">
+}
+<!-- Items -->
+@if (!editingOrder) {
+  <div class="card section">
     <h3>Items ({{ order.items?.length }})</h3>
     <table class="data-table">
       <thead>
@@ -191,164 +219,193 @@
       </thead>
       <tbody>
         @for (item of order.items; track item.id) {
-        <tr>
-          <td>{{ item.description }}</td>
-          <td>{{ item.product?.name || '—' }}</td>
-          <td class="text-right">{{ item.quantity }}</td>
-          <td class="text-right hide-on-production">{{ config.currency }} {{ item.unitPrice | number:'1.0-0' }}</td>
-          <td class="text-right hide-on-production">{{ config.currency }} {{ item.lineTotal | number:'1.0-0' }}</td>
-        </tr>
+          <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.product?.name || '—' }}</td>
+            <td class="text-right">{{ item.quantity }}</td>
+            <td class="text-right hide-on-production">{{ config.currency }} {{ item.unitPrice | number:'1.0-0' }}</td>
+            <td class="text-right hide-on-production">{{ config.currency }} {{ item.lineTotal | number:'1.0-0' }}</td>
+          </tr>
         }
       </tbody>
     </table>
   </div>
-
-  <!-- Payments (no-print for production) -->
-  <div class="card section no-print-production" *ngIf="!editingOrder">
+}
+<!-- Payments (no-print for production) -->
+@if (!editingOrder) {
+  <div class="card section no-print-production">
     <div class="section-header">
       <h3>Pagos ({{ order.payments?.length }})</h3>
-      <button *ngIf="order.status === 'ACTIVE' && order.balance > 0" class="btn btn-primary btn-sm no-print"
-        (click)="showPaymentForm = !showPaymentForm">
-        {{ showPaymentForm ? 'Cancelar' : '+ Registrar Pago' }}
-      </button>
+      @if (order.status === 'ACTIVE' && order.balance > 0) {
+        <button class="btn btn-primary btn-sm no-print"
+          (click)="showPaymentForm = !showPaymentForm">
+          {{ showPaymentForm ? 'Cancelar' : '+ Registrar Pago' }}
+        </button>
+      }
     </div>
-
     <!-- Payment Form -->
-    <div class="form-inline no-print" *ngIf="showPaymentForm">
-      <select [(ngModel)]="newPayment.paymentMethodId">
-        <option value="">Medio de pago</option>
-        @for (m of paymentMethods; track m.id) {
-        <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
-        }
-      </select>
-      <input type="number" [(ngModel)]="newPayment.amount" [max]="order.balance" placeholder="Monto" />
-      <input type="text" [(ngModel)]="newPayment.notes" placeholder="Nota (opcional)" />
-      <button class="btn btn-primary btn-sm" (click)="registerPayment()" [disabled]="savingPayment">
-        {{ savingPayment ? '...' : 'Guardar' }}
-      </button>
-    </div>
-
-    <table class="data-table" *ngIf="order.payments?.length > 0">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Medio</th>
-          <th class="text-right">Monto</th>
-          <th>Nota</th>
-          <th class="text-center no-print">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (p of order.payments; track p.id) {
-        <tr>
-          <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm':config.timezone }}</td>
-          <td>{{ p.paymentMethod?.name }}</td>
-          <td class="text-right">{{ config.currency }} {{ p.amount | number:'1.0-0' }}</td>
-          <td>{{ p.notes || '—' }}</td>
-          <td class="text-center no-print" *ngIf="order.status !== 'CANCELLED'">
-            <button class="btn-icon" title="Editar" (click)="startEditPayment(p)"><span
-                class="icon icon-edit"></span></button>
-            <button class="btn-icon danger" title="Eliminar" (click)="deletePayment(p)"><span
-                class="icon icon-delete"></span></button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-
+    @if (showPaymentForm) {
+      <div class="form-inline no-print">
+        <select [(ngModel)]="newPayment.paymentMethodId">
+          <option value="">Medio de pago</option>
+          @for (m of paymentMethods; track m.id) {
+            <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
+          }
+        </select>
+        <input type="number" [(ngModel)]="newPayment.amount" [max]="order.balance" placeholder="Monto" />
+        <input type="text" [(ngModel)]="newPayment.notes" placeholder="Nota (opcional)" />
+        <button class="btn btn-primary btn-sm" (click)="registerPayment()" [disabled]="savingPayment">
+          {{ savingPayment ? '...' : 'Guardar' }}
+        </button>
+      </div>
+    }
+    @if (order.payments?.length > 0) {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Medio</th>
+            <th class="text-right">Monto</th>
+            <th>Nota</th>
+            <th class="text-center no-print">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of order.payments; track p.id) {
+            <tr>
+              <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm':config.timezone }}</td>
+              <td>{{ p.paymentMethod?.name }}</td>
+              <td class="text-right">{{ config.currency }} {{ p.amount | number:'1.0-0' }}</td>
+              <td>{{ p.notes || '—' }}</td>
+              @if (order.status !== 'CANCELLED') {
+                <td class="text-center no-print">
+                  <button class="btn-icon" title="Editar" (click)="startEditPayment(p)"><span
+                  class="icon icon-edit"></span></button>
+                  <button class="btn-icon danger" title="Eliminar" (click)="deletePayment(p)"><span
+                  class="icon icon-delete"></span></button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
     <!-- Edit Payment Form -->
-    <div class="form-inline no-print" *ngIf="editingPayment">
-      <strong class="form-label">Editando pago:</strong>
-      <select [(ngModel)]="editPaymentData.paymentMethodId">
-        @for (m of paymentMethods; track m.id) {
-        <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
-        }
-      </select>
-      <input type="number" [(ngModel)]="editPaymentData.amount" placeholder="Monto" />
-      <input type="text" [(ngModel)]="editPaymentData.notes" placeholder="Nota (opcional)" />
-      <button class="btn btn-primary btn-sm" (click)="savePaymentEdit()" [disabled]="savingPayment">
-        {{ savingPayment ? '...' : 'Guardar' }}
-      </button>
-      <button class="btn btn-outline btn-sm" (click)="editingPayment = null">Cancelar</button>
-    </div>
+    @if (editingPayment) {
+      <div class="form-inline no-print">
+        <strong class="form-label">Editando pago:</strong>
+        <select [(ngModel)]="editPaymentData.paymentMethodId">
+          @for (m of paymentMethods; track m.id) {
+            <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
+          }
+        </select>
+        <input type="number" [(ngModel)]="editPaymentData.amount" placeholder="Monto" />
+        <input type="text" [(ngModel)]="editPaymentData.notes" placeholder="Nota (opcional)" />
+        <button class="btn btn-primary btn-sm" (click)="savePaymentEdit()" [disabled]="savingPayment">
+          {{ savingPayment ? '...' : 'Guardar' }}
+        </button>
+        <button class="btn btn-outline btn-sm" (click)="editingPayment = null">Cancelar</button>
+      </div>
+    }
   </div>
-
-  <!-- Status History Timeline -->
-  <div class="card section no-print" *ngIf="order.events?.length > 0 && !editingOrder">
+}
+<!-- Status History Timeline -->
+@if (order.events?.length > 0 && !editingOrder) {
+  <div class="card section no-print">
     <div class="section-header clickable" (click)="historyOpen = !historyOpen">
       <h3>Historial de Movimientos ({{ order.events.length }})</h3>
       <span class="toggle-icon">{{ historyOpen ? '▲' : '▼' }}</span>
     </div>
-    <div class="timeline" *ngIf="historyOpen">
-      @for (e of order.events; track e.id) {
-      <div class="timeline-item">
-        <div class="timeline-dot" [class.cancelled]="e.toStatus === 'CANCELLED' || e.type === 'PAYMENT_DELETED'"
-          [class.completed]="e.toStatus === 'COMPLETED'" [class.payment]="e.type === 'PAYMENT_ADDED'"></div>
-        <div class="timeline-content">
-          <span class="timeline-date">{{ e.createdAt | date:'dd/MM/yyyy HH:mm':config.timezone }} por <strong>{{
+    @if (historyOpen) {
+      <div class="timeline">
+        @for (e of order.events; track e.id) {
+          <div class="timeline-item">
+            <div class="timeline-dot" [class.cancelled]="e.toStatus === 'CANCELLED' || e.type === 'PAYMENT_DELETED'"
+            [class.completed]="e.toStatus === 'COMPLETED'" [class.payment]="e.type === 'PAYMENT_ADDED'"></div>
+            <div class="timeline-content">
+              <span class="timeline-date">{{ e.createdAt | date:'dd/MM/yyyy HH:mm':config.timezone }} por <strong>{{
               e.changedByName }}</strong></span>
-          <span class="timeline-change">
-            <span *ngIf="e.type === 'STATUS_CHANGE'">
-              <span class="badge badge-sm">{{ e.fromStatus || '—' }}</span> → <span class="badge badge-sm">{{ e.toStatus
-                }}</span>
+              <span class="timeline-change">
+                @if (e.type === 'STATUS_CHANGE') {
+                  <span>
+                    <span class="badge badge-sm">{{ e.fromStatus || '—' }}</span> → <span class="badge badge-sm">{{ e.toStatus
+                  }}</span>
+                </span>
+              }
+              @if (e.type === 'PAYMENT_ADDED') {
+                <span class="text-success fw-bold">
+                  💰 Abono Registrado
+                </span>
+              }
+              @if (e.type === 'PAYMENT_DELETED') {
+                <span class="text-danger fw-bold">
+                  🚫 Abono Eliminado
+                </span>
+              }
             </span>
-            <span *ngIf="e.type === 'PAYMENT_ADDED'" class="text-success fw-bold">
-              💰 Abono Registrado
-            </span>
-            <span *ngIf="e.type === 'PAYMENT_DELETED'" class="text-danger fw-bold">
-              🚫 Abono Eliminado
-            </span>
-          </span>
-          <span class="timeline-reason" *ngIf="e.description">{{ e.description }}</span>
+            @if (e.description) {
+              <span class="timeline-reason">{{ e.description }}</span>
+            }
+          </div>
         </div>
-      </div>
       }
     </div>
-  </div>
-  <!-- Print Footer -->
-  <div class="print-footer">
-    <div class="signature-line">
-      <span>Firma del cliente</span>
-    </div>
-    <p class="print-note">Documento generado el {{ today | date:'dd/MM/yyyy HH:mm':config.timezone }}</p>
-  </div>
+  }
 </div>
+}
+<!-- Print Footer -->
+<div class="print-footer">
+  <div class="signature-line">
+    <span>Firma del cliente</span>
+  </div>
+  <p class="print-note">Documento generado el {{ today | date:'dd/MM/yyyy HH:mm':config.timezone }}</p>
+</div>
+</div>
+}
 
-<div class="loading" *ngIf="loading">
-  <div class="spinner"></div>
-  <p>Cargando orden...</p>
-</div>
+@if (loading) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando orden...</p>
+  </div>
+}
 
 <!-- Product Picker Modal -->
-<div class="modal-overlay" *ngIf="showProductPicker" (click)="showProductPicker = false">
-  <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Seleccionar Producto</h3>
-      <button class="btn-close" (click)="showProductPicker = false">×</button>
-    </div>
-    <div class="modal-body">
-      <input type="text" [(ngModel)]="productSearch" (input)="searchProducts()" placeholder="Buscar producto..."
-        class="full-width" autofocus />
-      <div class="product-list">
-        @for (p of productResults; track p.id) {
-        <div class="product-item" (click)="addProductToEdit(p)">
-          <div class="product-info">
-            <strong>{{ p.name }}</strong>
-            <span class="product-desc" *ngIf="p.description">{{ p.description }}</span>
-          </div>
-          <div class="product-meta">
-            <span class="product-price">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
-            <span class="product-unit" *ngIf="p.unit">/ {{ p.unit }}</span>
-          </div>
+@if (showProductPicker) {
+  <div class="modal-overlay" (click)="showProductPicker = false">
+    <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Seleccionar Producto</h3>
+        <button class="btn-close" (click)="showProductPicker = false">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" [(ngModel)]="productSearch" (input)="searchProducts()" placeholder="Buscar producto..."
+          class="full-width" autofocus />
+        <div class="product-list">
+          @for (p of productResults; track p.id) {
+            <div class="product-item" (click)="addProductToEdit(p)">
+              <div class="product-info">
+                <strong>{{ p.name }}</strong>
+                @if (p.description) {
+                  <span class="product-desc">{{ p.description }}</span>
+                }
+              </div>
+              <div class="product-meta">
+                <span class="product-price">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
+                @if (p.unit) {
+                  <span class="product-unit">/ {{ p.unit }}</span>
+                }
+              </div>
+            </div>
+          }
+          @if (productResults.length === 0) {
+            <p class="empty">No se encontraron productos</p>
+          }
         </div>
-        }
-        @if (productResults.length === 0) {
-        <p class="empty">No se encontraron productos</p>
-        }
       </div>
     </div>
   </div>
-</div>
+}
 
 
 <!-- Material Calculator -->

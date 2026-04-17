@@ -12,254 +12,310 @@
 </div>
 
 <!-- Payment Methods -->
-<div *ngIf="activeTab === 'payment'">
-  <div class="inline-form">
-    <input [(ngModel)]="newPaymentMethod" placeholder="Nuevo medio de pago" />
-    <button class="btn btn-primary btn-sm" (click)="addPaymentMethod()" [disabled]="!newPaymentMethod">Agregar</button>
-  </div>
-  <div class="card">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Estado</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (m of paymentMethods; track m.id) {
-        <tr>
-          <td>
-            <input *ngIf="editing?.id === m.id && editing?.type === 'payment'" [(ngModel)]="editing.data.name"
-              class="edit-input" />
-            <strong *ngIf="editing?.id !== m.id || editing?.type !== 'payment'">{{ m.name }}</strong>
-          </td>
-          <td>
-            <label *ngIf="editing?.id === m.id && editing?.type === 'payment'">
-              <input type="checkbox" [(ngModel)]="editing.data.isActive" /> Activo
-            </label>
-            <span *ngIf="editing?.id !== m.id || editing?.type !== 'payment'" class="badge"
-              [class.active]="m.isActive">{{ m.isActive ? 'Activo' : 'Inactivo' }}</span>
-          </td>
-          <td class="text-center actions-cell">
-            <ng-container *ngIf="editing?.id === m.id && editing?.type === 'payment'">
-              <button class="btn btn-primary btn-xs" (click)="saveEdit('payment')">Guardar</button>
-              <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
-            </ng-container>
-            <ng-container *ngIf="editing?.id !== m.id || editing?.type !== 'payment'">
-              <button class="btn-icon" (click)="startEdit('payment', m)" title="Editar"><span
+@if (activeTab === 'payment') {
+  <div>
+    <div class="inline-form">
+      <input [(ngModel)]="newPaymentMethod" placeholder="Nuevo medio de pago" />
+      <button class="btn btn-primary btn-sm" (click)="addPaymentMethod()" [disabled]="!newPaymentMethod">Agregar</button>
+    </div>
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of paymentMethods; track m.id) {
+            <tr>
+              <td>
+                @if (editing?.id === m.id && editing?.type === 'payment') {
+                  <input [(ngModel)]="editing.data.name"
+                    class="edit-input" />
+                }
+                @if (editing?.id !== m.id || editing?.type !== 'payment') {
+                  <strong>{{ m.name }}</strong>
+                }
+              </td>
+              <td>
+                @if (editing?.id === m.id && editing?.type === 'payment') {
+                  <label>
+                    <input type="checkbox" [(ngModel)]="editing.data.isActive" /> Activo
+                  </label>
+                }
+                @if (editing?.id !== m.id || editing?.type !== 'payment') {
+                  <span class="badge"
+                  [class.active]="m.isActive">{{ m.isActive ? 'Activo' : 'Inactivo' }}</span>
+                }
+              </td>
+              <td class="text-center actions-cell">
+                @if (editing?.id === m.id && editing?.type === 'payment') {
+                  <button class="btn btn-primary btn-xs" (click)="saveEdit('payment')">Guardar</button>
+                  <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
+                }
+                @if (editing?.id !== m.id || editing?.type !== 'payment') {
+                  <button class="btn-icon" (click)="startEdit('payment', m)" title="Editar"><span
                   class="icon icon-edit"></span></button>
-              <button class="btn-icon danger" (click)="deleteItem('payment', m)" title="Eliminar"><span
+                  <button class="btn-icon danger" (click)="deleteItem('payment', m)" title="Eliminar"><span
                   class="icon icon-delete"></span></button>
-            </ng-container>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+}
 
 <!-- Categories -->
-<div *ngIf="activeTab === 'categories'">
-  <div class="inline-form">
-    <input [(ngModel)]="newCategory.name" placeholder="Nombre de categoría" />
-    <select [(ngModel)]="newCategory.type">
-      <option value="EXPENSE">Egreso</option>
-      <option value="BOTH">Ambos</option>
-    </select>
-    <button class="btn btn-primary btn-sm" (click)="addCategory()" [disabled]="!newCategory.name">Agregar</button>
-  </div>
-  <div class="card">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Tipo</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (c of categories; track c.id) {
-        <tr>
-          <td>
-            <input *ngIf="editing?.id === c.id && editing?.type === 'category'" [(ngModel)]="editing.data.name"
-              class="edit-input" />
-            <strong *ngIf="editing?.id !== c.id || editing?.type !== 'category'">{{ c.name }}</strong>
-          </td>
-          <td>
-            <select *ngIf="editing?.id === c.id && editing?.type === 'category'" [(ngModel)]="editing.data.type"
-              class="edit-input">
-              <option value="EXPENSE">Egreso</option>
-              <option value="BOTH">Ambos</option>
-            </select>
-            <span *ngIf="editing?.id !== c.id || editing?.type !== 'category'" class="badge">{{ c.type }}</span>
-          </td>
-          <td class="text-center actions-cell">
-            <ng-container *ngIf="editing?.id === c.id && editing?.type === 'category'">
-              <button class="btn btn-primary btn-xs" (click)="saveEdit('category')">Guardar</button>
-              <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
-            </ng-container>
-            <ng-container *ngIf="editing?.id !== c.id || editing?.type !== 'category'">
-              <button class="btn-icon" (click)="startEdit('category', c)" title="Editar"><span
+@if (activeTab === 'categories') {
+  <div>
+    <div class="inline-form">
+      <input [(ngModel)]="newCategory.name" placeholder="Nombre de categoría" />
+      <select [(ngModel)]="newCategory.type">
+        <option value="EXPENSE">Egreso</option>
+        <option value="BOTH">Ambos</option>
+      </select>
+      <button class="btn btn-primary btn-sm" (click)="addCategory()" [disabled]="!newCategory.name">Agregar</button>
+    </div>
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of categories; track c.id) {
+            <tr>
+              <td>
+                @if (editing?.id === c.id && editing?.type === 'category') {
+                  <input [(ngModel)]="editing.data.name"
+                    class="edit-input" />
+                }
+                @if (editing?.id !== c.id || editing?.type !== 'category') {
+                  <strong>{{ c.name }}</strong>
+                }
+              </td>
+              <td>
+                @if (editing?.id === c.id && editing?.type === 'category') {
+                  <select [(ngModel)]="editing.data.type"
+                    class="edit-input">
+                    <option value="EXPENSE">Egreso</option>
+                    <option value="BOTH">Ambos</option>
+                  </select>
+                }
+                @if (editing?.id !== c.id || editing?.type !== 'category') {
+                  <span class="badge">{{ c.type }}</span>
+                }
+              </td>
+              <td class="text-center actions-cell">
+                @if (editing?.id === c.id && editing?.type === 'category') {
+                  <button class="btn btn-primary btn-xs" (click)="saveEdit('category')">Guardar</button>
+                  <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
+                }
+                @if (editing?.id !== c.id || editing?.type !== 'category') {
+                  <button class="btn-icon" (click)="startEdit('category', c)" title="Editar"><span
                   class="icon icon-edit"></span></button>
-              <button class="btn-icon danger" (click)="deleteItem('category', c)" title="Eliminar"><span
+                  <button class="btn-icon danger" (click)="deleteItem('category', c)" title="Eliminar"><span
                   class="icon icon-delete"></span></button>
-            </ng-container>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+}
 
 <!-- Suppliers -->
-<div *ngIf="activeTab === 'suppliers'">
-  <div class="inline-form">
-    <input [(ngModel)]="newSupplier.name" placeholder="Nombre *" />
-    <input [(ngModel)]="newSupplier.identification" placeholder="NIT / CC" />
-    <input [(ngModel)]="newSupplier.phone" placeholder="Teléfono" />
-    <input [(ngModel)]="newSupplier.email" placeholder="Email" />
-    <button class="btn btn-primary btn-sm" (click)="addSupplier()" [disabled]="!newSupplier.name">Agregar</button>
-  </div>
-  <div class="card">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>NIT / CC</th>
-          <th>Teléfono</th>
-          <th>Email</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (s of suppliers; track s.id) {
-        <tr>
-          <td>
-            <input *ngIf="editing?.id === s.id && editing?.type === 'supplier'" [(ngModel)]="editing.data.name"
-              class="edit-input" />
-            <strong *ngIf="editing?.id !== s.id || editing?.type !== 'supplier'">{{ s.name }}</strong>
-          </td>
-          <td>
-            <input *ngIf="editing?.id === s.id && editing?.type === 'supplier'"
-              [(ngModel)]="editing.data.identification" class="edit-input" />
-            <span *ngIf="editing?.id !== s.id || editing?.type !== 'supplier'">{{ s.identification || '—' }}</span>
-          </td>
-          <td>
-            <input *ngIf="editing?.id === s.id && editing?.type === 'supplier'" [(ngModel)]="editing.data.phone"
-              class="edit-input" />
-            <span *ngIf="editing?.id !== s.id || editing?.type !== 'supplier'">{{ s.phone || '—' }}</span>
-          </td>
-          <td>
-            <input *ngIf="editing?.id === s.id && editing?.type === 'supplier'" [(ngModel)]="editing.data.email"
-              class="edit-input" />
-            <span *ngIf="editing?.id !== s.id || editing?.type !== 'supplier'">{{ s.email || '—' }}</span>
-          </td>
-          <td class="text-center actions-cell">
-            <ng-container *ngIf="editing?.id === s.id && editing?.type === 'supplier'">
-              <button class="btn btn-primary btn-xs" (click)="saveEdit('supplier')">Guardar</button>
-              <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
-            </ng-container>
-            <ng-container *ngIf="editing?.id !== s.id || editing?.type !== 'supplier'">
-              <button class="btn-icon" (click)="startEdit('supplier', s)" title="Editar"><span
+@if (activeTab === 'suppliers') {
+  <div>
+    <div class="inline-form">
+      <input [(ngModel)]="newSupplier.name" placeholder="Nombre *" />
+      <input [(ngModel)]="newSupplier.identification" placeholder="NIT / CC" />
+      <input [(ngModel)]="newSupplier.phone" placeholder="Teléfono" />
+      <input [(ngModel)]="newSupplier.email" placeholder="Email" />
+      <button class="btn btn-primary btn-sm" (click)="addSupplier()" [disabled]="!newSupplier.name">Agregar</button>
+    </div>
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>NIT / CC</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of suppliers; track s.id) {
+            <tr>
+              <td>
+                @if (editing?.id === s.id && editing?.type === 'supplier') {
+                  <input [(ngModel)]="editing.data.name"
+                    class="edit-input" />
+                }
+                @if (editing?.id !== s.id || editing?.type !== 'supplier') {
+                  <strong>{{ s.name }}</strong>
+                }
+              </td>
+              <td>
+                @if (editing?.id === s.id && editing?.type === 'supplier') {
+                  <input
+                    [(ngModel)]="editing.data.identification" class="edit-input" />
+                }
+                @if (editing?.id !== s.id || editing?.type !== 'supplier') {
+                  <span>{{ s.identification || '—' }}</span>
+                }
+              </td>
+              <td>
+                @if (editing?.id === s.id && editing?.type === 'supplier') {
+                  <input [(ngModel)]="editing.data.phone"
+                    class="edit-input" />
+                }
+                @if (editing?.id !== s.id || editing?.type !== 'supplier') {
+                  <span>{{ s.phone || '—' }}</span>
+                }
+              </td>
+              <td>
+                @if (editing?.id === s.id && editing?.type === 'supplier') {
+                  <input [(ngModel)]="editing.data.email"
+                    class="edit-input" />
+                }
+                @if (editing?.id !== s.id || editing?.type !== 'supplier') {
+                  <span>{{ s.email || '—' }}</span>
+                }
+              </td>
+              <td class="text-center actions-cell">
+                @if (editing?.id === s.id && editing?.type === 'supplier') {
+                  <button class="btn btn-primary btn-xs" (click)="saveEdit('supplier')">Guardar</button>
+                  <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
+                }
+                @if (editing?.id !== s.id || editing?.type !== 'supplier') {
+                  <button class="btn-icon" (click)="startEdit('supplier', s)" title="Editar"><span
                   class="icon icon-edit"></span></button>
-              <button class="btn-icon danger" (click)="deleteItem('supplier', s)" title="Eliminar"><span
+                  <button class="btn-icon danger" (click)="deleteItem('supplier', s)" title="Eliminar"><span
                   class="icon icon-delete"></span></button>
-            </ng-container>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+}
 
 <!-- Tax -->
-<div *ngIf="activeTab === 'tax'">
-  <div class="inline-form">
-    <input [(ngModel)]="newTax.name" placeholder="Nombre (ej: IVA 19%)" />
-    <input type="number" [(ngModel)]="newTax.rate" placeholder="Tasa (0.19)" step="0.01" />
-    <button class="btn btn-primary btn-sm" (click)="addTax()" [disabled]="!newTax.name">Agregar</button>
-  </div>
-  <div class="card">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Tasa</th>
-          <th>Default</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (t of taxConfigs; track t.id) {
-        <tr>
-          <td>
-            <input *ngIf="editing?.id === t.id && editing?.type === 'tax'" [(ngModel)]="editing.data.name"
-              class="edit-input" />
-            <strong *ngIf="editing?.id !== t.id || editing?.type !== 'tax'">{{ t.name }}</strong>
-          </td>
-          <td>
-            <input *ngIf="editing?.id === t.id && editing?.type === 'tax'" type="number" [(ngModel)]="editing.data.rate"
-              step="0.01" class="edit-input" style="width:80px" />
-            <span *ngIf="editing?.id !== t.id || editing?.type !== 'tax'">{{ t.rate * 100 }}%</span>
-          </td>
-          <td>
-            <label *ngIf="editing?.id === t.id && editing?.type === 'tax'">
-              <input type="checkbox" [(ngModel)]="editing.data.isDefault" /> Default
-            </label>
-            <span *ngIf="editing?.id !== t.id || editing?.type !== 'tax'">{{ t.isDefault ? '✅' : '' }}</span>
-          </td>
-          <td class="text-center actions-cell">
-            <ng-container *ngIf="editing?.id === t.id && editing?.type === 'tax'">
-              <button class="btn btn-primary btn-xs" (click)="saveEdit('tax')">Guardar</button>
-              <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
-            </ng-container>
-            <ng-container *ngIf="editing?.id !== t.id || editing?.type !== 'tax'">
-              <button class="btn-icon" (click)="startEdit('tax', t)" title="Editar"><span
+@if (activeTab === 'tax') {
+  <div>
+    <div class="inline-form">
+      <input [(ngModel)]="newTax.name" placeholder="Nombre (ej: IVA 19%)" />
+      <input type="number" [(ngModel)]="newTax.rate" placeholder="Tasa (0.19)" step="0.01" />
+      <button class="btn btn-primary btn-sm" (click)="addTax()" [disabled]="!newTax.name">Agregar</button>
+    </div>
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tasa</th>
+            <th>Default</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of taxConfigs; track t.id) {
+            <tr>
+              <td>
+                @if (editing?.id === t.id && editing?.type === 'tax') {
+                  <input [(ngModel)]="editing.data.name"
+                    class="edit-input" />
+                }
+                @if (editing?.id !== t.id || editing?.type !== 'tax') {
+                  <strong>{{ t.name }}</strong>
+                }
+              </td>
+              <td>
+                @if (editing?.id === t.id && editing?.type === 'tax') {
+                  <input type="number" [(ngModel)]="editing.data.rate"
+                    step="0.01" class="edit-input" style="width:80px" />
+                }
+                @if (editing?.id !== t.id || editing?.type !== 'tax') {
+                  <span>{{ t.rate * 100 }}%</span>
+                }
+              </td>
+              <td>
+                @if (editing?.id === t.id && editing?.type === 'tax') {
+                  <label>
+                    <input type="checkbox" [(ngModel)]="editing.data.isDefault" /> Default
+                  </label>
+                }
+                @if (editing?.id !== t.id || editing?.type !== 'tax') {
+                  <span>{{ t.isDefault ? '✅' : '' }}</span>
+                }
+              </td>
+              <td class="text-center actions-cell">
+                @if (editing?.id === t.id && editing?.type === 'tax') {
+                  <button class="btn btn-primary btn-xs" (click)="saveEdit('tax')">Guardar</button>
+                  <button class="btn btn-outline btn-xs" (click)="editing = null">Cancelar</button>
+                }
+                @if (editing?.id !== t.id || editing?.type !== 'tax') {
+                  <button class="btn-icon" (click)="startEdit('tax', t)" title="Editar"><span
                   class="icon icon-edit"></span></button>
-              <button class="btn-icon danger" (click)="deleteItem('tax', t)" title="Eliminar"><span
+                  <button class="btn-icon danger" (click)="deleteItem('tax', t)" title="Eliminar"><span
                   class="icon icon-delete"></span></button>
-            </ng-container>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+}
 
 <!-- Financial -->
-<div *ngIf="activeTab === 'financial'">
-  <div class="card form-card" *ngIf="financialConfig">
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Símbolo de moneda</label>
-        <input [(ngModel)]="financialConfig.currency" placeholder="$" />
+@if (activeTab === 'financial') {
+  <div>
+    @if (financialConfig) {
+      <div class="card form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Símbolo de moneda</label>
+            <input [(ngModel)]="financialConfig.currency" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label>Zona horaria</label>
+            <select [(ngModel)]="financialConfig.timezone">
+              <option value="America/Bogota">Colombia (America/Bogota)</option>
+              <option value="America/Mexico_City">México Central (America/Mexico_City)</option>
+              <option value="America/Lima">Perú (America/Lima)</option>
+              <option value="America/Santiago">Chile (America/Santiago)</option>
+              <option value="America/Argentina/Buenos_Aires">Argentina (America/Buenos_Aires)</option>
+              <option value="America/Caracas">Venezuela (America/Caracas)</option>
+              <option value="America/Guayaquil">Ecuador (America/Guayaquil)</option>
+              <option value="America/Panama">Panamá (America/Panama)</option>
+              <option value="America/Costa_Rica">Costa Rica (America/Costa_Rica)</option>
+              <option value="America/New_York">US Eastern (America/New_York)</option>
+              <option value="America/Chicago">US Central (America/Chicago)</option>
+              <option value="America/Los_Angeles">US Pacific (America/Los_Angeles)</option>
+              <option value="Europe/Madrid">España (Europe/Madrid)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" (click)="saveFinancial()">Guardar</button>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Zona horaria</label>
-        <select [(ngModel)]="financialConfig.timezone">
-          <option value="America/Bogota">Colombia (America/Bogota)</option>
-          <option value="America/Mexico_City">México Central (America/Mexico_City)</option>
-          <option value="America/Lima">Perú (America/Lima)</option>
-          <option value="America/Santiago">Chile (America/Santiago)</option>
-          <option value="America/Argentina/Buenos_Aires">Argentina (America/Buenos_Aires)</option>
-          <option value="America/Caracas">Venezuela (America/Caracas)</option>
-          <option value="America/Guayaquil">Ecuador (America/Guayaquil)</option>
-          <option value="America/Panama">Panamá (America/Panama)</option>
-          <option value="America/Costa_Rica">Costa Rica (America/Costa_Rica)</option>
-          <option value="America/New_York">US Eastern (America/New_York)</option>
-          <option value="America/Chicago">US Central (America/Chicago)</option>
-          <option value="America/Los_Angeles">US Pacific (America/Los_Angeles)</option>
-          <option value="Europe/Madrid">España (Europe/Madrid)</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-actions">
-      <button class="btn btn-primary" (click)="saveFinancial()">Guardar</button>
-    </div>
+    }
   </div>
-</div>
+}

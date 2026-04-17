@@ -24,7 +24,9 @@
     <label>Hasta</label>
     <input type="date" [(ngModel)]="dateTo" (change)="onFilter()" />
   </div>
-  <button class="btn btn-outline btn-sm" *ngIf="dateFrom || dateTo" (click)="clearDates()">✕ Limpiar fechas</button>
+  @if (dateFrom || dateTo) {
+    <button class="btn btn-outline btn-sm" (click)="clearDates()">✕ Limpiar fechas</button>
+  }
 </div>
 
 <!-- Table -->
@@ -63,22 +65,26 @@
     </tbody>
   </table>
 
-  <div class="pagination" *ngIf="total > limit">
-    <button class="btn btn-sm" [disabled]="page <= 1" (click)="changePage(page - 1)">← Anterior</button>
-    <span>Página {{ page }} de {{ totalPages }} ({{ total }} resultados)</span>
-    <button class="btn btn-sm" [disabled]="page >= totalPages" (click)="changePage(page + 1)">Siguiente →</button>
-  </div>
+  @if (total > limit) {
+    <div class="pagination">
+      <button class="btn btn-sm" [disabled]="page <= 1" (click)="changePage(page - 1)">← Anterior</button>
+      <span>Página {{ page }} de {{ totalPages }} ({{ total }} resultados)</span>
+      <button class="btn btn-sm" [disabled]="page >= totalPages" (click)="changePage(page + 1)">Siguiente →</button>
+    </div>
+  }
 </div>
 
 <!-- Cancel Confirmation Modal -->
-<div class="modal-overlay" *ngIf="showCancelModal" (click)="showCancelModal = false">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <h3>Anular Orden #{{ cancelTarget?.number }}</h3>
-    <p>Esta acción no se puede deshacer. Ingresa el motivo de anulación:</p>
-    <textarea [(ngModel)]="cancelReason" rows="3" placeholder="Motivo de anulación..."></textarea>
-    <div class="modal-actions">
-      <button class="btn btn-outline" (click)="showCancelModal = false">Cancelar</button>
-      <button class="btn btn-danger" (click)="confirmCancel()" [disabled]="!cancelReason.trim()">Confirmar Anulación</button>
+@if (showCancelModal) {
+  <div class="modal-overlay" (click)="showCancelModal = false">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Anular Orden #{{ cancelTarget?.number }}</h3>
+      <p>Esta acción no se puede deshacer. Ingresa el motivo de anulación:</p>
+      <textarea [(ngModel)]="cancelReason" rows="3" placeholder="Motivo de anulación..."></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-outline" (click)="showCancelModal = false">Cancelar</button>
+        <button class="btn btn-danger" (click)="confirmCancel()" [disabled]="!cancelReason.trim()">Confirmar Anulación</button>
+      </div>
     </div>
   </div>
-</div>
+}

@@ -1,178 +1,188 @@
-<div *ngIf="customer" class="detail-page">
-  <!-- Top Bar -->
-  <div class="detail-bar">
-    <a routerLink="/customers" class="btn btn-outline btn-sm">← Volver</a>
-    <div class="actions-dropdown" [class.open]="actionsOpen">
-      <button class="actions-toggle" (click)="actionsOpen = !actionsOpen">
-        Acciones <span class="caret">▼</span>
-      </button>
-      <div class="actions-menu">
-        <button class="action-item" (click)="toggleEdit(); actionsOpen = false">
-          {{ editingCustomer ? 'Cancelar edición' : 'Editar' }}
+@if (customer) {
+  <div class="detail-page">
+    <!-- Top Bar -->
+    <div class="detail-bar">
+      <a routerLink="/customers" class="btn btn-outline btn-sm">← Volver</a>
+      <div class="actions-dropdown" [class.open]="actionsOpen">
+        <button class="actions-toggle" (click)="actionsOpen = !actionsOpen">
+          Acciones <span class="caret">▼</span>
         </button>
-        <div class="action-separator"></div>
-        <button class="action-item danger" (click)="deleteCustomer(); actionsOpen = false">Eliminar</button>
+        <div class="actions-menu">
+          <button class="action-item" (click)="toggleEdit(); actionsOpen = false">
+            {{ editingCustomer ? 'Cancelar edición' : 'Editar' }}
+          </button>
+          <div class="action-separator"></div>
+          <button class="action-item danger" (click)="deleteCustomer(); actionsOpen = false">Eliminar</button>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="page-header">
-    <div>
-      <h1>{{ customer.name }}</h1>
-      <span class="sub-id">{{ customer.identification }}</span>
-    </div>
-  </div>
-
-  <!-- Customer Info -->
-  <div class="info-grid">
-    <div class="info-card">
-      <h4>Contacto</h4>
-      <p class="sub" *ngIf="customer.phone">📞 {{ customer.phone }}</p>
-      <p class="sub" *ngIf="customer.email">📧 {{ customer.email }}</p>
-      <p class="sub" *ngIf="customer.address">📍 {{ customer.address }}</p>
-      <p class="sub" *ngIf="!customer.phone && !customer.email && !customer.address">Sin datos de contacto</p>
-    </div>
-
-    <!-- C2: Stats Widgets -->
-    <div class="info-card stat-card">
-      <h4>Historial</h4>
-      <div class="stat-row">
-        <span>Total órdenes</span>
-        <strong>{{ customer.stats?.totalOrders || 0 }}</strong>
-      </div>
-      <div class="stat-row">
-        <span>Total facturado</span>
-        <strong class="text-green">{{ config.currency }} {{ customer.stats?.totalSpent | number:'1.0-0' }}</strong>
+    <div class="page-header">
+      <div>
+        <h1>{{ customer.name }}</h1>
+        <span class="sub-id">{{ customer.identification }}</span>
       </div>
     </div>
-    <div class="info-card stat-card" [class.has-debt]="customer.stats?.totalDebt > 0">
-      <h4>Deuda</h4>
-      <div class="stat-row">
-        <span>Saldo pendiente</span>
-        <strong class="text-red">{{ config.currency }} {{ customer.stats?.totalDebt | number:'1.0-0' }}</strong>
+    <!-- Customer Info -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Contacto</h4>
+        @if (customer.phone) {
+          <p class="sub">📞 {{ customer.phone }}</p>
+        }
+        @if (customer.email) {
+          <p class="sub">📧 {{ customer.email }}</p>
+        }
+        @if (customer.address) {
+          <p class="sub">📍 {{ customer.address }}</p>
+        }
+        @if (!customer.phone && !customer.email && !customer.address) {
+          <p class="sub">Sin datos de contacto</p>
+        }
       </div>
-      <div class="stat-row">
-        <span>Órdenes con saldo</span>
-        <strong>{{ customer.stats?.activeDebtOrders || 0 }}</strong>
+      <!-- C2: Stats Widgets -->
+      <div class="info-card stat-card">
+        <h4>Historial</h4>
+        <div class="stat-row">
+          <span>Total órdenes</span>
+          <strong>{{ customer.stats?.totalOrders || 0 }}</strong>
+        </div>
+        <div class="stat-row">
+          <span>Total facturado</span>
+          <strong class="text-green">{{ config.currency }} {{ customer.stats?.totalSpent | number:'1.0-0' }}</strong>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Edit Customer Form -->
-  <div class="card section" *ngIf="editingCustomer">
-    <h3>Editar Cliente</h3>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Nombre <span class="required-asterisk">*</span></label>
-        <input [(ngModel)]="editData.name" placeholder="Nombre" />
-      </div>
-      <div class="form-group">
-        <label>Teléfono</label>
-        <input type="text" [(ngModel)]="editData.phone" placeholder="Ej: 3001234567" pattern="^3[0-9]{9}$"
-          maxlength="10" title="Debe ser un número de 10 dígitos que empiece por 3 sin espacios" />
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input [(ngModel)]="editData.email" placeholder="Email" />
-      </div>
-      <div class="form-group">
-        <label>Dirección</label>
-        <input [(ngModel)]="editData.address" placeholder="Dirección" />
-      </div>
-      <div class="form-group full-width">
-        <label>Notas</label>
-        <input [(ngModel)]="editData.notes" placeholder="Notas" />
-      </div>
-      <div class="form-group">
-        <label>
-          <input type="checkbox" [(ngModel)]="editData.isActive" />
-          Activo
-        </label>
+      <div class="info-card stat-card" [class.has-debt]="customer.stats?.totalDebt > 0">
+        <h4>Deuda</h4>
+        <div class="stat-row">
+          <span>Saldo pendiente</span>
+          <strong class="text-red">{{ config.currency }} {{ customer.stats?.totalDebt | number:'1.0-0' }}</strong>
+        </div>
+        <div class="stat-row">
+          <span>Órdenes con saldo</span>
+          <strong>{{ customer.stats?.activeDebtOrders || 0 }}</strong>
+        </div>
       </div>
     </div>
-    <div class="form-actions">
-      <button class="btn btn-outline btn-sm" (click)="editingCustomer = false">Cancelar</button>
-      <button class="btn btn-primary btn-sm" (click)="saveCustomerEdit()" [disabled]="savingCustomer">
-        {{ savingCustomer ? 'Guardando...' : 'Guardar Cambios' }}
-      </button>
-    </div>
-  </div>
-
-  <!-- C1: Order History with Filters -->
-  <div class="card section">
-    <h3>Órdenes</h3>
-
-    <div class="filters">
-      <select [(ngModel)]="statusFilter" (change)="onFilter()">
-        <option value="">Todos los estados</option>
-        <option value="ACTIVE">Activas</option>
-        <option value="COMPLETED">Completadas</option>
-        <option value="CANCELLED">Anuladas</option>
-      </select>
-      <select [(ngModel)]="operationalFilter" (change)="onFilter()">
-        <option value="">Estado operativo</option>
-        <option value="PENDING">Pendiente</option>
-        <option value="APPROVED">Aprobada</option>
-        <option value="IN_PRODUCTION">En Producción</option>
-        <option value="PRODUCED">Producida</option>
-        <option value="DELIVERED">Entregada</option>
-      </select>
-      <div class="date-group">
-        <label>Desde</label>
-        <input type="date" [(ngModel)]="dateFrom" (change)="onFilter()" />
+    <!-- Edit Customer Form -->
+    @if (editingCustomer) {
+      <div class="card section">
+        <h3>Editar Cliente</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre <span class="required-asterisk">*</span></label>
+            <input [(ngModel)]="editData.name" placeholder="Nombre" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" [(ngModel)]="editData.phone" placeholder="Ej: 3001234567" pattern="^3[0-9]{9}$"
+              maxlength="10" title="Debe ser un número de 10 dígitos que empiece por 3 sin espacios" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input [(ngModel)]="editData.email" placeholder="Email" />
+          </div>
+          <div class="form-group">
+            <label>Dirección</label>
+            <input [(ngModel)]="editData.address" placeholder="Dirección" />
+          </div>
+          <div class="form-group full-width">
+            <label>Notas</label>
+            <input [(ngModel)]="editData.notes" placeholder="Notas" />
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="editData.isActive" />
+              Activo
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-outline btn-sm" (click)="editingCustomer = false">Cancelar</button>
+          <button class="btn btn-primary btn-sm" (click)="saveCustomerEdit()" [disabled]="savingCustomer">
+            {{ savingCustomer ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </div>
       </div>
-      <div class="date-group">
-        <label>Hasta</label>
-        <input type="date" [(ngModel)]="dateTo" (change)="onFilter()" />
+    }
+    <!-- C1: Order History with Filters -->
+    <div class="card section">
+      <h3>Órdenes</h3>
+      <div class="filters">
+        <select [(ngModel)]="statusFilter" (change)="onFilter()">
+          <option value="">Todos los estados</option>
+          <option value="ACTIVE">Activas</option>
+          <option value="COMPLETED">Completadas</option>
+          <option value="CANCELLED">Anuladas</option>
+        </select>
+        <select [(ngModel)]="operationalFilter" (change)="onFilter()">
+          <option value="">Estado operativo</option>
+          <option value="PENDING">Pendiente</option>
+          <option value="APPROVED">Aprobada</option>
+          <option value="IN_PRODUCTION">En Producción</option>
+          <option value="PRODUCED">Producida</option>
+          <option value="DELIVERED">Entregada</option>
+        </select>
+        <div class="date-group">
+          <label>Desde</label>
+          <input type="date" [(ngModel)]="dateFrom" (change)="onFilter()" />
+        </div>
+        <div class="date-group">
+          <label>Hasta</label>
+          <input type="date" [(ngModel)]="dateTo" (change)="onFilter()" />
+        </div>
+        @if (dateFrom || dateTo || statusFilter || operationalFilter) {
+          <button class="btn btn-outline btn-sm"
+          (click)="clearFilters()">✕ Limpiar</button>
+        }
       </div>
-      <button class="btn btn-outline btn-sm" *ngIf="dateFrom || dateTo || statusFilter || operationalFilter"
-        (click)="clearFilters()">✕ Limpiar</button>
-    </div>
-
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Fecha</th>
-          <th>Vendedor</th>
-          <th class="text-right">Total</th>
-          <th class="text-right">Saldo</th>
-          <th>Estado</th>
-          <th>Operativo</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (o of orders; track o.id) {
-        <tr class="clickable" [routerLink]="['/orders', o.id]">
-          <td class="mono">{{ o.number }}</td>
-          <td>{{ o.orderDate | date:'dd/MM/yyyy':config.timezone }}</td>
-          <td class="text-muted">{{ o.sellerName }}</td>
-          <td class="text-right">{{ config.currency }} {{ o.total | number:'1.0-0' }}</td>
-          <td class="text-right" [class.debt]="o.balance > 0">{{ config.currency }} {{ o.balance | number:'1.0-0' }}
-          </td>
-          <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
-          <td><span class="badge op-{{ o.operationalStatus }}">{{ operationalLabels[o.operationalStatus] ||
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Vendedor</th>
+            <th class="text-right">Total</th>
+            <th class="text-right">Saldo</th>
+            <th>Estado</th>
+            <th>Operativo</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of orders; track o.id) {
+            <tr class="clickable" [routerLink]="['/orders', o.id]">
+              <td class="mono">{{ o.number }}</td>
+              <td>{{ o.orderDate | date:'dd/MM/yyyy':config.timezone }}</td>
+              <td class="text-muted">{{ o.sellerName }}</td>
+              <td class="text-right">{{ config.currency }} {{ o.total | number:'1.0-0' }}</td>
+              <td class="text-right" [class.debt]="o.balance > 0">{{ config.currency }} {{ o.balance | number:'1.0-0' }}
+              </td>
+              <td><span class="badge status-{{ o.status }}">{{ o.status }}</span></td>
+              <td><span class="badge op-{{ o.operationalStatus }}">{{ operationalLabels[o.operationalStatus] ||
               o.operationalStatus }}</span></td>
-        </tr>
-        }
-        @if (orders.length === 0 && !loadingOrders) {
-        <tr>
-          <td colspan="7" class="empty">No se encontraron órdenes</td>
-        </tr>
-        }
-      </tbody>
-    </table>
-
-    <div class="pagination" *ngIf="orderTotal > orderLimit">
-      <button class="btn btn-sm" [disabled]="orderPage <= 1" (click)="changePage(orderPage - 1)">← Anterior</button>
-      <span>Pág. {{ orderPage }} de {{ totalOrderPages }} ({{ orderTotal }} resultados)</span>
-      <button class="btn btn-sm" [disabled]="orderPage >= totalOrderPages" (click)="changePage(orderPage + 1)">Siguiente
-        →</button>
+            </tr>
+          }
+          @if (orders.length === 0 && !loadingOrders) {
+            <tr>
+              <td colspan="7" class="empty">No se encontraron órdenes</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (orderTotal > orderLimit) {
+        <div class="pagination">
+          <button class="btn btn-sm" [disabled]="orderPage <= 1" (click)="changePage(orderPage - 1)">← Anterior</button>
+          <span>Pág. {{ orderPage }} de {{ totalOrderPages }} ({{ orderTotal }} resultados)</span>
+          <button class="btn btn-sm" [disabled]="orderPage >= totalOrderPages" (click)="changePage(orderPage + 1)">Siguiente
+          →</button>
+        </div>
+      }
     </div>
   </div>
-</div>
+}
 
-<div class="loading" *ngIf="loading">
-  <div class="spinner"></div>
-  <p>Cargando cliente...</p>
-</div>
+@if (loading) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando cliente...</p>
+  </div>
+}

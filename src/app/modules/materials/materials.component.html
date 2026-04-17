@@ -1,91 +1,121 @@
 <div class="page-header">
-    <h1>Materiales / Materia Prima</h1>
+  <h1>Materiales / Materia Prima</h1>
 </div>
 
 <!-- Search -->
-<div class="search-bar" *ngIf="!showCreateForm">
+@if (!showCreateForm) {
+  <div class="search-bar">
     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar material..." (input)="loadMaterials()" />
-    <button class="btn btn-primary btn-sm" (click)="showCreateForm = true" *ngIf="canCreate">+ Nuevo</button>
-</div>
+    @if (canCreate) {
+      <button class="btn btn-primary btn-sm" (click)="showCreateForm = true">+ Nuevo</button>
+    }
+  </div>
+}
 
 <!-- Create Form -->
-<div class="card section p-4 mb-2" *ngIf="canCreate && showCreateForm">
+@if (canCreate && showCreateForm) {
+  <div class="card section p-4 mb-2">
     <h3>Nuevo Material</h3>
     <div class="form-grid">
-        <div class="form-group">
-            <label>Nombre <span class="required-asterisk">*</span></label>
-            <input [(ngModel)]="newMaterial.name" placeholder="Ej: Vinilo adhesivo" />
-        </div>
-        <div class="form-group">
-            <label>Descripción</label>
-            <input [(ngModel)]="newMaterial.description" placeholder="Descripción del material" />
-        </div>
-        <div class="form-group">
-            <label>Precio</label>
-            <input type="number" [(ngModel)]="newMaterial.price" placeholder="0" />
-        </div>
-        <div class="form-group">
-            <label>Unidad</label>
-            <input [(ngModel)]="newMaterial.unit" placeholder="Ej: m², kg, rollo" />
-        </div>
+      <div class="form-group">
+        <label>Nombre <span class="required-asterisk">*</span></label>
+        <input [(ngModel)]="newMaterial.name" placeholder="Ej: Vinilo adhesivo" />
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <input [(ngModel)]="newMaterial.description" placeholder="Descripción del material" />
+      </div>
+      <div class="form-group">
+        <label>Precio</label>
+        <input type="number" [(ngModel)]="newMaterial.price" placeholder="0" />
+      </div>
+      <div class="form-group">
+        <label>Unidad</label>
+        <input [(ngModel)]="newMaterial.unit" placeholder="Ej: m², kg, rollo" />
+      </div>
     </div>
     <div class="form-actions">
-        <button class="btn btn-outline" (click)="cancelCreate()">Cancelar</button>
-        <button class="btn btn-primary" (click)="addMaterial()" [disabled]="!newMaterial.name">Agregar Material</button>
+      <button class="btn btn-outline" (click)="cancelCreate()">Cancelar</button>
+      <button class="btn btn-primary" (click)="addMaterial()" [disabled]="!newMaterial.name">Agregar Material</button>
     </div>
-</div>
+  </div>
+}
 
 <!-- Materials Table -->
 <div class="card">
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th class="text-right">Precio</th>
-                <th>Unidad</th>
-                <th class="text-center" *ngIf="canUpdate || canDelete">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (m of materials; track m.id) {
-            <tr>
-                <td>
-                    <input *ngIf="editing?.id === m.id" [(ngModel)]="editing.data.name" class="edit-input" />
-                    <strong *ngIf="editing?.id !== m.id">{{ m.name }}</strong>
-                </td>
-                <td>
-                    <input *ngIf="editing?.id === m.id" [(ngModel)]="editing.data.description" class="edit-input" />
-                    <span *ngIf="editing?.id !== m.id">{{ m.description || '—' }}</span>
-                </td>
-                <td class="text-right">
-                    <input *ngIf="editing?.id === m.id" type="number" [(ngModel)]="editing.data.price"
-                        class="edit-input w-100" />
-                    <span *ngIf="editing?.id !== m.id">{{ config.currency }} {{ m.price | number:'1.0-0' }}</span>
-                </td>
-                <td>
-                    <input *ngIf="editing?.id === m.id" [(ngModel)]="editing.data.unit" class="edit-input w-80" />
-                    <span *ngIf="editing?.id !== m.id">{{ m.unit || '—' }}</span>
-                </td>
-                <td class="text-center actions-cell" *ngIf="canUpdate || canDelete">
-                    <ng-container *ngIf="editing?.id === m.id">
-                        <button class="btn btn-primary btn-xs" (click)="saveEdit()">Guardar</button>
-                        <button class="btn btn-outline btn-xs" (click)="cancelEdit()">Cancelar</button>
-                    </ng-container>
-                    <ng-container *ngIf="editing?.id !== m.id">
-                        <button class="btn-icon" (click)="startEdit(m)" title="Editar" *ngIf="canUpdate"><span
-                                class="icon icon-edit"></span></button>
-                        <button class="btn-icon" (click)="deleteMaterial(m)" title="Eliminar" *ngIf="canDelete"><span
-                                class="icon icon-delete"></span></button>
-                    </ng-container>
-                </td>
-            </tr>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th class="text-right">Precio</th>
+        <th>Unidad</th>
+        @if (canUpdate || canDelete) {
+          <th class="text-center">Acciones</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (m of materials; track m.id) {
+        <tr>
+          <td>
+            @if (editing?.id === m.id) {
+              <input [(ngModel)]="editing.data.name" class="edit-input" />
             }
-            @if (materials.length === 0) {
-            <tr>
-                <td [attr.colspan]="(canUpdate || canDelete) ? 5 : 4" class="empty">No hay materiales registrados</td>
-            </tr>
+            @if (editing?.id !== m.id) {
+              <strong>{{ m.name }}</strong>
             }
-        </tbody>
-    </table>
+          </td>
+          <td>
+            @if (editing?.id === m.id) {
+              <input [(ngModel)]="editing.data.description" class="edit-input" />
+            }
+            @if (editing?.id !== m.id) {
+              <span>{{ m.description || '—' }}</span>
+            }
+          </td>
+          <td class="text-right">
+            @if (editing?.id === m.id) {
+              <input type="number" [(ngModel)]="editing.data.price"
+                class="edit-input w-100" />
+            }
+            @if (editing?.id !== m.id) {
+              <span>{{ config.currency }} {{ m.price | number:'1.0-0' }}</span>
+            }
+          </td>
+          <td>
+            @if (editing?.id === m.id) {
+              <input [(ngModel)]="editing.data.unit" class="edit-input w-80" />
+            }
+            @if (editing?.id !== m.id) {
+              <span>{{ m.unit || '—' }}</span>
+            }
+          </td>
+          @if (canUpdate || canDelete) {
+            <td class="text-center actions-cell">
+              @if (editing?.id === m.id) {
+                <button class="btn btn-primary btn-xs" (click)="saveEdit()">Guardar</button>
+                <button class="btn btn-outline btn-xs" (click)="cancelEdit()">Cancelar</button>
+              }
+              @if (editing?.id !== m.id) {
+                @if (canUpdate) {
+                  <button class="btn-icon" (click)="startEdit(m)" title="Editar"><span
+                  class="icon icon-edit"></span></button>
+                }
+                @if (canDelete) {
+                  <button class="btn-icon" (click)="deleteMaterial(m)" title="Eliminar"><span
+                  class="icon icon-delete"></span></button>
+                }
+              }
+            </td>
+          }
+        </tr>
+      }
+      @if (materials.length === 0) {
+        <tr>
+          <td [attr.colspan]="(canUpdate || canDelete) ? 5 : 4" class="empty">No hay materiales registrados</td>
+        </tr>
+      }
+    </tbody>
+  </table>
 </div>

@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
     selector: 'app-loader-overlay',
-    imports: [CommonModule],
+    imports: [],
     template: `
     <div class="loader-overlay" [class.loader-fixed]="mode === 'fixed'" [class.loader-absolute]="mode === 'absolute'">
         <img src="assets/ordamy_loader.svg" alt="Cargando..." class="loader-spinner" />

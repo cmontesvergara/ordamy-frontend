@@ -5,63 +5,65 @@
   </button>
 </div>
 
-<div class="card form-card" *ngIf="showForm">
-  <h3>Nuevo Egreso</h3>
-  <div class="form-grid">
-    <div class="form-group">
-      <label>Descripción <span class="required-asterisk">*</span></label>
-      <input [(ngModel)]="newExpense.description" placeholder="Descripción" />
+@if (showForm) {
+  <div class="card form-card">
+    <h3>Nuevo Egreso</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Descripción <span class="required-asterisk">*</span></label>
+        <input [(ngModel)]="newExpense.description" placeholder="Descripción" />
+      </div>
+      <div class="form-group">
+        <label>Monto <span class="required-asterisk">*</span></label>
+        <input type="number" [(ngModel)]="newExpense.amount" placeholder="0" />
+      </div>
+      <div class="form-group">
+        <label>Categoría <span class="required-asterisk">*</span></label>
+        <select [(ngModel)]="newExpense.categoryId">
+          <option value="">Seleccionar...</option>
+          @for (c of categories; track c.id) {
+            <option [value]="c.id">{{ c.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Proveedor</label>
+        <select [(ngModel)]="newExpense.supplierId">
+          <option value="">Seleccionar...</option>
+          @for (s of suppliers; track s.id) {
+            <option [value]="s.id">{{ s.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Medio de pago <span class="required-asterisk">*</span></label>
+        <select [(ngModel)]="newExpense.paymentMethodId">
+          <option value="">Seleccionar...</option>
+          @for (m of paymentMethods; track m.id) {
+            <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nro. Factura Proveedor</label>
+        <input [(ngModel)]="newExpense.invoiceNumber" placeholder="Ej: FAC-001 (opcional)" />
+      </div>
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" [(ngModel)]="newExpense.expenseDate" />
+      </div>
+      <div class="form-group full-width">
+        <label>Notas</label>
+        <input [(ngModel)]="newExpense.notes" placeholder="Notas opcionales" />
+      </div>
     </div>
-    <div class="form-group">
-      <label>Monto <span class="required-asterisk">*</span></label>
-      <input type="number" [(ngModel)]="newExpense.amount" placeholder="0" />
-    </div>
-    <div class="form-group">
-      <label>Categoría <span class="required-asterisk">*</span></label>
-      <select [(ngModel)]="newExpense.categoryId">
-        <option value="">Seleccionar...</option>
-        @for (c of categories; track c.id) {
-        <option [value]="c.id">{{ c.name }}</option>
-        }
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Proveedor</label>
-      <select [(ngModel)]="newExpense.supplierId">
-        <option value="">Seleccionar...</option>
-        @for (s of suppliers; track s.id) {
-        <option [value]="s.id">{{ s.name }}</option>
-        }
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Medio de pago <span class="required-asterisk">*</span></label>
-      <select [(ngModel)]="newExpense.paymentMethodId">
-        <option value="">Seleccionar...</option>
-        @for (m of paymentMethods; track m.id) {
-        <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
-        }
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Nro. Factura Proveedor</label>
-      <input [(ngModel)]="newExpense.invoiceNumber" placeholder="Ej: FAC-001 (opcional)" />
-    </div>
-    <div class="form-group">
-      <label>Fecha</label>
-      <input type="date" [(ngModel)]="newExpense.expenseDate" />
-    </div>
-    <div class="form-group full-width">
-      <label>Notas</label>
-      <input [(ngModel)]="newExpense.notes" placeholder="Notas opcionales" />
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="createExpense()" [disabled]="saving">
+        {{ saving ? 'Guardando...' : 'Guardar' }}
+      </button>
     </div>
   </div>
-  <div class="form-actions">
-    <button class="btn btn-primary" (click)="createExpense()" [disabled]="saving">
-      {{ saving ? 'Guardando...' : 'Guardar' }}
-    </button>
-  </div>
-</div>
+}
 
 <!-- Filters -->
 <div class="filters">
@@ -70,7 +72,7 @@
   <select [(ngModel)]="filterCategory" (change)="onFilter()">
     <option value="">Todas las categorías</option>
     @for (c of categories; track c.id) {
-    <option [value]="c.id">{{ c.name }}</option>
+      <option [value]="c.id">{{ c.name }}</option>
     }
   </select>
 </div>
@@ -83,7 +85,9 @@
     <label>Hasta</label>
     <input type="date" [(ngModel)]="filterTo" (change)="onFilter()" />
   </div>
-  <button class="btn btn-outline btn-sm" *ngIf="filterFrom || filterTo" (click)="clearDates()">✕ Limpiar fechas</button>
+  @if (filterFrom || filterTo) {
+    <button class="btn btn-outline btn-sm" (click)="clearDates()">✕ Limpiar fechas</button>
+  }
 </div>
 
 <div class="card">
@@ -103,94 +107,98 @@
     </thead>
     <tbody>
       @for (e of expenses; track e.id) {
-      <tr>
-        <td class="mono">{{ e.number }}</td>
-        <td><strong>{{ e.description }}</strong></td>
-        <td>{{ e.category?.name || '—' }}</td>
-        <td>{{ e.supplier?.name || '—' }}</td>
-        <td class="mono">{{ e.invoiceNumber || '—' }}</td>
-        <td><span class="badge badge-muted">{{ e.paymentMethod?.name || '—' }}</span></td>
-        <td class="text-right expense-amount">{{ config.currency }} {{ e.amount | number:'1.0-0' }}</td>
-        <td>{{ e.expenseDate | date:'dd/MM/yyyy':config.timezone }}</td>
-        <td class="actions-cell">
-          <button class="btn-icon" title="Editar" (click)="startEditExpense(e)"><span
-              class="icon icon-edit"></span></button>
-          <button class="btn-icon danger" title="Eliminar" (click)="deleteExpense(e.id)"><span
-              class="icon icon-delete"></span></button>
-        </td>
-      </tr>
+        <tr>
+          <td class="mono">{{ e.number }}</td>
+          <td><strong>{{ e.description }}</strong></td>
+          <td>{{ e.category?.name || '—' }}</td>
+          <td>{{ e.supplier?.name || '—' }}</td>
+          <td class="mono">{{ e.invoiceNumber || '—' }}</td>
+          <td><span class="badge badge-muted">{{ e.paymentMethod?.name || '—' }}</span></td>
+          <td class="text-right expense-amount">{{ config.currency }} {{ e.amount | number:'1.0-0' }}</td>
+          <td>{{ e.expenseDate | date:'dd/MM/yyyy':config.timezone }}</td>
+          <td class="actions-cell">
+            <button class="btn-icon" title="Editar" (click)="startEditExpense(e)"><span
+            class="icon icon-edit"></span></button>
+            <button class="btn-icon danger" title="Eliminar" (click)="deleteExpense(e.id)"><span
+            class="icon icon-delete"></span></button>
+          </td>
+        </tr>
       }
       @if (expenses.length === 0 && !loading) {
-      <tr>
-        <td colspan="9" class="empty">No se encontraron egresos</td>
-      </tr>
+        <tr>
+          <td colspan="9" class="empty">No se encontraron egresos</td>
+        </tr>
       }
     </tbody>
   </table>
 
   <!-- Edit Expense Inline Form -->
-  <div class="card form-card edit-expense-form" *ngIf="editingExpense">
-    <h3>Editar Egreso #{{ editingExpense.number }}</h3>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Descripción <span class="required-asterisk">*</span></label>
-        <input [(ngModel)]="editData.description" placeholder="Descripción" />
+  @if (editingExpense) {
+    <div class="card form-card edit-expense-form">
+      <h3>Editar Egreso #{{ editingExpense.number }}</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Descripción <span class="required-asterisk">*</span></label>
+          <input [(ngModel)]="editData.description" placeholder="Descripción" />
+        </div>
+        <div class="form-group">
+          <label>Monto <span class="required-asterisk">*</span></label>
+          <input type="number" [(ngModel)]="editData.amount" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label>Categoría</label>
+          <select [(ngModel)]="editData.categoryId">
+            <option value="">Seleccionar...</option>
+            @for (c of categories; track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Proveedor</label>
+          <select [(ngModel)]="editData.supplierId">
+            <option value="">Seleccionar...</option>
+            @for (s of suppliers; track s.id) {
+              <option [value]="s.id">{{ s.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Medio de pago</label>
+          <select [(ngModel)]="editData.paymentMethodId">
+            <option value="">Seleccionar...</option>
+            @for (m of paymentMethods; track m.id) {
+              <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nro. Factura</label>
+          <input [(ngModel)]="editData.invoiceNumber" placeholder="FAC-001" />
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" [(ngModel)]="editData.expenseDate" />
+        </div>
+        <div class="form-group">
+          <label>Notas</label>
+          <input [(ngModel)]="editData.notes" placeholder="Notas" />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Monto <span class="required-asterisk">*</span></label>
-        <input type="number" [(ngModel)]="editData.amount" placeholder="0" />
-      </div>
-      <div class="form-group">
-        <label>Categoría</label>
-        <select [(ngModel)]="editData.categoryId">
-          <option value="">Seleccionar...</option>
-          @for (c of categories; track c.id) {
-          <option [value]="c.id">{{ c.name }}</option>
-          }
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Proveedor</label>
-        <select [(ngModel)]="editData.supplierId">
-          <option value="">Seleccionar...</option>
-          @for (s of suppliers; track s.id) {
-          <option [value]="s.id">{{ s.name }}</option>
-          }
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Medio de pago</label>
-        <select [(ngModel)]="editData.paymentMethodId">
-          <option value="">Seleccionar...</option>
-          @for (m of paymentMethods; track m.id) {
-          <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
-          }
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Nro. Factura</label>
-        <input [(ngModel)]="editData.invoiceNumber" placeholder="FAC-001" />
-      </div>
-      <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" [(ngModel)]="editData.expenseDate" />
-      </div>
-      <div class="form-group">
-        <label>Notas</label>
-        <input [(ngModel)]="editData.notes" placeholder="Notas" />
+      <div class="form-actions">
+        <button class="btn btn-outline btn-sm" (click)="editingExpense = null">Cancelar</button>
+        <button class="btn btn-primary btn-sm" (click)="saveExpenseEdit()" [disabled]="savingEdit">
+          {{ savingEdit ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
       </div>
     </div>
-    <div class="form-actions">
-      <button class="btn btn-outline btn-sm" (click)="editingExpense = null">Cancelar</button>
-      <button class="btn btn-primary btn-sm" (click)="saveExpenseEdit()" [disabled]="savingEdit">
-        {{ savingEdit ? 'Guardando...' : 'Guardar Cambios' }}
-      </button>
-    </div>
-  </div>
+  }
 
-  <div class="pagination" *ngIf="total > limit">
-    <button class="btn btn-sm" [disabled]="page <= 1" (click)="changePage(page - 1)">← Anterior</button>
-    <span>Página {{ page }} de {{ totalPages }} ({{ total }} resultados)</span>
-    <button class="btn btn-sm" [disabled]="page >= totalPages" (click)="changePage(page + 1)">Siguiente →</button>
-  </div>
+  @if (total > limit) {
+    <div class="pagination">
+      <button class="btn btn-sm" [disabled]="page <= 1" (click)="changePage(page - 1)">← Anterior</button>
+      <span>Página {{ page }} de {{ totalPages }} ({{ total }} resultados)</span>
+      <button class="btn btn-sm" [disabled]="page >= totalPages" (click)="changePage(page + 1)">Siguiente →</button>
+    </div>
+  }
 </div>

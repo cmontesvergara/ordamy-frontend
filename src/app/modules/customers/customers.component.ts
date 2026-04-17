@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CustomerService } from '../../core/services/customer/customer.service';
@@ -7,7 +7,7 @@ import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
     selector: 'app-customers',
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [FormsModule, RouterLink],
     templateUrl: './customers.component.html',
     styleUrl: './customers.component.scss'
 })
