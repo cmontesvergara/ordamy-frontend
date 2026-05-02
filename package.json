@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "start:local": "NODE_EXTRA_CA_CERTS='$(mkcert -CAROOT)/rootCA.pem' && ng serve --port 4001 --host 0.0.0.0",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
