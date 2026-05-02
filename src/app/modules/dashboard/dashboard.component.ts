@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReportService } from '../../core/services/report/report.service';
+import { Component, OnInit } from '@angular/core';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { ReportService } from '../../core/services/report/report.service';
 
 @Component({
-    selector: 'app-dashboard',
-    imports: [CommonModule],
-    templateUrl: './dashboard.component.html',
-    styleUrl: './dashboard.component.scss'
+  selector: 'app-dashboard',
+  imports: [CommonModule],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
   data: any = null;
@@ -20,7 +21,7 @@ export class DashboardComponent implements OnInit {
     { key: 'DELIVERED', label: 'Entregada' },
   ];
 
-  constructor(private reportService: ReportService, public config: AppConfigService) { }
+  constructor(private reportService: ReportService, public config: AppConfigService, private authService: AuthService) { }
 
   ngOnInit() {
     this.reportService.getDashboard().subscribe({

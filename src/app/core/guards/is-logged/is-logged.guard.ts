@@ -1,31 +1,36 @@
 import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
-import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service';
+import { SessionService } from '../../services/session/session.service';
 
 export const isLoggedGuard: CanActivateFn = (route, state) => {
-    const authService = inject(AuthService);
+    const sessionService = inject(SessionService);
     const router = inject(Router);
 
-    if (!authService.getAccessToken()) {
-        router.navigate(['/']);
-        return of(false);
+    // Si la sesión ya está en memoria, permitir acceso inmediatamente
+    if (sessionService.isDefined()) {
+        console.log('[IsLoggedGuard] Sesión en memoria. Permitiendo acceso a:', state.url);
+        return true;
     }
 
-    // Usar getSessionWithAutoRefresh para manejar refreshRequired automáticamente
-    return authService.getSessionWithAutoRefresh().pipe(
-        map((session: any) => {
-            if (session && session.user && session.user.userId) {
+    // Si no hay sesión en memoria, intentar recuperarla del servidor
+    console.log('[IsLoggedGuard] Sin sesión en memoria. Intentando recuperar del servidor...');
+    return sessionService.getSession().pipe(
+        map((response: any) => {
+            if (response?.user && response?.tokens?.accessToken) {
+                console.log('[IsLoggedGuard] Sesión recuperada. Setup y permitiendo acceso.');
+                sessionService.setupSession(response);
                 return true;
             }
+            // Respuesta inválida, redirigir
+            console.warn('[IsLoggedGuard] Respuesta de sesión inválida. Redirigiendo a login.');
             router.navigate(['/']);
             return false;
         }),
-        catchError(() => {
-            authService.clearSession();
+        catchError((error) => {
+            console.error('[IsLoggedGuard] Error al recuperar sesión:', error);
             router.navigate(['/']);
             return of(false);
-        }),
+        })
     );
 };

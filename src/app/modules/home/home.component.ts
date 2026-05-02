@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
-import { AuthService } from '../../core/services/auth/auth.service';
 
 import { RouterModule } from '@angular/router';
+import { SessionService } from '../../core/services/session/session.service';
 
 @Component({
     selector: 'app-home',
@@ -13,15 +13,9 @@ import { RouterModule } from '@angular/router';
 export class HomeComponent implements OnInit {
     tenantName = '';
 
-    constructor(private authService: AuthService) { }
+    constructor(private sessionService: SessionService) { }
 
     ngOnInit() {
-        this.authService.getSession().subscribe({
-            next: (session: any) => {
-                if (session && session.tenant) {
-                    this.tenantName = session.tenant.name;
-                }
-            },
-        });
+        this.tenantName = this.sessionService.getCurrentTenant().name
     }
 }

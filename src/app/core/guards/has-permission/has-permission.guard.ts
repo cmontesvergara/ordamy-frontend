@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
-import { AuthService } from '../../services/auth/auth.service';
+import { SessionService } from '../../services/session/session.service';
 import { ToastService } from '../../services/toast/toast.service';
 
 /**
@@ -14,33 +13,26 @@ export function hasPermissionGuard(
     action: string,
 ): CanActivateFn {
     return () => {
-        const authService = inject(AuthService);
+        const sessionService = inject(SessionService);
         const toastService = inject(ToastService);
 
-        // Usar getSessionWithAutoRefresh para manejar refreshRequired automáticamente
-        return authService.getSessionWithAutoRefresh().pipe(
-            map((session: any) => {
-                if (!session?.tenant?.permissions) {
-                    toastService.error('Autenticación', 'No hay datos de sesión o permisos disponibles.');
-                    return false;
-                }
+        const permissions = sessionService.getPermissions();
+        console.log(`[HasPermissionGuard] Verificando permiso para ${resource}:${action}. Permisos del usuario:`, permissions);
+        //const user = sessionService.getUser();
 
-                // SuperAdmins bypass permission checks
-                if (session.user?.isSuperAdmin) {
-                    return true;
-                }
+        if (!permissions) {
+            toastService.error('Autenticación', 'No hay datos de sesión o permisos disponibles.');
+            return false;
+        }
 
-                const hasAccess = session.tenant.permissions.some(
-                    (p: any) => p.resource === resource && p.action === action,
-                );
-
-                if (!hasAccess) {
-                    toastService.warning('Acceso Restringido', `No tienes permiso para acceder a esta sección (${resource}:${action}).`);
-                }
-
-                return hasAccess;
-            }),
-            catchError(() => of(false)),
+        const hasAccess = permissions.some(
+            (p) => p.resource === resource && p.action === action,
         );
+
+        if (!hasAccess) {
+            toastService.warning('Acceso Restringido', `No tienes permiso para acceder a esta sección (${resource}:${action}).`);
+        }
+
+        return hasAccess;
     };
 }

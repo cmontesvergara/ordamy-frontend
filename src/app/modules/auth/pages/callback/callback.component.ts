@@ -1,6 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth/auth.service';
+import { environment } from '../../../../../environments/environment';
+import { Permission, SessionService, User } from '../../../../core/services/session/session.service';
+import { Tenant } from '../../../../shared/components/tenant-selector.component';
+export interface ExchangeResponse {
+    success: boolean;
+    tokens: {
+        accessToken: string;
+        expiresIn: number;
+    }
+    user: User;
+    currentTenant: Tenant & { permissions: Permission[] };
+    relatedTenants: Tenant[];
+}
 
 @Component({
     selector: 'app-callback',
@@ -34,7 +46,7 @@ export class CallbackComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private authService: AuthService,
+        private sessionService: SessionService,
     ) { }
 
     ngOnInit() {
@@ -43,21 +55,32 @@ export class CallbackComponent implements OnInit {
         const codeVerifier = this.route.snapshot.queryParamMap.get('codeVerifier');
 
         if (payload) {
-            this.authService.exchangePayload(payload, codeVerifier as string).subscribe({
-                next: (response: any) => {
+            // Hacer exchange directo usando el SessionService
+            const exchangeUrl = `${(environment as any).middlewareBaseUrl}/api/auth/exchange`;
+
+            fetch(exchangeUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    payload: payload,
+                    codeVerifier: codeVerifier
+                })
+            })
+                .then(res => res.json())
+                .then((response: ExchangeResponse) => {
                     if (response.success) {
-                        this.authService.handleLoginResponse(response);
+                        this.sessionService.setupSession(response);
                         this.router.navigate(['/home']);
                     } else {
                         console.error('Exchange payload failed:', response);
                         this.router.navigate(['/']);
                     }
-                },
-                error: (error: any) => {
+                })
+                .catch((error: any) => {
                     console.error('Exchange payload error:', error);
                     this.router.navigate(['/']);
-                },
-            });
+                });
             return;
         }
 

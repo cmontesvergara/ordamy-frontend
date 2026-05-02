@@ -1,13 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
-import { AuthService } from '../../core/services/auth/auth.service';
-import { AppConfigService } from '../../core/services/app-config/app-config.service';
-import { environment } from '../../../environments/environment';
+import { filter, takeUntil } from 'rxjs/operators';
 import packageJson from '../../../../package.json';
-import { TenantSelectorComponent, Tenant } from '../../shared/components/tenant-selector.component';
+import { environment } from '../../../environments/environment';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { SessionService } from '../../core/services/session/session.service';
+import { Tenant, TenantSelectorComponent } from '../../shared/components/tenant-selector.component';
 
 interface MenuItem {
   label: string;
@@ -17,9 +18,9 @@ interface MenuItem {
 }
 
 @Component({
-    selector: 'app-logged-layout',
-    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TenantSelectorComponent],
-    templateUrl: './logged-layout.component.html'
+  selector: 'app-logged-layout',
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TenantSelectorComponent],
+  templateUrl: './logged-layout.component.html'
 })
 export class LoggedLayoutComponent implements OnInit, OnDestroy {
   sidebarCollapsed = false;
@@ -57,35 +58,31 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private appConfig: AppConfigService,
+    private sessionService: SessionService,
   ) { }
 
+  // @HostListener('window:beforeunload', ['$event'])
+  // async onBeforeUnload(event: BeforeUnloadEvent) {
+  //   await this.authService.refreshTokens();
+  //   event.preventDefault();
+  //   event.returnValue = true; // Modern browsers require a value to be set
+  // }
+
   ngOnInit() {
-    // Usar getSessionWithAutoRefresh para manejar refreshRequired automáticamente
-    this.authService.getSessionWithAutoRefresh().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (session: any) => {
-        if (session?.user) {
-          this.userName = `${session.user.firstName || ''} ${session.user.lastName || ''}`.trim() || session.user.userId;
-        }
-        if (session?.tenant) {
-          this.tenantName = session.tenant.name;
-        }
-        // Load tenants from response (backend now sends tenants array directly)
-        if (session?.tenants) {
-          this.tenants = session.tenants;
-          // Set current tenant (first one or the one matching tenantId)
-          this.currentTenant = this.tenants.find((t: Tenant) => t.id === session.tenant?.tenantId) || this.tenants[0] || null;
-        }
-      },
-      error: (err) => {
-        console.error('Failed to get session:', err);
-        // Si hay error 401/403, redirigir a login
-        if (err.status === 401 || err.status === 403) {
-          this.router.navigate(['/auth/login']);
-        }
-      }
-    });
+    const userSession = this.sessionService.getUser();
+    const currentTenant = this.sessionService.getCurrentTenant();
+    const relatedTenants = this.sessionService.getRelatedTenants();
+    if (userSession) {
+      this.userName = `${userSession.firstName || ''} ${userSession.lastName || ''}`.trim() || userSession.userId;
+    }
+    if (currentTenant) {
+      this.tenantName = currentTenant.name;
+    }
+    if (relatedTenants) {
+      this.tenants = relatedTenants;
+    }
+
+
     this.appConfig.load();
 
     // Update page title on navigation
