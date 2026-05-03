@@ -105,11 +105,11 @@
               ],
               "outputHashing": "all"
             },
-            "qa": {
+            "local": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.qa.ts"
+                  "with": "src/environments/environment.local.ts"
                 }
               ],
               "budgets": [
@@ -145,14 +145,14 @@
             "production": {
               "buildTarget": "ordamy-frontend:build:production"
             },
-            "qa": {
-              "buildTarget": "ordamy-frontend:build:qa"
+            "local": {
+              "buildTarget": "ordamy-frontend:build:local"
             },
             "development": {
               "buildTarget": "ordamy-frontend:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
