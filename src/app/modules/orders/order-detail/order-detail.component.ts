@@ -323,5 +323,14 @@ export class OrderDetailComponent implements OnInit {
     }
     this.showCompositionCalc = false;
   }
+
+  removeMaterialFromComposition(item: any, materialIndex: number, itemIndex: number) {
+    if (item.composition && item.composition.length > 0) {
+      item.composition.splice(materialIndex, 1);
+      // Recalculate item unit price
+      item.unitPrice = item.composition.reduce((sum: number, c: any) => sum + (c.subtotal || 0), 0);
+      this.recalcEditTotals();
+    }
+  }
 }
 

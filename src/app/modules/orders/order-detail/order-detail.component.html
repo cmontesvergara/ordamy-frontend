@@ -169,24 +169,35 @@
               <td>
                 <input type="text" [(ngModel)]="item.description" class="input-full" [readonly]="!!item.productId" />
                 @if (item.composition && item.composition.length > 0) {
-                  <div class="composition-view mt-1" style="margin-top: 6px; padding: 8px; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem;">
-                    <div style="font-weight: 500; margin-bottom: 4px; color: var(--text-secondary);">↳ Composición:</div>
-                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                  <div class="composition-view mt-1" style="margin-top: 8px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                      <div style="font-weight: 600; color: #475569; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">↳ Composición del Ítem</div>
+                      <button class="btn-icon primary btn-xs" style="font-size: 0.75rem; padding: 2px 8px; background: #e0e7ff; color: #4338ca; border-radius: 4px; font-weight: 600;" (click)="openCompositionCalc(i)" title="Agregar/Editar composición">+ Agregar / Editar</button>
+                    </div>
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem;">
                       <thead>
-                        <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
-                          <th style="padding: 2px 4px; font-weight: normal;">Nombre</th>
-                          <th style="padding: 2px 4px; font-weight: normal;">Medidas</th>
-                          <th style="padding: 2px 4px; font-weight: normal; text-align: right;">Cant.</th>
-                          <th style="padding: 2px 4px; font-weight: normal;">Unidad</th>
+                        <tr style="color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;">
+                          <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Material</th>
+                          <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Medidas</th>
+                          <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Cant.</th>
+                          <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Factor</th>
+                          <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Valor</th>
+                          <th style="padding: 4px; border-bottom: 1px solid #cbd5e1; width: 30px;"></th>
                         </tr>
                       </thead>
                       <tbody>
                         @for (c of item.composition; track $index) {
-                          <tr style="border-bottom: 1px dashed var(--border-color-light);">
-                            <td style="padding: 4px;">{{ c.name }}</td>
-                            <td style="padding: 4px;">{{ c.quantityExpr }}</td>
-                            <td style="padding: 4px; text-align: right;">{{ c.quantity }}</td>
-                            <td style="padding: 4px; color: var(--text-muted);">{{ c.unitId }}</td>
+                          <tr>
+                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #1e293b; font-weight: 500;">
+                              {{ c.name }} <span style="color: #94a3b8; font-size: 0.75rem; font-weight: normal;">({{ c.unitId }})</span>
+                            </td>
+                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569;">{{ c.quantityExpr }}</td>
+                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">{{ c.quantity }}</td>
+                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">{{ c.factor | number:'1.0-2' }}</td>
+                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #0f172a; font-weight: 500; text-align: right;">{{ config.currency }} {{ (c.subtotal || 0) | number:'1.0-0' }}</td>
+                            <td style="padding: 6px 4px; border-bottom: 1px dashed #e2e8f0; text-align: center;">
+                              <button class="btn-icon danger btn-xs" style="padding: 2px; color: #ef4444;" (click)="removeMaterialFromComposition(item, $index, i)" title="Eliminar material">×</button>
+                            </td>
                           </tr>
                         }
                       </tbody>
@@ -197,7 +208,10 @@
               <td><input type="number" [(ngModel)]="item.quantity" min="1" class="input-full text-right"
               (input)="recalcEditTotals()" /></td>
               <td><input type="number" [(ngModel)]="item.unitPrice" min="0" class="input-full text-right"
-              (input)="recalcEditTotals()" [readonly]="!!item.productId || (item.composition && item.composition.length > 0)" /></td>
+              (input)="recalcEditTotals()" [readonly]="!!item.productId || (item.composition && item.composition.length > 0)"
+              [style.background]="(!!item.productId || (item.composition && item.composition.length > 0)) ? '#f1f5f9' : ''"
+              [style.cursor]="(!!item.productId || (item.composition && item.composition.length > 0)) ? 'not-allowed' : 'text'"
+              [style.opacity]="(!!item.productId || (item.composition && item.composition.length > 0)) ? '0.8' : '1'" /></td>
               <td class="text-center">
                 @if (!item.productId && !(item.composition && item.composition.length > 0)) {
                   <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
@@ -266,24 +280,28 @@
             <td>
               {{ item.description }}
               @if (item.composition && item.composition.length > 0) {
-                <div class="composition-view mt-1" style="margin-top: 6px; padding: 8px; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem;">
-                  <div style="font-weight: 500; margin-bottom: 4px; color: var(--text-secondary);">↳ Composición:</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <div class="composition-view mt-1" style="margin-top: 8px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                  <div style="font-weight: 600; color: #475569; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">↳ Composición del Ítem</div>
+                  <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem;">
                     <thead>
-                      <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
-                        <th style="padding: 2px 4px; font-weight: normal;">Nombre</th>
-                        <th style="padding: 2px 4px; font-weight: normal;">Medidas</th>
-                        <th style="padding: 2px 4px; font-weight: normal; text-align: right;">Cant.</th>
-                        <th style="padding: 2px 4px; font-weight: normal;">Unidad</th>
+                      <tr style="color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;">
+                        <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Material</th>
+                        <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Medidas</th>
+                        <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Cant.</th>
+                        <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Factor</th>
+                        <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Valor</th>
                       </tr>
                     </thead>
                     <tbody>
                       @for (c of item.composition; track $index) {
-                        <tr style="border-bottom: 1px dashed var(--border-color-light);">
-                          <td style="padding: 4px;">{{ c.name }}</td>
-                          <td style="padding: 4px;">{{ c.quantityExpr }}</td>
-                          <td style="padding: 4px; text-align: right;">{{ c.quantity }}</td>
-                          <td style="padding: 4px; color: var(--text-muted);">{{ c.unitId }}</td>
+                        <tr>
+                          <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #1e293b; font-weight: 500;">
+                            {{ c.name }} <span style="color: #94a3b8; font-size: 0.75rem; font-weight: normal;">({{ c.unitId }})</span>
+                          </td>
+                          <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569;">{{ c.quantityExpr }}</td>
+                          <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">{{ c.quantity }}</td>
+                          <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">{{ c.factor | number:'1.0-2' }}</td>
+                          <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #0f172a; font-weight: 500; text-align: right;">{{ config.currency }} {{ (c.subtotal || 0) | number:'1.0-0' }}</td>
                         </tr>
                       }
                     </tbody>
@@ -486,6 +504,8 @@
 
 <!-- Item Composition Calculator -->
 <app-item-composition-calculator
+  *ngIf="showCompositionCalc"
   [(visible)]="showCompositionCalc"
+  [initialComposition]="compItemIndex !== -1 && editOrderData.items[compItemIndex]?.composition ? editOrderData.items[compItemIndex].composition : []"
   (compositionApplied)="onCompositionApplied($event)">
 </app-item-composition-calculator>

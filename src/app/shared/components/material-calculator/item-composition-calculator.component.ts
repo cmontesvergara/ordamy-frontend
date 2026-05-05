@@ -20,6 +20,7 @@ interface CalcMaterial {
     styleUrl: './item-composition-calculator.component.scss'
 })
 export class ItemCompositionCalculatorComponent {
+    @Input() initialComposition: any[] = [];
     @Input() set visible(val: boolean) {
         this._visible = val;
         if (val) this.reset();
@@ -43,7 +44,7 @@ export class ItemCompositionCalculatorComponent {
     }
 
     get calcTotal() {
-        return this.calcMaterialsSum * this.calcGlobalFactor;
+        return this.calcMaterialsSum;
     }
 
     constructor(
@@ -52,8 +53,17 @@ export class ItemCompositionCalculatorComponent {
     ) { }
 
     reset() {
-        this.calcMaterials = [];
-        this.calcGlobalFactor = 1;
+        if (this.initialComposition && this.initialComposition.length > 0) {
+            this.calcMaterials = this.initialComposition.map(c => ({
+                material: { id: c.materialId, name: c.name, price: c.unitPrice, unit: c.unitId },
+                quantityExpr: c.quantityExpr,
+                quantity: c.quantity,
+                factor: c.factor || 1,
+                subtotal: c.subtotal || (c.quantity * (c.factor || 1) * c.unitPrice)
+            }));
+        } else {
+            this.calcMaterials = [];
+        }
         this.calcMaterialSearch = '';
         this.calcMaterialResults = [];
     }
