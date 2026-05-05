@@ -18,6 +18,7 @@ interface OrderItem {
   unitPrice: number;
   productId?: string;
   composition?: any[];
+  _compositionCollapsed?: boolean;
 }
 
 @Component({
