@@ -506,6 +506,6 @@
 <app-item-composition-calculator
   *ngIf="showCompositionCalc"
   [(visible)]="showCompositionCalc"
-  [initialComposition]="compItemIndex !== -1 && editOrderData.items[compItemIndex]?.composition ? editOrderData.items[compItemIndex].composition : []"
+  [initialComposition]="compItemIndex !== -1 ? (editOrderData.items[compItemIndex].composition || []) : []"
   (compositionApplied)="onCompositionApplied($event)">
 </app-item-composition-calculator>

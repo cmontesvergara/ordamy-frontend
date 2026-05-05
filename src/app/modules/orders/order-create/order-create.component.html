@@ -253,6 +253,6 @@
 
 <!-- Item Composition Calculator -->
 <app-item-composition-calculator [(visible)]="showCompositionCalc"
-  [initialComposition]="compItemIndex !== -1 && items[compItemIndex]?.composition ? items[compItemIndex].composition : []"
+  [initialComposition]="compItemIndex !== -1 ? (items[compItemIndex].composition || []) : []"
   (compositionApplied)="onCompositionApplied($event)">
 </app-item-composition-calculator>
