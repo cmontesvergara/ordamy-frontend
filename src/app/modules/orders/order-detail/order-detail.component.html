@@ -166,16 +166,30 @@
         <tbody>
           @for (item of editOrderData.items; track $index; let i = $index) {
             <tr>
-              <td><input type="text" [(ngModel)]="item.description" class="input-full" [readonly]="!!item.productId || !!item.isCalculated" />
+              <td>
+                <input type="text" [(ngModel)]="item.description" class="input-full" [readonly]="!!item.productId || (item.composition && item.composition.length > 0)" />
+                @if (item.composition && item.composition.length > 0) {
+                  <div class="composition-view mt-1" style="margin-top: 6px;">
+                    <small class="text-muted" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                      ↳ Composición: 
+                      @for (c of item.composition; track $index) {
+                        <span class="badge badge-sm" style="font-weight: normal; border: 1px solid var(--border-color); color: var(--text-secondary)">{{ c.name }} ({{ c.quantityExpr }})</span>
+                      }
+                      <button class="btn-icon danger btn-sm" style="font-size: 1rem; line-height: 1; padding: 0 4px; height: auto;" (click)="item.composition = []; recalcEditTotals()" title="Quitar composición">×</button>
+                    </small>
+                  </div>
+                }
               </td>
               <td><input type="number" [(ngModel)]="item.quantity" min="1" class="input-full text-right"
               (input)="recalcEditTotals()" /></td>
               <td><input type="number" [(ngModel)]="item.unitPrice" min="0" class="input-full text-right"
-              (input)="recalcEditTotals()" [readonly]="!!item.productId || !!item.isCalculated" /></td>
+              (input)="recalcEditTotals()" [readonly]="!!item.productId || (item.composition && item.composition.length > 0)" /></td>
               <td class="text-center">
-                @if (!item.productId && !item.isCalculated) {
+                @if (!item.productId && !(item.composition && item.composition.length > 0)) {
                   <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
                   >🔢</button>
+                  <button class="btn-icon calc-btn" (click)="openCompositionCalc(i)" title="Composición de materiales"
+                  >🧩</button>
                 }
               </td>
               <td class="text-right">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
@@ -235,7 +249,19 @@
       <tbody>
         @for (item of order.items; track item.id) {
           <tr>
-            <td>{{ item.description }}</td>
+            <td>
+              {{ item.description }}
+              @if (item.composition && item.composition.length > 0) {
+                <div class="composition-view mt-1" style="margin-top: 4px;">
+                  <small class="text-muted" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                    ↳ Composición: 
+                    @for (c of item.composition; track $index) {
+                      <span class="badge badge-sm" style="font-weight: normal; border: 1px solid var(--border-color); color: var(--text-secondary)">{{ c.name }} ({{ c.quantityExpr }})</span>
+                    }
+                  </small>
+                </div>
+              }
+            </td>
             <td>{{ item.product?.name || '—' }}</td>
             <td class="text-right">{{ item.quantity }}</td>
             <td class="text-right hide-on-production">{{ config.currency }} {{ item.unitPrice | number:'1.0-0' }}</td>
@@ -426,6 +452,11 @@
 <!-- Material Calculator -->
 <app-material-calculator
   [(visible)]="showMaterialCalc"
-  (priceApplied)="onCalcPriceApplied($event)"
-  (itemsApplied)="onCalcItemsApplied($event)">
+  (priceApplied)="onCalcPriceApplied($event)">
 </app-material-calculator>
+
+<!-- Item Composition Calculator -->
+<app-item-composition-calculator
+  [(visible)]="showCompositionCalc"
+  (compositionApplied)="onCompositionApplied($event)">
+</app-item-composition-calculator>

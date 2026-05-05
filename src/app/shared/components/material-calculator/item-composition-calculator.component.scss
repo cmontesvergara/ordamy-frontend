@@ -134,11 +134,15 @@
     min-width: 60px;
 }
 
-.calc-resolved {
-    display: block;
-    font-size: 0.7rem;
+.badge-resolved {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--primary, hsl(24, 90%, 50%));
-    margin-top: 2px;
+    background: var(--primary-light, hsla(24, 90%, 50%, 0.1));
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-top: 4px;
 }
 
 .calc-unit {

@@ -56,6 +56,10 @@ export class OrderDetailComponent implements OnInit {
   showMaterialCalc = false;
   calcItemIndex = -1;
 
+  // Composition Calculator
+  showCompositionCalc = false;
+  compItemIndex = -1;
+
   // O10: Operational status steps
   operationalSteps = [
     { key: 'PENDING', label: 'Pendiente' },
@@ -294,21 +298,6 @@ export class OrderDetailComponent implements OnInit {
   onCalcPriceApplied(price: number) {
     if (this.calcItemIndex >= 0 && this.calcItemIndex < this.editOrderData.items.length) {
       this.editOrderData.items[this.calcItemIndex].unitPrice = price;
-      this.editOrderData.items[this.calcItemIndex].isCalculated = true;
-      this.recalcEditTotals();
-    }
-    this.showMaterialCalc = false;
-  }
-
-  onCalcItemsApplied(newItems: any[]) {
-    if (this.calcItemIndex >= 0 && this.calcItemIndex < this.editOrderData.items.length) {
-      const currentItem = this.editOrderData.items[this.calcItemIndex];
-      // If current item is practically empty, replace it. Otherwise insert after it.
-      if (!currentItem.description && currentItem.unitPrice === 0) {
-        this.editOrderData.items.splice(this.calcItemIndex, 1, ...newItems);
-      } else {
-        this.editOrderData.items.splice(this.calcItemIndex + 1, 0, ...newItems);
-      }
       this.recalcEditTotals();
     }
     this.showMaterialCalc = false;
@@ -316,6 +305,22 @@ export class OrderDetailComponent implements OnInit {
 
   closeMaterialCalc() {
     this.showMaterialCalc = false;
+  }
+
+  // ─── Item Composition Calculator ─────────────────────────
+
+  openCompositionCalc(index: number) {
+    this.compItemIndex = index;
+    this.showCompositionCalc = true;
+  }
+
+  onCompositionApplied(data: {materials: any[], unitPrice: number}) {
+    if (this.compItemIndex >= 0 && this.compItemIndex < this.editOrderData.items.length) {
+      this.editOrderData.items[this.compItemIndex].unitPrice = data.unitPrice;
+      this.editOrderData.items[this.compItemIndex].composition = data.materials;
+      this.recalcEditTotals();
+    }
+    this.showCompositionCalc = false;
   }
 }
 

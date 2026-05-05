@@ -14,12 +14,12 @@ interface CalcMaterial {
 }
 
 @Component({
-    selector: 'app-material-calculator',
+    selector: 'app-item-composition-calculator',
     imports: [CommonModule, FormsModule, LoaderOverlayComponent],
-    templateUrl: './material-calculator.component.html',
-    styleUrl: './material-calculator.component.scss'
+    templateUrl: './item-composition-calculator.component.html',
+    styleUrl: './item-composition-calculator.component.scss'
 })
-export class MaterialCalculatorComponent {
+export class ItemCompositionCalculatorComponent {
     @Input() set visible(val: boolean) {
         this._visible = val;
         if (val) this.reset();
@@ -27,7 +27,7 @@ export class MaterialCalculatorComponent {
     get visible() { return this._visible; }
 
     @Output() visibleChange = new EventEmitter<boolean>();
-    @Output() priceApplied = new EventEmitter<number>();
+    @Output() compositionApplied = new EventEmitter<{materials: any[], unitPrice: number}>();
 
     private _visible = false;
 
@@ -120,8 +120,21 @@ export class MaterialCalculatorComponent {
         cm.subtotal = price * cm.quantity * cm.factor;
     }
 
-    applyPrice() {
-        this.priceApplied.emit(Math.round(this.calcTotal * 100) / 100);
+    applyComposition() {
+        const composition = this.calcMaterials.map(cm => ({
+            materialId: cm.material.id,
+            name: cm.material.name,
+            quantityExpr: cm.quantityExpr,
+            quantity: cm.quantity,
+            factor: cm.factor,
+            unitPrice: parseFloat(cm.material.price) || 0,
+            subtotal: cm.subtotal
+        }));
+        
+        this.compositionApplied.emit({
+            materials: composition,
+            unitPrice: Math.round(this.calcTotal * 100) / 100
+        });
         this.close();
     }
 }

@@ -9,6 +9,7 @@ import { ProductService } from '../../../core/services/product/product.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
+import { ItemCompositionCalculatorComponent } from '../../../shared/components/material-calculator/item-composition-calculator.component';
 import { OverlayModule } from '@angular/cdk/overlay';
 
 interface OrderItem {
@@ -16,12 +17,12 @@ interface OrderItem {
   quantity: number;
   unitPrice: number;
   productId?: string;
-  isCalculated?: boolean;
+  composition?: any[];
 }
 
 @Component({
     selector: 'app-order-create',
-    imports: [CommonModule, FormsModule, OverlayModule, MaterialCalculatorComponent],
+    imports: [CommonModule, FormsModule, OverlayModule, MaterialCalculatorComponent, ItemCompositionCalculatorComponent],
     templateUrl: './order-create.component.html',
     styleUrl: './order-create.component.scss'
 })
@@ -54,6 +55,10 @@ export class OrderCreateComponent implements OnInit {
   // Material calculator
   showMaterialCalc = false;
   calcItemIndex = -1;
+
+  // Composition calculator
+  showCompositionCalc = false;
+  compItemIndex = -1;
 
   get subtotal() {
     return this.items.reduce((sum, i) => sum + (i.quantity * i.unitPrice), 0);
@@ -206,25 +211,26 @@ export class OrderCreateComponent implements OnInit {
   onCalcPriceApplied(price: number) {
     if (this.calcItemIndex >= 0 && this.calcItemIndex < this.items.length) {
       this.items[this.calcItemIndex].unitPrice = price;
-      this.items[this.calcItemIndex].isCalculated = true;
-    }
-    this.showMaterialCalc = false;
-  }
-
-  onCalcItemsApplied(newItems: any[]) {
-    if (this.calcItemIndex >= 0 && this.calcItemIndex < this.items.length) {
-      const currentItem = this.items[this.calcItemIndex];
-      // If current item is practically empty, replace it. Otherwise insert after it.
-      if (!currentItem.description && currentItem.unitPrice === 0) {
-        this.items.splice(this.calcItemIndex, 1, ...newItems);
-      } else {
-        this.items.splice(this.calcItemIndex + 1, 0, ...newItems);
-      }
     }
     this.showMaterialCalc = false;
   }
 
   closeMaterialCalc() {
     this.showMaterialCalc = false;
+  }
+
+  // ─── Item Composition Calculator ─────────────────────────
+
+  openCompositionCalc(index: number) {
+    this.compItemIndex = index;
+    this.showCompositionCalc = true;
+  }
+
+  onCompositionApplied(data: {materials: any[], unitPrice: number}) {
+    if (this.compItemIndex >= 0 && this.compItemIndex < this.items.length) {
+      this.items[this.compItemIndex].unitPrice = data.unitPrice;
+      this.items[this.compItemIndex].composition = data.materials;
+    }
+    this.showCompositionCalc = false;
   }
 }
