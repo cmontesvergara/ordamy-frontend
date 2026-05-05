@@ -162,7 +162,8 @@
     <div class="form-actions">
       <button class="btn btn-outline" (click)="cancel()">Cancelar</button>
       <button class="btn btn-primary" (click)="createOrder()"
-        [disabled]="saving || !selectedCustomer || items.length === 0">
+        [disabled]="saving || !isOrderValid"
+        [title]="(!isOrderValid && requireComposition && items.length > 0) ? 'Todos los ítems deben tener composición y descripción' : ''">
         {{ saving ? 'Guardando...' : 'Crear Orden' }}
       </button>
     </div>

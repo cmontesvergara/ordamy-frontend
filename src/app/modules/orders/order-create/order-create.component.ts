@@ -65,6 +65,19 @@ export class OrderCreateComponent implements OnInit {
     return this.items.reduce((sum, i) => sum + (i.quantity * i.unitPrice), 0);
   }
 
+  requireComposition = false;
+
+  get isOrderValid() {
+    if (!this.selectedCustomer || this.items.length === 0) return false;
+    // Check if items have names
+    if (this.items.some(i => !i.description)) return false;
+    // Enforce composition if permission is set
+    if (this.requireComposition) {
+      if (this.items.some(i => !i.composition || i.composition.length === 0)) return false;
+    }
+    return true;
+  }
+
   constructor(
     private router: Router,
     private orderService: OrderService,
@@ -83,6 +96,10 @@ export class OrderCreateComponent implements OnInit {
           // O2: Check discount permission
           this.canApplyDiscount = session.user.systemRole === 'admin' || (session.tenant?.permissions || []).some(
             (p: any) => p.resource === 'orders' && p.action === 'apply_discount'
+          );
+          // Check if composition is mandatory for all items
+          this.requireComposition = (session.tenant?.permissions || []).some(
+            (p: any) => p.resource === 'orders' && p.action === 'require_composition'
           );
         }
       },
@@ -154,7 +171,7 @@ export class OrderCreateComponent implements OnInit {
   }
 
   createOrder() {
-    if (!this.selectedCustomer || this.items.length === 0) return;
+    if (!this.isOrderValid) return;
     this.saving = true;
     this.orderService.create({
       customerId: this.selectedCustomer.id,

@@ -261,7 +261,9 @@
       </table>
       <div class="form-actions">
         <button class="btn btn-outline btn-sm" (click)="editingOrder = false">Cancelar</button>
-        <button class="btn btn-primary btn-sm" (click)="saveOrderEdit()" [disabled]="savingOrder">
+        <button class="btn btn-primary btn-sm" (click)="saveOrderEdit()"
+          [disabled]="savingOrder || !isEditValid"
+          [title]="(!isEditValid && requireComposition && editOrderData.items?.length > 0) ? 'Todos los ítems deben tener composición y descripción' : ''">
           {{ savingOrder ? 'Guardando...' : 'Guardar Cambios' }}
         </button>
       </div>

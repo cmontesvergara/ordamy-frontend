@@ -108,6 +108,7 @@ export class OrderDetailComponent implements OnInit {
         this.canApplyDiscount = isAdmin || perms.some((p: any) => p.resource === 'orders' && p.action === 'apply_discount');
         this.canCancel        = isAdmin || perms.some((p: any) => p.resource === 'orders'   && p.action === 'cancel');
         this.canAddPayment    = isAdmin || perms.some((p: any) => p.resource === 'payments' && p.action === 'create');
+        this.requireComposition = perms.some((p: any) => p.resource === 'orders' && p.action === 'require_composition');
       }
     });
   }
@@ -161,6 +162,8 @@ export class OrderDetailComponent implements OnInit {
           description: item.description,
           quantity: parseFloat(item.quantity),
           unitPrice: parseFloat(item.unitPrice),
+          composition: item.composition || [],
+          _compositionCollapsed: false
         })),
       };
       this.editDiscount = parseFloat(this.order.discount) || 0;
@@ -184,7 +187,19 @@ export class OrderDetailComponent implements OnInit {
     this.editTotal = this.editSubtotal - (this.editDiscount || 0);
   }
 
+  requireComposition = false;
+
+  get isEditValid() {
+    if (!this.editOrderData.items || this.editOrderData.items.length === 0) return false;
+    if (this.editOrderData.items.some((i: any) => !i.description)) return false;
+    if (this.requireComposition) {
+      if (this.editOrderData.items.some((i: any) => !i.composition || i.composition.length === 0)) return false;
+    }
+    return true;
+  }
+
   saveOrderEdit() {
+    if (!this.isEditValid) return;
     this.savingOrder = true;
     this.orderService.update(this.order.id, {
       notes: this.editOrderData.notes,
