@@ -107,6 +107,7 @@ export class ItemCompositionCalculatorComponent {
     evalQuantity(expr: string): number {
         if (!expr || !expr.trim()) return 0;
         try {
+            if (!/[xX*]/.test(expr)) return 0;
             const sanitized = expr.replace(/[xX]/g, '*');
             if (!/^[\d\s+\-*/.,]+$/.test(sanitized)) return 0;
             const result = Function('"use strict"; return (' + sanitized + ')')();
