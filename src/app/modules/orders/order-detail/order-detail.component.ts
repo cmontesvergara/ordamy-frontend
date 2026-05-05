@@ -294,6 +294,7 @@ export class OrderDetailComponent implements OnInit {
   onCalcPriceApplied(price: number) {
     if (this.calcItemIndex >= 0 && this.calcItemIndex < this.editOrderData.items.length) {
       this.editOrderData.items[this.calcItemIndex].unitPrice = price;
+      this.editOrderData.items[this.calcItemIndex].isCalculated = true;
       this.recalcEditTotals();
     }
     this.showMaterialCalc = false;

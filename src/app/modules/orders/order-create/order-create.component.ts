@@ -16,6 +16,7 @@ interface OrderItem {
   quantity: number;
   unitPrice: number;
   productId?: string;
+  isCalculated?: boolean;
 }
 
 @Component({
@@ -205,6 +206,7 @@ export class OrderCreateComponent implements OnInit {
   onCalcPriceApplied(price: number) {
     if (this.calcItemIndex >= 0 && this.calcItemIndex < this.items.length) {
       this.items[this.calcItemIndex].unitPrice = price;
+      this.items[this.calcItemIndex].isCalculated = true;
     }
     this.showMaterialCalc = false;
   }

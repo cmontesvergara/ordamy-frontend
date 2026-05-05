@@ -58,13 +58,13 @@
       </div>
       <div class="items-list">
         @for (item of items; track $index; let i = $index) {
-          <div class="item-row" [class.locked-item]="!!item.productId">
+          <div class="item-row" [class.locked-item]="!!item.productId || !!item.isCalculated">
             <input type="text" [(ngModel)]="item.description" placeholder="Descripción *" class="flex-2"
-              [readonly]="!!item.productId" />
+              [readonly]="!!item.productId || !!item.isCalculated" />
             <input type="number" [(ngModel)]="item.quantity" min="1" placeholder="Cant." class="w-80" />
             <input type="number" [(ngModel)]="item.unitPrice" min="0" placeholder="Precio" class="w-120"
-              [readonly]="!!item.productId" />
-            @if (!item.productId) {
+              [readonly]="!!item.productId || !!item.isCalculated" />
+            @if (!item.productId && !item.isCalculated) {
               <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
               >🔢</button>
             }

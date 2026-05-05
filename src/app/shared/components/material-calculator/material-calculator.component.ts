@@ -128,10 +128,11 @@ export class MaterialCalculatorComponent {
 
     applyItems() {
         const newItems = this.calcMaterials.map(cm => ({
-            description: `${cm.quantityExpr}${cm.material.unit ? ' ' + cm.material.unit : ''} - ${cm.material.name}`,
-            quantity: cm.factor, // If they set a factor, we can use it as quantity, but wait. If factor is 2, and unitPrice is subtotal without factor... The user just wants items. Subtotal already includes factor. So quantity = 1, unitPrice = subtotal.
+            description: `${cm.material.name} - [ ${cm.quantityExpr} ]`,
+            quantity: cm.factor,
             unitPrice: cm.subtotal,
-            productId: null
+            productId: null,
+            isCalculated: true
         }));
         this.itemsApplied.emit(newItems);
         this.close();
