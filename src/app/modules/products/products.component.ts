@@ -33,8 +33,7 @@ export class ProductsComponent implements OnInit {
         this.authService.getSession().subscribe({
             next: (session: any) => {
                 const perms = session?.tenant?.permissions || [];
-                // Admin bypass via isSuperAdmin
-                if (session?.user?.isSuperAdmin) {
+                if (session?.user?.systemRole === 'admin') {
                     this.canCreate = true;
                     this.canUpdate = true;
                 } else {

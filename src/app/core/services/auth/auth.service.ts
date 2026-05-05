@@ -51,16 +51,42 @@ export class AuthService {
                     email: 'admin@ordamy.local',
                     firstName: 'Admin',
                     lastName: 'LocalBypass',
+                    systemRole: 'admin',
                 },
                 tenant: {
                     id: 'local-tenant',
                     name: 'Ordamy Local',
                     slug: 'ordamy-local',
+                    permissions: [],
                 }
             });
         }
-        return this.http.get(`${environment.middlewareBaseUrl}/api/auth/session`, { withCredentials: true });
+        return this.http.get<any>(
+            `${environment.middlewareBaseUrl}/api/auth/session`,
+            { withCredentials: true }
+        ).pipe(
+            // Normalize API response shape for all components:
+            //   user.systemRole is passed through as-is
+            //   currentTenant  → tenant (alias)
+            switchMap(raw => of(this.normalizeSession(raw))),
+            catchError(err => { throw err; })
+        );
     }
+
+    private normalizeSession(raw: any): any {
+        if (!raw?.success) return raw;
+        const u = raw.user || {};
+        return {
+            ...raw,
+            user: {
+                ...u,
+                userId: u.userId || u.id,
+            },
+            // alias currentTenant → tenant so existing components work
+            tenant: raw.currentTenant || raw.tenant,
+        };
+    }
+
 
     /**
      * Get session with automatic refresh handling.

@@ -74,7 +74,7 @@ export class OrderCreateComponent implements OnInit {
         if (session?.user) {
           this.sellerDisplayName = `${session.user.firstName} ${session.user.lastName}`;
           // O2: Check discount permission
-          this.canApplyDiscount = session.user.isSuperAdmin || (session.tenant?.permissions || []).some(
+          this.canApplyDiscount = session.user.systemRole === 'admin' || (session.tenant?.permissions || []).some(
             (p: any) => p.resource === 'orders' && p.action === 'apply_discount'
           );
         }

@@ -5,10 +5,11 @@ import { environment } from '../../../../environments/environment';
 import { ExchangeResponse } from '../../../modules/auth/pages/callback/callback.component';
 
 export interface User {
-    userId: string
+    userId: string   // normalized from API's user.id
     email: string
     firstName: string
     lastName: string
+    systemRole?: string
 }
 
 export interface Tenant {
@@ -37,10 +38,19 @@ export class SessionService {
 
     setupSession(data: ExchangeResponse) {
         this.setAccessToken(data.tokens.accessToken);
-        this.setUser(data.user);
+        // Normalize: API returns user.id but internal interface uses userId
+        const rawUser = data.user as any;
+        const user: User = {
+            userId:      rawUser.userId || rawUser.id,
+            email:       rawUser.email,
+            firstName:   rawUser.firstName,
+            lastName:    rawUser.lastName,
+            systemRole:  rawUser.systemRole,
+        };
+        this.setUser(user);
         this.setCurrentTenant(data.currentTenant);
-        this.setRelatedTenants(data.relatedTenants);
-        if (data.currentTenant.permissions) {
+        this.setRelatedTenants(data.relatedTenants || []);
+        if (data.currentTenant?.permissions) {
             this.setPermissions(data.currentTenant.permissions);
         }
     }

@@ -34,7 +34,7 @@ export class MaterialsComponent implements OnInit {
         this.authService.getSession().subscribe({
             next: (session: any) => {
                 const perms = session?.tenant?.permissions || [];
-                if (session?.user?.isSuperAdmin) {
+                if (session?.user?.systemRole === 'admin') {
                     this.canCreate = true;
                     this.canUpdate = true;
                     this.canDelete = true;
