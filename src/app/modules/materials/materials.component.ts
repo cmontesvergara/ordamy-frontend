@@ -14,7 +14,7 @@ import { AuthService } from '../../core/services/auth/auth.service';
 })
 export class MaterialsComponent implements OnInit {
     materials: any[] = [];
-    newMaterial = { name: '', description: '', price: 0, unit: '' };
+    newMaterial = { name: '', description: '', price: 0, cost: 0, unit: '' };
     editing: any = null;
     searchTerm = '';
     showCreateForm = false;
@@ -58,7 +58,7 @@ export class MaterialsComponent implements OnInit {
         if (!this.newMaterial.name) return;
         this.materialService.create(this.newMaterial).subscribe({
             next: () => {
-                this.newMaterial = { name: '', description: '', price: 0, unit: '' };
+                this.newMaterial = { name: '', description: '', price: 0, cost: 0, unit: '' };
                 this.showCreateForm = false;
                 this.loadMaterials();
                 this.toast.success('Creado', 'Material agregado');
@@ -68,7 +68,7 @@ export class MaterialsComponent implements OnInit {
     }
 
     cancelCreate() {
-        this.newMaterial = { name: '', description: '', price: 0, unit: '' };
+        this.newMaterial = { name: '', description: '', price: 0, cost: 0, unit: '' };
         this.showCreateForm = false;
     }
 
