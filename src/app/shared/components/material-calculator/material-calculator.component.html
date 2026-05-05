@@ -110,7 +110,7 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-outline" (click)="close()">Cancelar</button>
-        <button class="btn btn-primary" (click)="applyPrice()" [disabled]="calcMaterials.length === 0">
+        <button class="btn btn-primary" (click)="applyPrice()" [disabled]="!isCompositionValid">
           Aplicar Precio
         </button>
       </div>

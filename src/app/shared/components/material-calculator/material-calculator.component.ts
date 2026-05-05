@@ -46,6 +46,10 @@ export class MaterialCalculatorComponent {
         return this.calcMaterialsSum * this.calcGlobalFactor;
     }
 
+    get isCompositionValid() {
+        return this.calcMaterials.length > 0 && this.calcMaterials.every(cm => cm.quantity > 0);
+    }
+
     constructor(
         private materialService: MaterialService,
         public config: AppConfigService,
@@ -82,10 +86,10 @@ export class MaterialCalculatorComponent {
     addCalcMaterial(material: any) {
         this.calcMaterials.push({
             material,
-            quantityExpr: '1',
-            quantity: 1,
+            quantityExpr: '',
+            quantity: 0,
             factor: 1,
-            subtotal: parseFloat(material.price) || 0,
+            subtotal: 0,
         });
         this.calcMaterialSearch = '';
     }
