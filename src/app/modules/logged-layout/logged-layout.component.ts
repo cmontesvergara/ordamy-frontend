@@ -84,9 +84,12 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
     }
 
     if (relatedTenants?.length) {
-      this.tenants = relatedTenants;
+      // Current tenant always first
+      this.tenants = [
+        ...relatedTenants.filter(t => t.id === currentTenant?.id),
+        ...relatedTenants.filter(t => t.id !== currentTenant?.id),
+      ];
     } else if (currentTenant) {
-      // Fallback: at minimum show the current tenant in the selector
       this.tenants = [currentTenant];
     }
 
