@@ -58,19 +58,33 @@
       </div>
       <div class="items-list">
         @for (item of items; track $index; let i = $index) {
-          <div class="item-row" [class.locked-item]="!!item.productId || (item.composition && item.composition.length > 0)" style="align-items: flex-start;">
+          <div class="item-row" [class.locked-item]="!!item.productId" style="align-items: flex-start;">
             <div class="flex-2">
               <input type="text" [(ngModel)]="item.description" placeholder="Descripción *" class="full-width"
-                [readonly]="!!item.productId || (item.composition && item.composition.length > 0)" />
+                [readonly]="!!item.productId" />
               @if (item.composition && item.composition.length > 0) {
-                <div class="composition-view mt-1" style="margin-top: 6px;">
-                  <small class="text-muted" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
-                    ↳ Composición: 
-                    @for (c of item.composition; track $index) {
-                      <span class="badge badge-sm" style="font-weight: normal; border: 1px solid var(--border-color); color: var(--text-secondary)">{{ c.name }} ({{ c.quantityExpr }})</span>
-                    }
-                    <button class="btn-icon danger btn-sm" style="font-size: 1rem; line-height: 1; padding: 0 4px; height: auto;" (click)="item.composition = []" title="Quitar composición">×</button>
-                  </small>
+                <div class="composition-view mt-1" style="margin-top: 6px; padding: 8px; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem;">
+                  <div style="font-weight: 500; margin-bottom: 4px; color: var(--text-secondary);">↳ Composición:</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                      <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                        <th style="padding: 2px 4px; font-weight: normal;">Nombre</th>
+                        <th style="padding: 2px 4px; font-weight: normal;">Medidas</th>
+                        <th style="padding: 2px 4px; font-weight: normal; text-align: right;">Cant.</th>
+                        <th style="padding: 2px 4px; font-weight: normal;">Unidad</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (c of item.composition; track $index) {
+                        <tr style="border-bottom: 1px dashed var(--border-color-light);">
+                          <td style="padding: 4px;">{{ c.name }}</td>
+                          <td style="padding: 4px;">{{ c.quantityExpr }}</td>
+                          <td style="padding: 4px; text-align: right;">{{ c.quantity }}</td>
+                          <td style="padding: 4px; color: var(--text-muted);">{{ c.unitId }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
                 </div>
               }
             </div>
