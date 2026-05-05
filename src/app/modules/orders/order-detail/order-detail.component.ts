@@ -10,11 +10,12 @@ import { AppConfigService } from '../../../core/services/app-config/app-config.s
 import { ToastService } from '../../../core/services/toast/toast.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
+import { ItemCompositionCalculatorComponent } from '../../../shared/components/material-calculator/item-composition-calculator.component';
 import { OverlayModule } from '@angular/cdk/overlay';
 
 @Component({
     selector: 'app-order-detail',
-    imports: [CommonModule, FormsModule, RouterLink, OverlayModule, MaterialCalculatorComponent],
+    imports: [CommonModule, FormsModule, RouterLink, OverlayModule, MaterialCalculatorComponent, ItemCompositionCalculatorComponent],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss'
 })
