@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BigsoAuth } from '@bigso/auth-sdk/browser';
 import { environment } from '../../../../../environments/environment';
 
@@ -11,8 +11,10 @@ import { environment } from '../../../../../environments/environment';
 })
 export class WelcomeComponent {
     private auth: BigsoAuth;
+    private tenantId: string;
 
-    constructor(private router: Router) {
+    constructor(private router: Router, private route: ActivatedRoute,) {
+        this.tenantId = this.route.snapshot.queryParams['tenant_id'] || '';
         this.auth = new BigsoAuth({
             clientId: environment.appId,
             ssoOrigin: environment.ssoPortalUrl,
@@ -21,6 +23,7 @@ export class WelcomeComponent {
             theme: 'light',
             timeout: 60000,
             redirectUri: `${environment.baseUrl}/auth/callback`,
+            tenantId: this.tenantId,
         });
     }
 
