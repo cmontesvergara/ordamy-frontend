@@ -128,7 +128,7 @@ export class MaterialCalculatorComponent {
 
     applyItems() {
         const newItems = this.calcMaterials.map(cm => ({
-            description: `${cm.material.name} - [ ${cm.quantityExpr} ]`,
+            description: `${cm.material.name} —— (${cm.quantityExpr}  ${cm.material.unit})`,
             quantity: cm.factor,
             unitPrice: cm.subtotal,
             productId: null,
