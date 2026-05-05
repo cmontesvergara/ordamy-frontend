@@ -17,7 +17,7 @@ RUN npm install
 COPY . .
 
 # Construir Angular para producción
-RUN npm run build -- --configuration develop
+RUN npm run build -- --configuration production
 
 # Etapa 2: Servidor Nginx
 FROM public.ecr.aws/docker/library/nginx:alpine
