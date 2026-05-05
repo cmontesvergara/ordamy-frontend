@@ -26,12 +26,12 @@
         <input [(ngModel)]="newMaterial.description" placeholder="Descripción del material" />
       </div>
       <div class="form-group">
-        <label>Precio</label>
-        <input type="number" [(ngModel)]="newMaterial.price" placeholder="0" />
-      </div>
-      <div class="form-group">
         <label>Costo</label>
         <input type="number" [(ngModel)]="newMaterial.cost" placeholder="0" />
+      </div>
+      <div class="form-group">
+        <label>Precio</label>
+        <input type="number" [(ngModel)]="newMaterial.price" placeholder="0" />
       </div>
       <div class="form-group">
         <label>Unidad</label>
@@ -52,8 +52,8 @@
       <tr>
         <th>Nombre</th>
         <th>Descripción</th>
-        <th class="text-right">Precio</th>
         <th class="text-right">Costo</th>
+        <th class="text-right">Precio</th>
         <th>Unidad</th>
         @if (canUpdate || canDelete) {
           <th class="text-center">Acciones</th>
@@ -65,7 +65,7 @@
         <tr>
           <td>
             @if (editing?.id === m.id) {
-              <input [(ngModel)]="editing.data.name" class="edit-input" />
+              <input [(ngModel)]="editing.data.name" class="edit-input" style="width:140px" />
             }
             @if (editing?.id !== m.id) {
               <strong>{{ m.name }}</strong>
@@ -73,7 +73,7 @@
           </td>
           <td>
             @if (editing?.id === m.id) {
-              <input [(ngModel)]="editing.data.description" class="edit-input" />
+              <input [(ngModel)]="editing.data.description" class="edit-input" style="width:140px" />
             }
             @if (editing?.id !== m.id) {
               <span>{{ m.description || '—' }}</span>
@@ -81,25 +81,23 @@
           </td>
           <td class="text-right">
             @if (editing?.id === m.id) {
-              <input type="number" [(ngModel)]="editing.data.price"
-                class="edit-input w-100" />
-            }
-            @if (editing?.id !== m.id) {
-              <span>{{ config.currency }} {{ m.price | number:'1.0-0' }}</span>
-            }
-          </td>
-          <td class="text-right">
-            @if (editing?.id === m.id) {
-              <input type="number" [(ngModel)]="editing.data.cost"
-                class="edit-input w-100" />
+              <input type="number" [(ngModel)]="editing.data.cost" class="edit-input" style="width:80px" />
             }
             @if (editing?.id !== m.id) {
               <span>{{ config.currency }} {{ (m.cost || 0) | number:'1.0-0' }}</span>
             }
           </td>
+          <td class="text-right">
+            @if (editing?.id === m.id) {
+              <input type="number" [(ngModel)]="editing.data.price" class="edit-input" style="width:80px" />
+            }
+            @if (editing?.id !== m.id) {
+              <span>{{ config.currency }} {{ m.price | number:'1.0-0' }}</span>
+            }
+          </td>
           <td>
             @if (editing?.id === m.id) {
-              <input [(ngModel)]="editing.data.unit" class="edit-input w-80" />
+              <input [(ngModel)]="editing.data.unit" class="edit-input" style="width:70px" />
             }
             @if (editing?.id !== m.id) {
               <span>{{ m.unit || '—' }}</span>

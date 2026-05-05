@@ -207,5 +207,7 @@
 }
 
 <!-- Material Calculator -->
-<app-material-calculator [(visible)]="showMaterialCalc" (priceApplied)="onCalcPriceApplied($event)">
+<app-material-calculator [(visible)]="showMaterialCalc" 
+  (priceApplied)="onCalcPriceApplied($event)"
+  (itemsApplied)="onCalcItemsApplied($event)">
 </app-material-calculator>

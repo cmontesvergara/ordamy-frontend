@@ -39,7 +39,7 @@
               <thead>
                 <tr>
                   <th>Material</th>
-                  <th class="w-120">Cantidad</th>
+                  <th class="w-120">Medidas</th>
                   <th class="w-100">Factor</th>
                   <th class="text-right w-120">Precio Unit.</th>
                   <th class="text-right w-120">Subtotal</th>
@@ -60,9 +60,8 @@
                       <input type="text" [(ngModel)]="cm.quantityExpr" (input)="onQuantityExprChange(cm)"
                         placeholder="Ej: 3x2" class="edit-input calc-input" />
                       @if (cm.quantityExpr && cm.quantityExpr !== cm.quantity.toString()) {
-                        <span class="calc-resolved"
-                          >= {{
-                        cm.quantity }}</span>
+                        <span class="calc-resolved badge-resolved"
+                          >= {{ cm.quantity }} {{ cm.material.unit || '' }}</span>
                       }
                     </td>
                     <td>
@@ -110,6 +109,9 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-outline" (click)="close()">Cancelar</button>
+        <button class="btn btn-outline" (click)="applyItems()" [disabled]="calcMaterials.length === 0">
+          Aplicar Items
+        </button>
         <button class="btn btn-primary" (click)="applyPrice()" [disabled]="calcMaterials.length === 0">
           Aplicar Precio
         </button>

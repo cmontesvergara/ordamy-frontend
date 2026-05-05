@@ -15,10 +15,10 @@
               Editar Orden
             </button>
           }
-          @if (order.status === 'ACTIVE') {
+          @if (order.status === 'ACTIVE' && canCancel) {
             <div class="action-separator"></div>
           }
-          @if (order.status === 'ACTIVE') {
+          @if (order.status === 'ACTIVE' && canCancel) {
             <button class="action-item danger"
               (click)="cancelOrder(); actionsOpen = false">
               Anular Orden
@@ -192,6 +192,21 @@
             <td class="text-right"><strong>{{ config.currency }} {{ editSubtotal | number:'1.0-0' }}</strong></td>
             <td></td>
           </tr>
+          <tr>
+            <td colspan="4" class="text-right">Descuento</td>
+            <td class="text-right">
+              <input type="number" [(ngModel)]="editDiscount" min="0"
+                (input)="recalcEditTotals()"
+                [disabled]="!canApplyDiscount"
+                style="width:100px; text-align:right" />
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="4" class="text-right"><strong>Total</strong></td>
+            <td class="text-right"><strong>{{ config.currency }} {{ editTotal | number:'1.0-0' }}</strong></td>
+            <td></td>
+          </tr>
         </tfoot>
       </table>
       <div class="form-actions">
@@ -236,7 +251,7 @@
   <div class="card section no-print-production">
     <div class="section-header">
       <h3>Pagos ({{ order.payments?.length }})</h3>
-      @if (order.status === 'ACTIVE' && order.balance > 0) {
+      @if (order.status === 'ACTIVE' && order.balance > 0 && canAddPayment) {
         <button class="btn btn-primary btn-sm no-print"
           (click)="showPaymentForm = !showPaymentForm">
           {{ showPaymentForm ? 'Cancelar' : '+ Registrar Pago' }}
@@ -411,5 +426,6 @@
 <!-- Material Calculator -->
 <app-material-calculator
   [(visible)]="showMaterialCalc"
-  (priceApplied)="onCalcPriceApplied($event)">
+  (priceApplied)="onCalcPriceApplied($event)"
+  (itemsApplied)="onCalcItemsApplied($event)">
 </app-material-calculator>

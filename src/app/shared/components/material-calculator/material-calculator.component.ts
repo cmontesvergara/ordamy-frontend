@@ -28,6 +28,7 @@ export class MaterialCalculatorComponent {
 
     @Output() visibleChange = new EventEmitter<boolean>();
     @Output() priceApplied = new EventEmitter<number>();
+    @Output() itemsApplied = new EventEmitter<any[]>();
 
     private _visible = false;
 
@@ -122,6 +123,17 @@ export class MaterialCalculatorComponent {
 
     applyPrice() {
         this.priceApplied.emit(Math.round(this.calcTotal * 100) / 100);
+        this.close();
+    }
+
+    applyItems() {
+        const newItems = this.calcMaterials.map(cm => ({
+            description: `${cm.quantityExpr}${cm.material.unit ? ' ' + cm.material.unit : ''} - ${cm.material.name}`,
+            quantity: cm.factor, // If they set a factor, we can use it as quantity, but wait. If factor is 2, and unitPrice is subtotal without factor... The user just wants items. Subtotal already includes factor. So quantity = 1, unitPrice = subtotal.
+            unitPrice: cm.subtotal,
+            productId: null
+        }));
+        this.itemsApplied.emit(newItems);
         this.close();
     }
 }

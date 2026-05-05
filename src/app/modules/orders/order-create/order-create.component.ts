@@ -209,6 +209,19 @@ export class OrderCreateComponent implements OnInit {
     this.showMaterialCalc = false;
   }
 
+  onCalcItemsApplied(newItems: any[]) {
+    if (this.calcItemIndex >= 0 && this.calcItemIndex < this.items.length) {
+      const currentItem = this.items[this.calcItemIndex];
+      // If current item is practically empty, replace it. Otherwise insert after it.
+      if (!currentItem.description && currentItem.unitPrice === 0) {
+        this.items.splice(this.calcItemIndex, 1, ...newItems);
+      } else {
+        this.items.splice(this.calcItemIndex + 1, 0, ...newItems);
+      }
+    }
+    this.showMaterialCalc = false;
+  }
+
   closeMaterialCalc() {
     this.showMaterialCalc = false;
   }

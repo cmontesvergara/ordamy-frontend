@@ -8,6 +8,7 @@ import { SettingsService } from '../../../core/services/settings/settings.servic
 import { ProductService } from '../../../core/services/product/product.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
 import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
 import { OverlayModule } from '@angular/cdk/overlay';
 
@@ -35,6 +36,11 @@ export class OrderDetailComponent implements OnInit {
   savingOrder = false;
   editOrderData: any = { notes: '', dueDate: '', items: [] };
   editSubtotal = 0;
+  editDiscount = 0;
+  editTotal = 0;
+  canApplyDiscount = false;
+  canCancel = false;
+  canAddPayment = false;
 
   // Edit payment
   editingPayment: any = null;
@@ -78,6 +84,7 @@ export class OrderDetailComponent implements OnInit {
     private paymentService: PaymentService,
     private settingsService: SettingsService,
     private productService: ProductService,
+    private authService: AuthService,
     private el: ElementRef,
     public config: AppConfigService,
     private toast: ToastService,
@@ -88,6 +95,15 @@ export class OrderDetailComponent implements OnInit {
     this.loadOrder(id);
     this.settingsService.getPaymentMethods().subscribe({
       next: (res: any) => { this.paymentMethods = res.data; },
+    });
+    this.authService.getSession().subscribe({
+      next: (session: any) => {
+        const perms = session?.tenant?.permissions || [];
+        const isAdmin = session?.user?.systemRole === 'admin';
+        this.canApplyDiscount = isAdmin || perms.some((p: any) => p.resource === 'orders' && p.action === 'apply_discount');
+        this.canCancel        = isAdmin || perms.some((p: any) => p.resource === 'orders'   && p.action === 'cancel');
+        this.canAddPayment    = isAdmin || perms.some((p: any) => p.resource === 'payments' && p.action === 'create');
+      }
     });
   }
 
@@ -142,6 +158,7 @@ export class OrderDetailComponent implements OnInit {
           unitPrice: parseFloat(item.unitPrice),
         })),
       };
+      this.editDiscount = parseFloat(this.order.discount) || 0;
       this.recalcEditTotals();
     }
   }
@@ -159,6 +176,7 @@ export class OrderDetailComponent implements OnInit {
     this.editSubtotal = (this.editOrderData.items || []).reduce(
       (sum: number, item: any) => sum + (parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0), 0
     );
+    this.editTotal = this.editSubtotal - (this.editDiscount || 0);
   }
 
   saveOrderEdit() {
@@ -167,6 +185,7 @@ export class OrderDetailComponent implements OnInit {
       notes: this.editOrderData.notes,
       dueDate: this.editOrderData.dueDate,
       items: this.editOrderData.items,
+      discount: this.editDiscount || 0,
     }).subscribe({
       next: (res: any) => {
         this.order = res.data;
@@ -275,6 +294,20 @@ export class OrderDetailComponent implements OnInit {
   onCalcPriceApplied(price: number) {
     if (this.calcItemIndex >= 0 && this.calcItemIndex < this.editOrderData.items.length) {
       this.editOrderData.items[this.calcItemIndex].unitPrice = price;
+      this.recalcEditTotals();
+    }
+    this.showMaterialCalc = false;
+  }
+
+  onCalcItemsApplied(newItems: any[]) {
+    if (this.calcItemIndex >= 0 && this.calcItemIndex < this.editOrderData.items.length) {
+      const currentItem = this.editOrderData.items[this.calcItemIndex];
+      // If current item is practically empty, replace it. Otherwise insert after it.
+      if (!currentItem.description && currentItem.unitPrice === 0) {
+        this.editOrderData.items.splice(this.calcItemIndex, 1, ...newItems);
+      } else {
+        this.editOrderData.items.splice(this.calcItemIndex + 1, 0, ...newItems);
+      }
       this.recalcEditTotals();
     }
     this.showMaterialCalc = false;
