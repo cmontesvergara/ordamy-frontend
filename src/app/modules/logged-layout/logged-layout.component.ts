@@ -69,17 +69,25 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
   // }
 
   ngOnInit() {
-    const userSession = this.sessionService.getUser();
-    const currentTenant = this.sessionService.getCurrentTenant();
-    const relatedTenants = this.sessionService.getRelatedTenants();
+    const userSession     = this.sessionService.getUser();
+    const currentTenant   = this.sessionService.getCurrentTenant();
+    const relatedTenants  = this.sessionService.getRelatedTenants();
+
     if (userSession) {
       this.userName = `${userSession.firstName || ''} ${userSession.lastName || ''}`.trim() || userSession.userId;
     }
+
     if (currentTenant) {
-      this.tenantName = currentTenant.name;
+      this.tenantName    = currentTenant.name;
+      // Pass currentTenant to the selector so it's auto-highlighted
+      this.currentTenant = currentTenant;
     }
-    if (relatedTenants) {
+
+    if (relatedTenants?.length) {
       this.tenants = relatedTenants;
+    } else if (currentTenant) {
+      // Fallback: at minimum show the current tenant in the selector
+      this.tenants = [currentTenant];
     }
 
 
