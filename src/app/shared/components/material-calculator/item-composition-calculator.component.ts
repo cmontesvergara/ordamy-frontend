@@ -10,7 +10,8 @@ interface CalcMaterial {
     quantityExpr: string;
     quantity: number;
     factor: number;
-    subtotal: number;
+    rawSubtotal: number;  // valor exacto antes del redondeo
+    subtotal: number;     // valor redondeado (el que se usa)
 }
 
 @Component({
@@ -47,6 +48,18 @@ export class ItemCompositionCalculatorComponent {
         return this.calcMaterialsSum;
     }
 
+    /**
+     * Conservative rounding assuming losses:
+     * - Values >= 100 → floor to nearest 100 (44.424,35 → 44.400)
+     * - Values < 100  → floor to integer     (44,35 → 44)
+     */
+    roundDown(value: number): number {
+        if (value >= 100) {
+            return Math.floor(value / 100) * 100;
+        }
+        return Math.floor(value);
+    }
+
     get isCompositionValid() {
         return this.calcMaterials.length > 0 && this.calcMaterials.every(cm => cm.quantity > 0);
     }
@@ -58,13 +71,17 @@ export class ItemCompositionCalculatorComponent {
 
     reset() {
         if (this.initialComposition && this.initialComposition.length > 0) {
-            this.calcMaterials = this.initialComposition.map(c => ({
-                material: { id: c.materialId, name: c.name, price: c.unitPrice, unit: c.unitId },
-                quantityExpr: c.quantityExpr,
-                quantity: c.quantity,
-                factor: c.factor || 1,
-                subtotal: c.subtotal || (c.quantity * (c.factor || 1) * c.unitPrice)
-            }));
+            this.calcMaterials = this.initialComposition.map(c => {
+                const raw = c.subtotal || (c.quantity * (c.factor || 1) * c.unitPrice);
+                return {
+                    material: { id: c.materialId, name: c.name, price: c.unitPrice, unit: c.unitId },
+                    quantityExpr: c.quantityExpr,
+                    quantity: c.quantity,
+                    factor: c.factor || 1,
+                    rawSubtotal: raw,
+                    subtotal: this.roundDown(raw),
+                };
+            });
         } else {
             this.calcMaterials = [];
         }
@@ -99,6 +116,7 @@ export class ItemCompositionCalculatorComponent {
             quantityExpr: '',
             quantity: 0,
             factor: 1,
+            rawSubtotal: 0,
             subtotal: 0,
         });
         this.calcMaterialSearch = '';
@@ -132,7 +150,8 @@ export class ItemCompositionCalculatorComponent {
 
     recalcMaterial(cm: CalcMaterial) {
         const price = parseFloat(cm.material.price) || 0;
-        cm.subtotal = price * cm.quantity * cm.factor;
+        cm.rawSubtotal = price * cm.quantity * cm.factor;
+        cm.subtotal = this.roundDown(cm.rawSubtotal);
     }
 
     applyComposition() {
@@ -143,12 +162,12 @@ export class ItemCompositionCalculatorComponent {
             quantity: cm.quantity,
             factor: cm.factor,
             unitPrice: parseFloat(cm.material.price) || 0,
-            subtotal: cm.subtotal
+            subtotal: cm.subtotal   // already rounded by recalcMaterial
         }));
         
         this.compositionApplied.emit({
             materials: composition,
-            unitPrice: Math.round(this.calcTotal * 100) / 100
+            unitPrice: this.roundDown(this.calcTotal)
         });
         this.close();
     }

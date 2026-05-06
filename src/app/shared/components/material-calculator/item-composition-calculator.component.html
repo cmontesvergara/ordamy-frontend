@@ -71,6 +71,11 @@
                     <td class="text-right">{{ config.currency }} {{ cm.material.price | number:'1.0-0' }}</td>
                     <td class="text-right">
                       <strong>{{ config.currency }} {{ cm.subtotal | number:'1.0-0' }}</strong>
+                      @if (cm.rawSubtotal !== cm.subtotal) {
+                        <span class="calc-rounded-hint" [title]="'Valor exacto: ' + config.currency + ' ' + (cm.rawSubtotal | number:'1.2-2')">
+                          ≈ redondeado de {{ config.currency }} {{ cm.rawSubtotal | number:'1.0-0' }}
+                        </span>
+                      }
                     </td>
                     <td class="text-center">
                       <button class="btn-icon" (click)="removeCalcMaterial(i)" title="Quitar"><span
@@ -98,7 +103,14 @@
 
             <div class="calc-totals-row calc-total-final">
               <strong>Precio unitario resultante:</strong>
-              <strong>{{ config.currency }} {{ calcTotal | number:'1.0-0' }}</strong>
+              <span class="calc-total-value">
+                <strong>{{ config.currency }} {{ roundDown(calcTotal) | number:'1.0-0' }}</strong>
+                @if (calcTotal !== roundDown(calcTotal)) {
+                  <span class="calc-rounded-hint calc-rounded-hint--total" [title]="'Valor exacto: ' + config.currency + ' ' + (calcTotal | number:'1.2-2')">
+                    ≈ redondeado de {{ config.currency }} {{ calcTotal | number:'1.0-0' }}
+                  </span>
+                }
+              </span>
             </div>
           </div>
         }
