@@ -10,34 +10,24 @@ import { environment } from '../../../../../environments/environment';
     styleUrls: [],
 })
 export class WelcomeComponent implements OnInit {
-    private auth: BigsoAuth;
-    private tenantId: string;
+    private auth!: BigsoAuth;
+    private tenantId: string = '';
 
-    constructor(private router: Router, private route: ActivatedRoute,) {
-        this.tenantId = this.route.snapshot.queryParams['tenant_id'] || '';
-        this.auth = new BigsoAuth({
-            clientId: environment.appId,
-            ssoOrigin: environment.ssoPortalUrl,
-            jwksUrl: environment.jwksUrl,
-            debug: !environment.production,
-            theme: 'light',
-            timeout: 60000,
-            redirectUri: `${environment.baseUrl}/auth/callback`,
-            tenantId: this.tenantId,
-        });
-    }
+    constructor(private router: Router, private route: ActivatedRoute) {}
 
     ngOnInit() {
         this.route.queryParams.subscribe(params => {
-            const tenantId = params['tenant_id'];
+            const urlTenantId = params['tenant_id'];
 
-            if (tenantId) {
+            if (urlTenantId) {
                 // Persist in localStorage
-                localStorage.setItem('tenant_id', tenantId);
+                localStorage.setItem('tenant_id', urlTenantId);
+                this.tenantId = urlTenantId;
             } else {
                 // If not in URL, check localStorage and inject if exists
                 const storedTenantId = localStorage.getItem('tenant_id');
                 if (storedTenantId) {
+                    this.tenantId = storedTenantId;
                     this.router.navigate([], {
                         relativeTo: this.route,
                         queryParams: { tenant_id: storedTenantId },
@@ -46,6 +36,18 @@ export class WelcomeComponent implements OnInit {
                     });
                 }
             }
+
+            // Initialize SDK here with correct tenantId
+            this.auth = new BigsoAuth({
+                clientId: environment.appId,
+                ssoOrigin: environment.ssoPortalUrl,
+                jwksUrl: environment.jwksUrl,
+                debug: !environment.production,
+                theme: 'light',
+                timeout: 60000,
+                redirectUri: `${environment.baseUrl}/auth/callback`,
+                tenantId: this.tenantId,
+            });
         });
     }
 
