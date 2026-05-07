@@ -88,6 +88,13 @@ export class OrdersComponent implements OnInit {
     this.onFilter();
   }
 
+  setToday() {
+    const today = new Date().toISOString().split('T')[0];
+    this.dateFrom = today;
+    this.dateTo = today;
+    this.onFilter();
+  }
+
   changePage(p: number) {
     this.page = p;
     this.loadOrders();

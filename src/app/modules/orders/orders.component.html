@@ -24,6 +24,7 @@
     <label>Hasta</label>
     <input type="date" [(ngModel)]="dateTo" (change)="onFilter()" />
   </div>
+  <button class="btn btn-outline btn-sm" (click)="setToday()">Hoy</button>
   @if (dateFrom || dateTo) {
     <button class="btn btn-outline btn-sm" (click)="clearDates()">✕ Limpiar fechas</button>
   }
