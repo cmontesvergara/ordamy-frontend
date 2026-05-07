@@ -38,12 +38,12 @@
           <tr>
             <td>{{ t.transactionDate | date:'dd/MM/yyyy HH:mm':config.timezone }}</td>
             <td>
-              <span class="badge" [class.income]="t.type === 'INCOME'" [class.expense]="t.type === 'EXPENSE'">
-                {{ t.type === 'INCOME' ? 'Ingreso' : 'Egreso' }}
+              <span class="badge" [class.income]="t.type === 'CREDIT'" [class.expense]="t.type === 'EXPENSE'">
+                {{ t.type === 'CREDIT' ? 'Ingreso' : 'Egreso' }}
               </span>
             </td>
             <td>{{ t.description }}</td>
-            <td class="text-right" [class.income-text]="t.type === 'INCOME'" [class.expense-text]="t.type === 'EXPENSE'">
+            <td class="text-right" [class.income-text]="t.type === 'CREDIT'" [class.expense-text]="t.type === 'EXPENSE'">
               {{ config.currency }} {{ t.amount | number:'1.0-0' }}
             </td>
           </tr>
