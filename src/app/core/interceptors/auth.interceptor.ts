@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Subject, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SessionService } from '../services/session/session.service';
+import { ToastService } from '../services/toast/toast.service';
 
 // Estado global para manejar el refresh
 let isRefreshing = false;
@@ -10,6 +11,7 @@ let refreshSubject: Subject<string> | null = null;
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const sessionService = inject(SessionService);
+    const toastService = inject(ToastService);
     const token = sessionService.getAccessToken();
     const isApiRequest = req.url.startsWith(environment.middlewareBaseUrl);
     const isAuthRequest = req.url.includes('/auth/') || req.url.includes('/api/auth/');
@@ -71,6 +73,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                         if (response?.tokens.accessToken) {
                             console.log('[AuthInterceptor] Token actualizado para:', req.url);
                             sessionService.setAccessToken(response.tokens.accessToken);
+                            
+                            // Notificar al usuario que la sesión fue renovada
+                            toastService.success('Sesión renovada', 'Tu sesión ha sido actualizada automáticamente.');
 
                             // Notificar a los requests en espera
                             refreshSubject?.next(response.tokens.accessToken);
