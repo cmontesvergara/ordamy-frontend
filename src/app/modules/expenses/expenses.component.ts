@@ -86,6 +86,26 @@ export class ExpensesComponent implements OnInit {
     this.onFilter();
   }
 
+  setToday() {
+    const today = new Date().toISOString().split('T')[0];
+    this.filterFrom = today;
+    this.filterTo = today;
+    this.onFilter();
+  }
+
+  closeCreateModal() {
+    this.showForm = false;
+    this.newExpense = {
+      description: '', amount: 0, categoryId: '', supplierId: '',
+      paymentMethodId: '', invoiceNumber: '', expenseDate: '', notes: ''
+    };
+  }
+
+  closeEditModal() {
+    this.editingExpense = null;
+    this.editData = {};
+  }
+
   changePage(p: number) {
     this.page = p;
     this.loadExpenses();
