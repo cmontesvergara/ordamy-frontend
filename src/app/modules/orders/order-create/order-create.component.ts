@@ -71,9 +71,9 @@ export class OrderCreateComponent implements OnInit {
     if (!this.selectedCustomer || this.items.length === 0) return false;
     // Check if items have names
     if (this.items.some(i => !i.description)) return false;
-    // Enforce composition if permission is set
+    // Enforce composition if permission is set (only for manual items, not products)
     if (this.requireComposition) {
-      if (this.items.some(i => !i.composition || i.composition.length === 0)) return false;
+      if (this.items.some(i => !i.productId && (!i.composition || i.composition.length === 0))) return false;
     }
     return true;
   }

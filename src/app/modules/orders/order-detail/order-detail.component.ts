@@ -193,8 +193,9 @@ export class OrderDetailComponent implements OnInit {
   get isEditValid() {
     if (!this.editOrderData.items || this.editOrderData.items.length === 0) return false;
     if (this.editOrderData.items.some((i: any) => !i.description)) return false;
+    // Enforce composition if permission is set (only for manual items, not products)
     if (this.requireComposition) {
-      if (this.editOrderData.items.some((i: any) => !i.composition || i.composition.length === 0)) return false;
+      if (this.editOrderData.items.some((i: any) => !i.productId && (!i.composition || i.composition.length === 0))) return false;
     }
     return true;
   }
