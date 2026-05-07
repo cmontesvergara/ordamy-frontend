@@ -9,6 +9,7 @@ import { ProductService } from '../../../core/services/product/product.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { extractDateFromISO } from '../../../shared/utils/date-utils';
 import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
 import { ItemCompositionCalculatorComponent } from '../../../shared/components/material-calculator/item-composition-calculator.component';
 import { OverlayModule } from '@angular/cdk/overlay';
@@ -156,7 +157,7 @@ export class OrderDetailComponent implements OnInit {
     if (this.editingOrder) {
       this.editOrderData = {
         notes: this.order.notes || '',
-        dueDate: this.order.dueDate ? new Date(this.order.dueDate).toISOString().split('T')[0] : '',
+        dueDate: extractDateFromISO(this.order.dueDate),
         items: (this.order.items || []).map((item: any) => ({
           productId: item.productId,
           description: item.description,

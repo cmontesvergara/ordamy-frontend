@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../core/services/expense/expense.service';
 import { SettingsService } from '../../core/services/settings/settings.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { extractDateFromISO } from '../../shared/utils/date-utils';
 
 @Component({
     selector: 'app-expenses',
@@ -132,7 +133,7 @@ export class ExpensesComponent implements OnInit {
       supplierId: expense.supplierId || expense.supplier?.id || '',
       paymentMethodId: expense.paymentMethodId || expense.paymentMethod?.id || '',
       invoiceNumber: expense.invoiceNumber || '',
-      expenseDate: expense.expenseDate ? new Date(expense.expenseDate).toISOString().split('T')[0] : '',
+      expenseDate: extractDateFromISO(expense.expenseDate),
       notes: expense.notes || '',
     };
   }
