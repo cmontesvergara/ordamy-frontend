@@ -1,73 +1,119 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BigsoAuth } from '@bigso/auth-sdk/browser';
 import { environment } from '../../../../../environments/environment';
+import { Tenant, TenantService } from '../../../../core/services/tenant/tenant.service';
 
 @Component({
     selector: 'app-welcome',
     standalone: true,
+    imports: [FormsModule, CommonModule],
     templateUrl: './welcome.component.html',
     styleUrls: [],
 })
 export class WelcomeComponent implements OnInit {
-    private auth!: BigsoAuth;
-    private tenantId: string = '';
+    // Tenant Search
+    tenantSearchQuery: string = '';
+    tenantResults: Tenant[] = [];
+    selectedTenant: Tenant | null = null;
+    isSearchingTenants: boolean = false;
+    showTenantResults: boolean = false;
+    searchError: string = '';
+    private tenantSearchTimeout: any = null;
 
-    constructor(private router: Router, private route: ActivatedRoute) {}
+    constructor(
+        private router: Router,
+        private route: ActivatedRoute,
+        private tenantService: TenantService
+    ) { }
 
     ngOnInit() {
-        this.route.queryParams.subscribe(params => {
-            const urlTenantId = params['tenant_id'];
+        // Check if there's a stored tenant and redirect automatically
+        const storedTenant = this.tenantService.getStoredTenantInfo();
+        if (storedTenant) {
+            console.log('[Welcome] Redirecting to stored tenant:', storedTenant.slug);
+            this.router.navigate(['/auth/org', storedTenant.slug]);
+        }
+    }
 
-            if (urlTenantId) {
-                // Persist in localStorage
-                localStorage.setItem('tenant_id', urlTenantId);
-                this.tenantId = urlTenantId;
-            } else {
-                // If not in URL, check localStorage and inject if exists
-                const storedTenantId = localStorage.getItem('tenant_id');
-                if (storedTenantId) {
-                    this.tenantId = storedTenantId;
-                    this.router.navigate([], {
-                        relativeTo: this.route,
-                        queryParams: { tenant_id: storedTenantId },
-                        queryParamsHandling: 'merge',
-                        replaceUrl: true
-                    });
-                }
+    redirectToSSOSignUp() {
+        // Redirect to SSO registration with OrdAmy app_id
+        const ssoSignUpUrl = `${environment.ssoPortalUrl}/auth/sign-up?client_id=${environment.appId}`;
+        window.location.href = ssoSignUpUrl;
+    }
+
+    navigateToTenantAuth() {
+        if (this.selectedTenant) {
+            // Store tenant info before navigating
+            this.tenantService.storeTenantInfo(this.selectedTenant);
+            this.router.navigate(['/auth/org', this.selectedTenant.slug]);
+        }
+    }
+
+    // Tenant Search Methods
+    onSearchTenants() {
+        // Clear previous timeout
+        if (this.tenantSearchTimeout) {
+            clearTimeout(this.tenantSearchTimeout);
+        }
+
+        this.selectedTenant = null;
+        this.searchError = '';
+
+        if (this.tenantSearchQuery.length < 2) {
+            this.tenantResults = [];
+            this.showTenantResults = false;
+            return;
+        }
+
+        this.showTenantResults = true;
+        this.isSearchingTenants = true;
+
+        // Debounce search
+        this.tenantSearchTimeout = setTimeout(() => {
+            this.performSearch();
+        }, 300);
+    }
+
+    private performSearch() {
+        this.tenantService.searchTenants(this.tenantSearchQuery).subscribe({
+            next: (tenants: Tenant[]) => {
+                this.tenantResults = tenants;
+                this.isSearchingTenants = false;
+            },
+            error: (error: any) => {
+                console.error('[Welcome] Search error:', error);
+                this.searchError = 'Error al buscar. Intenta de nuevo.';
+                this.tenantResults = [];
+                this.isSearchingTenants = false;
             }
-
-            // Initialize SDK here with correct tenantId
-            this.auth = new BigsoAuth({
-                clientId: environment.appId,
-                ssoOrigin: environment.ssoPortalUrl,
-                jwksUrl: environment.jwksUrl,
-                debug: !environment.production,
-                theme: 'light',
-                timeout: 60000,
-                redirectUri: `${environment.baseUrl}/auth/callback`,
-                tenantId: this.tenantId,
-            });
         });
     }
 
-    async openSSO() {
-        try {
-            const result = await this.auth.login();
-            console.log('[Ordamy] SSO login exitoso:', result);
+    selectTenant(tenant: Tenant) {
+        this.selectedTenant = tenant;
+    }
 
-            this.router.navigate(['/auth/callback'], {
-                queryParams: {
-                    payload: result.signed_payload,
-                    codeVerifier: result.codeVerifier,
+    clearTenantSearch() {
+        this.tenantSearchQuery = '';
+        this.tenantResults = [];
+        this.selectedTenant = null;
+        this.showTenantResults = false;
+        this.searchError = '';
+    }
+
+    scrollToTenantSearch() {
+        const element = document.getElementById('access-tenant');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Focus on the search input after scrolling
+            setTimeout(() => {
+                const searchInput = element.querySelector('input[type="text"]') as HTMLInputElement;
+                if (searchInput) {
+                    searchInput.focus();
                 }
-            });
-        } catch (error: any) {
-            if (error?.message === 'Login aborted' || error?.message === 'Login cancelled by user') {
-                console.log('[Ordamy] Login cancelado por el usuario');
-                return;
-            }
-            console.error('[Ordamy] SSO login error:', error);
+            }, 500);
         }
     }
 }
