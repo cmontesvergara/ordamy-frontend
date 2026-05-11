@@ -110,6 +110,7 @@ export class ExpensesComponent implements OnInit {
   closeEditModal() {
     this.editingExpense = null;
     this.editData = {};
+    this.editSelectedFile = null;
   }
 
   changePage(p: number) {
@@ -117,7 +118,7 @@ export class ExpensesComponent implements OnInit {
     this.loadExpenses();
   }
 
-  // File handling methods
+  // File handling methods for CREATE
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -135,6 +136,37 @@ export class ExpensesComponent implements OnInit {
 
   removeFile() {
     this.selectedFile = null;
+  }
+
+  // File handling methods for EDIT
+  editSelectedFile: File | null = null;
+
+  onEditFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        this.toastService.error('Archivo demasiado grande', 'El archivo es demasiado grande. Máximo 10MB.');
+        return;
+      }
+      
+      this.editSelectedFile = file;
+    }
+  }
+
+  removeEditFile() {
+    this.editSelectedFile = null;
+  }
+
+  // View attachment
+  viewAttachment(attachment: any) {
+    if (attachment?.fileUrl) {
+      window.open(attachment.fileUrl, '_blank');
+    } else {
+      this.toastService.error('Error', 'No se puede acceder al archivo');
+    }
   }
 
   formatFileSize(bytes: number): string {
