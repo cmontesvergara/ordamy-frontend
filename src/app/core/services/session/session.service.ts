@@ -180,10 +180,15 @@ export class SessionService {
     }
 
     refreshTokens(): Observable<any> {
+        const tenant = this.getCurrentTenant();
+        const headers: Record<string, string> = {};
+        if (tenant?.id) {
+            headers['x-tenant-id'] = tenant.id;
+        }
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/refresh`,
             {},
-            { headers: { 'x-tenant-id': this.getCurrentTenant().id }, withCredentials: true }
+            { headers, withCredentials: true }
         );
     }
 
