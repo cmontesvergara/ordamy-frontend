@@ -4,6 +4,8 @@ import { catchError, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ExchangeResponse } from '../../../modules/auth/pages/callback/callback.component';
 
+const STORAGE_KEY = `ordamy_session-${Date.now()}`;
+
 export interface User {
     userId: string   // normalized from API's user.id
     email: string
@@ -34,7 +36,47 @@ export class SessionService {
     private permissions: Permission[] | null = null;
     private relatedTenants: Tenant[] = [];
 
-    constructor(private readonly http: HttpClient) { }
+    constructor(private readonly http: HttpClient) {
+        // Restore session from sessionStorage on initialization
+        this.restoreFromStorage();
+    }
+
+    /**
+     * Restore session data from sessionStorage
+     */
+    private restoreFromStorage() {
+        try {
+            const stored = sessionStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                const data = JSON.parse(stored);
+                this.accessToken = data.accessToken || null;
+                this.user = data.user || null;
+                this.currentTenant = data.currentTenant || null;
+                this.permissions = data.permissions || null;
+                this.relatedTenants = data.relatedTenants || [];
+            }
+        } catch (error) {
+            console.error('[SessionService] Error restoring from storage:', error);
+        }
+    }
+
+    /**
+     * Persist session data to sessionStorage
+     */
+    private persistToStorage() {
+        try {
+            const data = {
+                accessToken: this.accessToken,
+                user: this.user,
+                currentTenant: this.currentTenant,
+                permissions: this.permissions,
+                relatedTenants: this.relatedTenants,
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (error) {
+            console.error('[SessionService] Error persisting to storage:', error);
+        }
+    }
 
     setupSession(data: ExchangeResponse) {
         this.setAccessToken(data.tokens.accessToken);
@@ -53,34 +95,58 @@ export class SessionService {
         if (data.currentTenant?.permissions) {
             this.setPermissions(data.currentTenant.permissions);
         }
+        // Persist to sessionStorage
+        this.persistToStorage();
     }
 
     isDefined() {
-        return !!this.accessToken && !!this.user && !!this.currentTenant && !!this.permissions;
+        // Check both memory and sessionStorage
+        const token = this.getAccessToken();
+        return !!token && !!this.user && !!this.currentTenant && !!this.permissions;
     }
 
     setAccessToken(accessToken: string) {
         this.accessToken = accessToken;
+        this.persistToStorage();
     }
 
     setUser(user: User) {
         this.user = user;
+        this.persistToStorage();
     }
 
     setCurrentTenant(tenant: Tenant) {
         this.currentTenant = tenant;
+        this.persistToStorage();
     }
 
     setRelatedTenants(tenants: Tenant[]) {
         this.relatedTenants = tenants;
+        this.persistToStorage();
     }
 
     setPermissions(permissions: Permission[]) {
         this.permissions = permissions;
+        this.persistToStorage();
     }
 
     getAccessToken() {
-        return this.accessToken;
+        // Return from memory, or from sessionStorage if memory is empty
+        if (this.accessToken) {
+            return this.accessToken;
+        }
+        // Try to get from sessionStorage
+        try {
+            const stored = sessionStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                const data = JSON.parse(stored);
+                this.accessToken = data.accessToken || null;
+                return this.accessToken;
+            }
+        } catch (error) {
+            console.error('[SessionService] Error reading from storage:', error);
+        }
+        return null;
     }
 
     getUser() {
@@ -105,6 +171,12 @@ export class SessionService {
         this.currentTenant = null;
         this.permissions = null;
         this.relatedTenants = [];
+        // Clear from sessionStorage
+        try {
+            sessionStorage.removeItem(STORAGE_KEY);
+        } catch (error) {
+            console.error('[SessionService] Error clearing storage:', error);
+        }
     }
 
     refreshTokens(): Observable<any> {
