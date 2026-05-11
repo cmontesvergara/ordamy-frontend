@@ -60,6 +60,42 @@
             <label>Fecha</label>
             <input type="date" [(ngModel)]="newExpense.expenseDate" />
           </div>
+          
+          <!-- File Attachment -->
+          <div class="form-group full-width">
+            <label>Soporte (factura, recibo, etc.)</label>
+            <div class="file-input-wrapper">
+              <input 
+                type="file" 
+                #fileInput
+                (change)="onFileSelected($event)"
+                accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.txt,.csv"
+                style="display: none;"
+              />
+              <button 
+                type="button" 
+                class="btn btn-outline btn-file"
+                (click)="fileInput.click()"
+              >
+                📎 Adjuntar archivo
+              </button>
+              
+              @if (selectedFile) {
+                <div class="file-preview">
+                  <span class="file-name">{{ selectedFile.name }}</span>
+                  <span class="file-size">({{ formatFileSize(selectedFile.size) }})</span>
+                  <button type="button" class="btn-remove" (click)="removeFile()" title="Eliminar">
+                    ✕
+                  </button>
+                </div>
+              }
+              
+              <div class="file-help">
+                Máximo 10MB. Formatos: PDF, imágenes, Office, TXT, CSV
+              </div>
+            </div>
+          </div>
+          
           <div class="form-group full-width">
             <label>Notas</label>
             <input [(ngModel)]="newExpense.notes" placeholder="Notas opcionales" />

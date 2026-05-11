@@ -5,6 +5,7 @@ import { ExpenseService } from '../../core/services/expense/expense.service';
 import { SettingsService } from '../../core/services/settings/settings.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { extractDateFromISO } from '../../shared/utils/date-utils';
+import { toast } from 'ngx-sonner';
 
 @Component({
     selector: 'app-expenses',
@@ -32,6 +33,9 @@ export class ExpensesComponent implements OnInit {
     description: '', amount: 0, categoryId: '', supplierId: '',
     paymentMethodId: '', invoiceNumber: '', expenseDate: '', notes: ''
   };
+
+  // File attachment
+  selectedFile: File | null = null;
 
   get totalPages() { return Math.ceil(this.total / this.limit); }
 
@@ -99,16 +103,31 @@ export class ExpensesComponent implements OnInit {
       description: '', amount: 0, categoryId: '', supplierId: '',
       paymentMethodId: '', invoiceNumber: '', expenseDate: '', notes: ''
     };
+    this.selectedFile = null;
   }
 
-  closeEditModal() {
-    this.editingExpense = null;
-    this.editData = {};
+  // File handling methods
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('El archivo es demasiado grande. Máximo 10MB.');
+        return;
+      }
+      
+      this.selectedFile = file;
+    }
   }
 
-  changePage(p: number) {
-    this.page = p;
-    this.loadExpenses();
+  removeFile() {
+    this.selectedFile = null;
+  }
+
+  formatFileSize(bytes: number): string {
+    return this.expenseService.formatFileSize(bytes);
   }
 
   createExpense() {
@@ -120,17 +139,32 @@ export class ExpensesComponent implements OnInit {
     if (!payload.paymentMethodId) delete payload.paymentMethodId;
     if (!payload.invoiceNumber) delete payload.invoiceNumber;
     if (!payload.expenseDate) delete payload.expenseDate;
-    this.expenseService.create(payload).subscribe({
-      next: () => {
+    
+    this.expenseService.create(payload, this.selectedFile || undefined).subscribe({
+      next: (res: any) => {
         this.saving = false;
         this.showForm = false;
         this.newExpense = {
           description: '', amount: 0, categoryId: '', supplierId: '',
           paymentMethodId: '', invoiceNumber: '', expenseDate: '', notes: ''
         };
+        this.selectedFile = null;
+        
+        // Show warning if some files failed
+        if (res.warnings?.failed?.length > 0) {
+          toast.warning('Egreso creado, pero el soporte no pudo subirse. Puedes intentar de nuevo.');
+        } else if (this.selectedFile) {
+          toast.success('Egreso y soporte creados exitosamente');
+        } else {
+          toast.success('Egreso creado exitosamente');
+        }
+        
         this.loadExpenses();
       },
-      error: () => { this.saving = false; },
+      error: (err: any) => { 
+        this.saving = false;
+        toast.error('Error al crear el egreso');
+      },
     });
   }
 
