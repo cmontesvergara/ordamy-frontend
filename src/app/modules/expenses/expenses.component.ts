@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../core/services/expense/expense.service';
 import { SettingsService } from '../../core/services/settings/settings.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { ToastService } from '../../core/services/toast/toast.service';
 import { extractDateFromISO } from '../../shared/utils/date-utils';
-import { toast } from 'ngx-sonner';
 
 @Component({
     selector: 'app-expenses',
@@ -43,6 +43,7 @@ export class ExpensesComponent implements OnInit {
     private expenseService: ExpenseService,
     private settingsService: SettingsService,
     public config: AppConfigService,
+    private toastService: ToastService,
   ) { }
 
   ngOnInit() {
@@ -106,6 +107,16 @@ export class ExpensesComponent implements OnInit {
     this.selectedFile = null;
   }
 
+  closeEditModal() {
+    this.editingExpense = null;
+    this.editData = {};
+  }
+
+  changePage(p: number) {
+    this.page = p;
+    this.loadExpenses();
+  }
+
   // File handling methods
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -114,7 +125,7 @@ export class ExpensesComponent implements OnInit {
       
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
-        toast.error('El archivo es demasiado grande. Máximo 10MB.');
+        this.toastService.error('Archivo demasiado grande', 'El archivo es demasiado grande. Máximo 10MB.');
         return;
       }
       
@@ -152,18 +163,18 @@ export class ExpensesComponent implements OnInit {
         
         // Show warning if some files failed
         if (res.warnings?.failed?.length > 0) {
-          toast.warning('Egreso creado, pero el soporte no pudo subirse. Puedes intentar de nuevo.');
+          this.toastService.warning('Soporte no subido', 'Egreso creado, pero el soporte no pudo subirse. Puedes intentar de nuevo.');
         } else if (this.selectedFile) {
-          toast.success('Egreso y soporte creados exitosamente');
+          this.toastService.success('Éxito', 'Egreso y soporte creados exitosamente');
         } else {
-          toast.success('Egreso creado exitosamente');
+          this.toastService.success('Éxito', 'Egreso creado exitosamente');
         }
         
         this.loadExpenses();
       },
       error: (err: any) => { 
         this.saving = false;
-        toast.error('Error al crear el egreso');
+        this.toastService.error('Error', 'Error al crear el egreso');
       },
     });
   }
