@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { ExpenseService } from '../../core/services/expense/expense.service';
 import { SettingsService } from '../../core/services/settings/settings.service';
-import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 import { extractDateFromISO } from '../../shared/utils/date-utils';
 
 @Component({
-    selector: 'app-expenses',
-    imports: [CommonModule, FormsModule],
-    templateUrl: './expenses.component.html',
-    styleUrl: './expenses.component.scss'
+  selector: 'app-expenses',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './expenses.component.html',
+  styleUrl: './expenses.component.scss'
 })
 export class ExpensesComponent implements OnInit {
   expenses: any[] = [];
@@ -67,7 +67,7 @@ export class ExpensesComponent implements OnInit {
         this.expenses = res.data || [];
         this.total = res.total || 0;
         this.loading = false;
-        
+
         // Load attachments for each expense
         this.expenses.forEach(expense => {
           if (expense.id) {
@@ -78,7 +78,7 @@ export class ExpensesComponent implements OnInit {
       error: () => { this.loading = false; },
     });
   }
-  
+
   loadAttachmentsForExpense(expense: any) {
     this.expenseService.getAttachments(expense.id).subscribe({
       next: (res: any) => {
@@ -141,13 +141,13 @@ export class ExpensesComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      
+
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
         this.toastService.error('Archivo demasiado grande', 'El archivo es demasiado grande. Máximo 10MB.');
         return;
       }
-      
+
       this.selectedFile = file;
     }
   }
@@ -163,13 +163,13 @@ export class ExpensesComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      
+
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
         this.toastService.error('Archivo demasiado grande', 'El archivo es demasiado grande. Máximo 10MB.');
         return;
       }
-      
+
       this.editSelectedFile = file;
     }
   }
@@ -180,11 +180,14 @@ export class ExpensesComponent implements OnInit {
 
   // View attachment
   viewAttachment(attachment: any) {
-    if (attachment?.fileUrl) {
-      window.open(attachment.fileUrl, '_blank');
+    // Use presigned downloadUrl if available, otherwise fall back to fileUrl
+    const url = attachment.downloadUrl || attachment.fileUrl;
+    if (url) {
+      window.open(url, '_blank');
     } else {
       this.toastService.error('Error', 'No se puede acceder al archivo');
     }
+
   }
 
   formatFileSize(bytes: number): string {
@@ -200,7 +203,7 @@ export class ExpensesComponent implements OnInit {
     if (!payload.paymentMethodId) delete payload.paymentMethodId;
     if (!payload.invoiceNumber) delete payload.invoiceNumber;
     if (!payload.expenseDate) delete payload.expenseDate;
-    
+
     this.expenseService.create(payload, this.selectedFile || undefined).subscribe({
       next: (res: any) => {
         this.saving = false;
@@ -210,7 +213,7 @@ export class ExpensesComponent implements OnInit {
           paymentMethodId: '', invoiceNumber: '', expenseDate: '', notes: ''
         };
         this.selectedFile = null;
-        
+
         // Show warning if some files failed
         if (res.warnings?.failed?.length > 0) {
           this.toastService.warning('Soporte no subido', 'Egreso creado, pero el soporte no pudo subirse. Puedes intentar de nuevo.');
@@ -219,10 +222,10 @@ export class ExpensesComponent implements OnInit {
         } else {
           this.toastService.success('Éxito', 'Egreso creado exitosamente');
         }
-        
+
         this.loadExpenses();
       },
-      error: (err: any) => { 
+      error: (err: any) => {
         this.saving = false;
         this.toastService.error('Error', 'Error al crear el egreso');
       },
@@ -251,11 +254,11 @@ export class ExpensesComponent implements OnInit {
       expenseDate: extractDateFromISO(expense.expenseDate),
       notes: expense.notes || '',
     };
-    
+
     // Load attachments for this expense
     this.loadExpenseAttachments(expense.id);
   }
-  
+
   loadExpenseAttachments(expenseId: string) {
     this.expenseService.getAttachments(expenseId).subscribe({
       next: (res: any) => {
