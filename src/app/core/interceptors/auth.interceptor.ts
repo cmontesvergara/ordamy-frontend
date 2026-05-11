@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Subject, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { Subject, catchError, filter, switchMap, take, throwError, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SessionService } from '../services/session/session.service';
 import { ToastService } from '../services/toast/toast.service';
@@ -8,6 +8,15 @@ import { ToastService } from '../services/toast/toast.service';
 // Estado global para manejar el refresh
 let isRefreshing = false;
 let refreshSubject: Subject<string> | null = null;
+let refreshAttempts = 0;
+const MAX_REFRESH_ATTEMPTS = 3;
+
+// Reset estado function
+const resetRefreshState = () => {
+    isRefreshing = false;
+    refreshSubject = null;
+    refreshAttempts = 0;
+};
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const sessionService = inject(SessionService);
@@ -15,105 +24,140 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const token = sessionService.getAccessToken();
     const isApiRequest = req.url.startsWith(environment.middlewareBaseUrl);
     const isAuthRequest = req.url.includes('/auth/') || req.url.includes('/api/auth/');
+    const isRefreshRequest = req.url.includes('/auth/refresh');
 
     // Si no es request a nuestra API, no agregamos token
     if (!isApiRequest) {
-        console.log('[AuthInterceptor] No se agrega token a request externo:', req.url);
         return next(req);
     }
 
-    // Si es un request de auth, no agregamos Authorization pero sí pasamos otros headers
+    // Si es un request de auth o refresh, no agregamos Authorization
     if (isAuthRequest) {
-        console.log('[AuthInterceptor] Request de auth, manteniendo headers existentes:', req.url);
         return next(req);
     }
 
-    // Si no hay token, hacer el request sin token
-    if (!token) {
-        console.warn('[AuthInterceptor] No se encontró token para request:', req.url);
-        return next(req);
+    // Determinar si tenemos token y crear el request apropiado
+    let requestToSend = req;
+    if (token) {
+        // Clonar request con el token
+        requestToSend = req.clone({
+            setHeaders: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } else {
+        console.warn('[AuthInterceptor] No hay access token, intentando con cookies...');
     }
 
-    // Clonar request con el token
-    const cloned = req.clone({
-        setHeaders: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+    // Handler para errores 401 y refresh
+    const handle401Error = (error: any) => {
+        console.error('[AuthInterceptor] Error:', error.status, error.message, 'URL:', req.url);
+        
+        // Si es 401, intentar refresh
+        if (error.status === 401) {
+            console.warn('[AuthInterceptor] 401 detectado');
+            
+            // Si es el request de refresh mismo que falló, no intentar de nuevo
+            if (isRefreshRequest) {
+                console.error('[AuthInterceptor] Refresh request failed with 401');
+                resetRefreshState();
+                sessionService.clearSession();
+                window.location.href = '/auth/login';
+                return throwError(() => error);
+            }
 
-    return next(cloned).pipe(
-        catchError((error) => {
-            console.error('[AuthInterceptor] Error en request:', req.url, 'Error:', error);
-            // Si es 401 y no estamos ya en un request de refresh
-            if (error.status === 401 && !isAuthRequest) {
-                console.warn('[AuthInterceptor] 401 detectado para:', req.url);
-                // Si ya estamos refrescando, esperar al nuevo token
-                if (isRefreshing && refreshSubject) {
-                    console.log('[AuthInterceptor] Esperando nuevo token para:', req.url);
-                    return refreshSubject.pipe(
-                        filter((newToken): newToken is string => !!newToken),
-                        take(1),
-                        switchMap((newToken) => {
-                            const retryReq = req.clone({
-                                setHeaders: {
-                                    Authorization: `Bearer ${newToken}`,
-                                },
-                            });
-                            return next(retryReq);
-                        })
-                    );
-                }
-
-                // Iniciar proceso de refresh
-                isRefreshing = true;
-                refreshSubject = new Subject<string>();
-
-                return sessionService.refreshTokens().pipe(
-                    switchMap((response: any) => {
-                        if (response?.tokens.accessToken) {
-                            console.log('[AuthInterceptor] Token actualizado para:', req.url);
-                            sessionService.setAccessToken(response.tokens.accessToken);
-                            
-                            // Notificar al usuario que la sesión fue renovada
-                            toastService.success('Sesión renovada', 'Tu sesión ha sido actualizada automáticamente.');
-
-                            // Notificar a los requests en espera
-                            refreshSubject?.next(response.tokens.accessToken);
-                            refreshSubject?.complete();
-
-                            // Resetear estado
-                            isRefreshing = false;
-                            refreshSubject = null;
-
-                            // Reintentar request original
-                            const retryReq = req.clone({
-                                setHeaders: {
-                                    Authorization: `Bearer ${response.tokens.accessToken}`,
-                                },
-                            });
-                            return next(retryReq);
-                        }
-
-                        // Si no hay token, logout
-                        refreshSubject?.error('No token in response');
-                        sessionService.clearSession();
-                        isRefreshing = false;
-                        refreshSubject = null;
-                        return throwError(() => error);
+            // Si ya estamos refrescando, esperar al nuevo token
+            if (isRefreshing && refreshSubject) {
+                console.log('[AuthInterceptor] Esperando refresh en progreso...');
+                return refreshSubject.pipe(
+                    filter((newToken): newToken is string => !!newToken),
+                    take(1),
+                    switchMap((newToken) => {
+                        const retryReq = req.clone({
+                            setHeaders: {
+                                Authorization: `Bearer ${newToken}`,
+                            },
+                        });
+                        return next(retryReq);
                     }),
-                    catchError((refreshError) => {
-                        console.error('[AuthInterceptor] Error al refrescar token:', refreshError);
-                        // Si el refresh falla, logout
-                        refreshSubject?.error(refreshError);
-                        sessionService.clearSession();
-                        isRefreshing = false;
-                        refreshSubject = null;
-                        return throwError(() => refreshError);
+                    catchError(() => {
+                        // Si el refresh falló, redirigir a login
+                        window.location.href = '/auth/login';
+                        return throwError(() => error);
                     })
                 );
             }
 
-            return throwError(() => error);
-        }),
+            // Limitar intentos de refresh
+            if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
+                console.error('[AuthInterceptor] Max refresh attempts reached');
+                resetRefreshState();
+                sessionService.clearSession();
+                window.location.href = '/auth/login';
+                return throwError(() => error);
+            }
+
+            // Iniciar proceso de refresh
+            console.log('[AuthInterceptor] Iniciando refresh de token...');
+            isRefreshing = true;
+            refreshAttempts++;
+            refreshSubject = new Subject<string>();
+
+            return sessionService.refreshTokens().pipe(
+                timeout(10000), // 10 second timeout
+                switchMap((response: any) => {
+                    console.log('[AuthInterceptor] Refresh exitoso:', response);
+                    
+                    if (response?.tokens?.accessToken) {
+                        // Guardar nuevo token
+                        sessionService.setAccessToken(response.tokens.accessToken);
+                        
+                        // Notificar éxito
+                        refreshSubject?.next(response.tokens.accessToken);
+                        refreshSubject?.complete();
+                        resetRefreshState();
+
+                        // Reintentar request original
+                        const retryReq = req.clone({
+                            setHeaders: {
+                                Authorization: `Bearer ${response.tokens.accessToken}`,
+                            },
+                        });
+                        return next(retryReq);
+                    }
+
+                    // No hay token en respuesta
+                    throw new Error('No access token in refresh response');
+                }),
+                catchError((refreshError) => {
+                    console.error('[AuthInterceptor] Refresh falló:', refreshError);
+                    
+                    // Notificar error
+                    refreshSubject?.error(refreshError);
+                    resetRefreshState();
+                    
+                    // Limpiar sesión y redirigir
+                    sessionService.clearSession();
+                    
+                    // Mostrar mensaje al usuario
+                    toastService.error('Sesión expirada', 'Por favor inicia sesión nuevamente');
+                    
+                    // Redirigir a login después de un momento
+                    setTimeout(() => {
+                        window.location.href = '/auth/login';
+                    }, 2000);
+                    
+                    return throwError(() => refreshError);
+                })
+            );
+        }
+
+        // Otros errores, propagar
+        return throwError(() => error);
+    };
+
+    // Ejecutar el request con el handler de errores 401
+    return next(requestToSend).pipe(
+        catchError(handle401Error)
     );
 };
