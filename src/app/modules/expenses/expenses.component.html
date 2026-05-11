@@ -255,23 +255,26 @@
                   class="btn btn-outline btn-file"
                   (click)="editFileInput.click()"
                 >
-                  📎 Adjuntar
+                  Adjuntar
                 </button>
                 
                 @if (editSelectedFile) {
                   <div class="file-preview">
                     <span class="file-name">{{ editSelectedFile.name }}</span>
                     <button type="button" class="btn-remove" (click)="removeEditFile()" title="Eliminar">
-                      ✕
+                      <span class="icon icon-close"></span>
                     </button>
                   </div>
                 } @else if (editingExpense?.attachments?.length > 0) {
-                  <div class="file-preview">
+                  <div class="file-preview existing-file">
+                    <span class="file-indicator">Archivo adjunto:</span>
                     <span class="file-name">{{ editingExpense.attachments[0].fileName }}</span>
-                    <button type="button" class="btn-icon-small" (click)="viewAttachment(editingExpense.attachments[0])" title="Ver">
+                    <button type="button" class="btn-icon-small" (click)="viewAttachment(editingExpense.attachments[0])" title="Ver archivo">
                       <span class="icon icon-view"></span>
                     </button>
                   </div>
+                } @else {
+                  <div class="file-help-text">No hay soporte adjunto</div>
                 }
               </div>
             </div>

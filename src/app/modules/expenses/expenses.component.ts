@@ -64,11 +64,29 @@ export class ExpensesComponent implements OnInit {
       limit: this.limit,
     }).subscribe({
       next: (res: any) => {
-        this.expenses = res.data;
-        this.total = res.total;
+        this.expenses = res.data || [];
+        this.total = res.total || 0;
         this.loading = false;
+        
+        // Load attachments for each expense
+        this.expenses.forEach(expense => {
+          if (expense.id) {
+            this.loadAttachmentsForExpense(expense);
+          }
+        });
       },
       error: () => { this.loading = false; },
+    });
+  }
+  
+  loadAttachmentsForExpense(expense: any) {
+    this.expenseService.getAttachments(expense.id).subscribe({
+      next: (res: any) => {
+        expense.attachments = res.data || [];
+      },
+      error: () => {
+        expense.attachments = [];
+      }
     });
   }
 
@@ -233,6 +251,22 @@ export class ExpensesComponent implements OnInit {
       expenseDate: extractDateFromISO(expense.expenseDate),
       notes: expense.notes || '',
     };
+    
+    // Load attachments for this expense
+    this.loadExpenseAttachments(expense.id);
+  }
+  
+  loadExpenseAttachments(expenseId: string) {
+    this.expenseService.getAttachments(expenseId).subscribe({
+      next: (res: any) => {
+        if (this.editingExpense) {
+          this.editingExpense.attachments = res.data;
+        }
+      },
+      error: () => {
+        // Silently fail - attachments are optional
+      }
+    });
   }
 
   saveExpenseEdit() {
