@@ -4,7 +4,7 @@ import { catchError, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ExchangeResponse } from '../../../modules/auth/pages/callback/callback.component';
 
-const STORAGE_KEY = `ordamy_session-${Date.now()}`;
+const STORAGE_KEY = 'ordamy_session_v1';
 
 export interface User {
     userId: string   // normalized from API's user.id
@@ -180,12 +180,17 @@ export class SessionService {
     }
 
     refreshTokens(): Observable<any> {
-        // El refresh solo necesita las cookies de sesión, no el x-tenant-id
-        // El SDK de SSO identifica al usuario por las cookies
+        // El refresh necesita las cookies de sesión Y el x-tenant-id
+        // El SDK en el middleware lee x-tenant-id para pasarlo al SSO Core
+        // y que éste genere el access token con el tenant/permisos correctos
+        const tenantId = this.currentTenant?.id || '';
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/refresh`,
             {},
-            { withCredentials: true }
+            {
+                withCredentials: true,
+                headers: tenantId ? { 'x-tenant-id': tenantId } : {}
+            }
         );
     }
 
