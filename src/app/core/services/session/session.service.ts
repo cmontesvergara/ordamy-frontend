@@ -180,15 +180,12 @@ export class SessionService {
     }
 
     refreshTokens(): Observable<any> {
-        const tenant = this.getCurrentTenant();
-        const headers: Record<string, string> = {};
-        if (tenant?.id) {
-            headers['x-tenant-id'] = tenant.id;
-        }
+        // El refresh solo necesita las cookies de sesión, no el x-tenant-id
+        // El SDK de SSO identifica al usuario por las cookies
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/refresh`,
             {},
-            { headers, withCredentials: true }
+            { withCredentials: true }
         );
     }
 
