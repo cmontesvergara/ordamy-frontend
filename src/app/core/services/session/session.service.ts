@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ExchangeResponse } from '../../../modules/auth/pages/callback/callback.component';
 
@@ -41,11 +41,11 @@ export class SessionService {
         // Normalize: API returns user.id but internal interface uses userId
         const rawUser = data.user as any;
         const user: User = {
-            userId:      rawUser.userId || rawUser.id,
-            email:       rawUser.email,
-            firstName:   rawUser.firstName,
-            lastName:    rawUser.lastName,
-            systemRole:  rawUser.systemRole,
+            userId: rawUser.userId || rawUser.id,
+            email: rawUser.email,
+            firstName: rawUser.firstName,
+            lastName: rawUser.lastName,
+            systemRole: rawUser.systemRole,
         };
         this.setUser(user);
         this.setCurrentTenant(data.currentTenant);
@@ -114,7 +114,33 @@ export class SessionService {
             { headers: { 'x-tenant-id': this.getCurrentTenant().id }, withCredentials: true }
         );
     }
+
+
     getSession() {
-        return this.http.get(`${environment.middlewareBaseUrl}/api/auth/session`, { withCredentials: true });
+        return this.http.get<any>(
+            `${environment.middlewareBaseUrl}/api/auth/session`,
+            { withCredentials: true }
+        ).pipe(
+            // Normalize API response shape for all components:
+            //   user.systemRole is passed through as-is
+            //   currentTenant  → tenant (alias)
+            switchMap(raw => of(this.normalizeSession(raw))),
+            catchError(err => { throw err; })
+        );
     }
+
+    private normalizeSession(raw: any): any {
+        if (!raw?.success) return raw;
+        const u = raw.user || {};
+        return {
+            ...raw,
+            user: {
+                ...u,
+                userId: u.userId || u.id,
+            },
+            // alias currentTenant → tenant so existing components work
+            tenant: raw.currentTenant || raw.tenant,
+        };
+    }
+
 }

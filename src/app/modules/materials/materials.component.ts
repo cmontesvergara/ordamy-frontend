@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MaterialService } from '../../core/services/material/material.service';
-import { ToastService } from '../../core/services/toast/toast.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
-import { AuthService } from '../../core/services/auth/auth.service';
+import { MaterialService } from '../../core/services/material/material.service';
+import { SessionService } from '../../core/services/session/session.service';
+import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
     selector: 'app-materials',
@@ -27,11 +27,11 @@ export class MaterialsComponent implements OnInit {
         private materialService: MaterialService,
         public config: AppConfigService,
         private toast: ToastService,
-        private authService: AuthService,
+        private sessionService: SessionService,
     ) { }
 
     ngOnInit() {
-        this.authService.getSession().subscribe({
+        this.sessionService.getSession().subscribe({
             next: (session: any) => {
                 const perms = session?.tenant?.permissions || [];
                 if (session?.user?.systemRole === 'admin') {

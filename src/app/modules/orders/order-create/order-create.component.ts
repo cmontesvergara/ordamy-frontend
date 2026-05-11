@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { OrderService } from '../../../core/services/order/order.service';
-import { CustomerService } from '../../../core/services/customer/customer.service';
-import { SettingsService } from '../../../core/services/settings/settings.service';
-import { ProductService } from '../../../core/services/product/product.service';
-import { AuthService } from '../../../core/services/auth/auth.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
-import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
+import { CustomerService } from '../../../core/services/customer/customer.service';
+import { OrderService } from '../../../core/services/order/order.service';
+import { ProductService } from '../../../core/services/product/product.service';
+import { SessionService } from '../../../core/services/session/session.service';
+import { SettingsService } from '../../../core/services/settings/settings.service';
 import { ItemCompositionCalculatorComponent } from '../../../shared/components/material-calculator/item-composition-calculator.component';
-import { OverlayModule } from '@angular/cdk/overlay';
+import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
 
 interface OrderItem {
   description: string;
@@ -22,10 +22,10 @@ interface OrderItem {
 }
 
 @Component({
-    selector: 'app-order-create',
-    imports: [CommonModule, FormsModule, OverlayModule, MaterialCalculatorComponent, ItemCompositionCalculatorComponent],
-    templateUrl: './order-create.component.html',
-    styleUrl: './order-create.component.scss'
+  selector: 'app-order-create',
+  imports: [CommonModule, FormsModule, OverlayModule, MaterialCalculatorComponent, ItemCompositionCalculatorComponent],
+  templateUrl: './order-create.component.html',
+  styleUrl: './order-create.component.scss'
 })
 export class OrderCreateComponent implements OnInit {
   customerSearch = '';
@@ -84,12 +84,12 @@ export class OrderCreateComponent implements OnInit {
     private customerService: CustomerService,
     private settingsService: SettingsService,
     private productService: ProductService,
-    private authService: AuthService,
+    private sessionService: SessionService,
     public config: AppConfigService,
   ) { }
 
   ngOnInit() {
-    this.authService.getSession().subscribe({
+    this.sessionService.getSession().subscribe({
       next: (session: any) => {
         if (session?.user) {
           this.sellerDisplayName = `${session.user.firstName} ${session.user.lastName}`;
@@ -244,7 +244,7 @@ export class OrderCreateComponent implements OnInit {
     this.showCompositionCalc = true;
   }
 
-  onCompositionApplied(data: {materials: any[], unitPrice: number}) {
+  onCompositionApplied(data: { materials: any[], unitPrice: number }) {
     if (this.compItemIndex >= 0 && this.compItemIndex < this.items.length) {
       this.items[this.compItemIndex].unitPrice = data.unitPrice;
       this.items[this.compItemIndex].composition = data.materials;

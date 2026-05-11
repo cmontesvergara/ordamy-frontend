@@ -1,24 +1,24 @@
-import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 import { OrderService } from '../../../core/services/order/order.service';
 import { PaymentService } from '../../../core/services/payment/payment.service';
-import { SettingsService } from '../../../core/services/settings/settings.service';
 import { ProductService } from '../../../core/services/product/product.service';
-import { AppConfigService } from '../../../core/services/app-config/app-config.service';
+import { SessionService } from '../../../core/services/session/session.service';
+import { SettingsService } from '../../../core/services/settings/settings.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import { extractDateFromISO } from '../../../shared/utils/date-utils';
-import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
 import { ItemCompositionCalculatorComponent } from '../../../shared/components/material-calculator/item-composition-calculator.component';
-import { OverlayModule } from '@angular/cdk/overlay';
+import { MaterialCalculatorComponent } from '../../../shared/components/material-calculator/material-calculator.component';
+import { extractDateFromISO } from '../../../shared/utils/date-utils';
 
 @Component({
-    selector: 'app-order-detail',
-    imports: [CommonModule, FormsModule, RouterLink, OverlayModule, MaterialCalculatorComponent, ItemCompositionCalculatorComponent],
-    templateUrl: './order-detail.component.html',
-    styleUrl: './order-detail.component.scss'
+  selector: 'app-order-detail',
+  imports: [CommonModule, FormsModule, RouterLink, OverlayModule, MaterialCalculatorComponent, ItemCompositionCalculatorComponent],
+  templateUrl: './order-detail.component.html',
+  styleUrl: './order-detail.component.scss'
 })
 export class OrderDetailComponent implements OnInit {
   order: any = null;
@@ -90,7 +90,7 @@ export class OrderDetailComponent implements OnInit {
     private paymentService: PaymentService,
     private settingsService: SettingsService,
     private productService: ProductService,
-    private authService: AuthService,
+    private sessionService: SessionService,
     private el: ElementRef,
     public config: AppConfigService,
     private toast: ToastService,
@@ -102,13 +102,13 @@ export class OrderDetailComponent implements OnInit {
     this.settingsService.getPaymentMethods().subscribe({
       next: (res: any) => { this.paymentMethods = res.data; },
     });
-    this.authService.getSession().subscribe({
+    this.sessionService.getSession().subscribe({
       next: (session: any) => {
         const perms = session?.tenant?.permissions || [];
         const isAdmin = session?.user?.systemRole === 'admin';
         this.canApplyDiscount = isAdmin || perms.some((p: any) => p.resource === 'orders' && p.action === 'apply_discount');
-        this.canCancel        = isAdmin || perms.some((p: any) => p.resource === 'orders'   && p.action === 'cancel');
-        this.canAddPayment    = isAdmin || perms.some((p: any) => p.resource === 'payments' && p.action === 'create');
+        this.canCancel = isAdmin || perms.some((p: any) => p.resource === 'orders' && p.action === 'cancel');
+        this.canAddPayment = isAdmin || perms.some((p: any) => p.resource === 'payments' && p.action === 'create');
         this.requireComposition = perms.some((p: any) => p.resource === 'orders' && p.action === 'require_composition');
       }
     });
@@ -332,7 +332,7 @@ export class OrderDetailComponent implements OnInit {
     this.showCompositionCalc = true;
   }
 
-  onCompositionApplied(data: {materials: any[], unitPrice: number}) {
+  onCompositionApplied(data: { materials: any[], unitPrice: number }) {
     if (this.compItemIndex >= 0 && this.compItemIndex < this.editOrderData.items.length) {
       this.editOrderData.items[this.compItemIndex].unitPrice = data.unitPrice;
       this.editOrderData.items[this.compItemIndex].composition = data.materials;

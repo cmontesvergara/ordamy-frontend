@@ -6,7 +6,6 @@ import { filter, takeUntil } from 'rxjs/operators';
 import packageJson from '../../../../package.json';
 import { environment } from '../../../environments/environment';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
-import { AuthService } from '../../core/services/auth/auth.service';
 import { SessionService } from '../../core/services/session/session.service';
 import { Tenant, TenantSelectorComponent } from '../../shared/components/tenant-selector.component';
 
@@ -55,30 +54,25 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
   ];
 
   constructor(
-    private authService: AuthService,
+    private authService: SessionService,
     private router: Router,
     private appConfig: AppConfigService,
     private sessionService: SessionService,
   ) { }
 
-  // @HostListener('window:beforeunload', ['$event'])
-  // async onBeforeUnload(event: BeforeUnloadEvent) {
-  //   await this.authService.refreshTokens();
-  //   event.preventDefault();
-  //   event.returnValue = true; // Modern browsers require a value to be set
-  // }
+
 
   ngOnInit() {
-    const userSession     = this.sessionService.getUser();
-    const currentTenant   = this.sessionService.getCurrentTenant();
-    const relatedTenants  = this.sessionService.getRelatedTenants();
+    const userSession = this.sessionService.getUser();
+    const currentTenant = this.sessionService.getCurrentTenant();
+    const relatedTenants = this.sessionService.getRelatedTenants();
 
     if (userSession) {
       this.userName = `${userSession.firstName || ''} ${userSession.lastName || ''}`.trim() || userSession.userId;
     }
 
     if (currentTenant) {
-      this.tenantName    = currentTenant.name;
+      this.tenantName = currentTenant.name;
       // Pass currentTenant to the selector so it's auto-highlighted
       this.currentTenant = currentTenant;
     }
@@ -119,16 +113,7 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.authService.handleLogout();
-        window.location.href = '/';
-      },
-      error: () => {
-        this.authService.handleLogout();
-        window.location.href = '/';
-      },
-    });
+    this.sessionService.clearSession()
   }
 
   onTouchStart(e: TouchEvent) {

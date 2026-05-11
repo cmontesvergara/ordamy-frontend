@@ -1,17 +1,17 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import { AuthService } from '../services/auth/auth.service';
+import { SessionService } from '../services/session/session.service';
 import { ToastService } from '../services/toast/toast.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const toastService = inject(ToastService);
-    const authService = inject(AuthService);
+    const sessionService = inject(SessionService);
 
     return next(req).pipe(
         catchError((error) => {
             if (error.status === 401) {
-                authService.clearSession();
+                sessionService.clearSession();
                 toastService.warning('Sesión expirada', 'Por favor, inicia sesión nuevamente.');
             } else if (error.status === 403) {
                 toastService.warning('Acceso denegado', 'No tienes permisos para realizar esta acción.');
