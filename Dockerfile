@@ -1,6 +1,6 @@
 # Etapa 1: Construcción
 FROM public.ecr.aws/docker/library/node:20 AS build
-ARG CACHEBUST=0
+ARG CACHEBUST=1
 WORKDIR /app
 
 # Copiar solo package.json (sin lockfile para evitar bug npm optional deps)
