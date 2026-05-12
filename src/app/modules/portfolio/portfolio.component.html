@@ -1,6 +1,11 @@
 <div class="page-header">
   <h1>Cartera</h1>
-  <button class="btn btn-outline" (click)="printPortfolio()">Imprimir</button>
+  <div class="actions">
+    <button class="btn btn-primary" (click)="downloadPdf()" [disabled]="loading">
+      <i class="fi fi-rr-download" style="margin-right: 6px;"></i>
+      {{ loading ? 'Generando...' : 'Descargar PDF' }}
+    </button>
+  </div>
 </div>
 
 <!-- Filters (CA1) -->

@@ -22,6 +22,16 @@ export class ReportService {
         return this.http.get<any>(`${this.url}/portfolio`, { params: httpParams, withCredentials: true });
     }
 
+    downloadPortfolioPdf(params: any = {}) {
+        let httpParams = new HttpParams();
+        Object.keys(params).forEach((key) => {
+            if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+                httpParams = httpParams.set(key, params[key]);
+            }
+        });
+        return this.http.get(`${this.url}/portfolio/pdf`, { params: httpParams, responseType: 'blob', withCredentials: true });
+    }
+
     getDaily(date?: string) {
         let params = new HttpParams();
         if (date) params = params.set('date', date);

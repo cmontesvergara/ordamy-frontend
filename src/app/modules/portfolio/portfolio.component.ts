@@ -117,8 +117,30 @@ export class PortfolioComponent implements OnInit {
     this.loadPortfolio();
   }
 
-  // CA2: Print
-  printPortfolio() {
-    window.print();
+  // CA2: Download PDF
+
+  downloadPdf() {
+    this.loading = true;
+    this.reportService.downloadPortfolioPdf({
+      dateFrom: this.dateFrom,
+      dateTo: this.dateTo,
+      customerId: this.selectedCustomer?.id,
+      status: this.statusFilter
+    }).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const dateStr = new Date().toISOString().split('T')[0];
+        a.download = `reporte-cartera-${dateStr}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error downloading portfolio PDF:', err);
+        this.loading = false;
+      }
+    });
   }
 }
