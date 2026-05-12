@@ -109,21 +109,64 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     console.log('[AuthInterceptor] Refresh exitoso:', response);
                     
                     if (response?.tokens?.accessToken) {
-                        // Guardar nuevo token
+                        // Primero guardar el access token para que las peticiones subsiguientes funcionen
                         sessionService.setAccessToken(response.tokens.accessToken);
                         
-                        // Notificar éxito
-                        refreshSubject?.next(response.tokens.accessToken);
-                        refreshSubject?.complete();
-                        resetRefreshState();
-
-                        // Reintentar request original
-                        const retryReq = req.clone({
-                            setHeaders: {
-                                Authorization: `Bearer ${response.tokens.accessToken}`,
-                            },
-                        });
-                        return next(retryReq);
+                        // Sincronizar el resto de la sesión (user, tenant, permissions)
+                        return sessionService.getSession().pipe(
+                            switchMap((sessionData: any) => {
+                                if (sessionData?.success) {
+                                    const userToSet = sessionData.user || {};
+                                    // Asegurar userId para compatibilidad
+                                    const normalizedUser = {
+                                        ...userToSet,
+                                        userId: userToSet.userId || userToSet.id
+                                    };
+                                    sessionService.setUser(normalizedUser);
+                                    
+                                    const tenant = sessionData.tenant || sessionData.currentTenant;
+                                    if (tenant) {
+                                        sessionService.setCurrentTenant(tenant);
+                                    }
+                                    
+                                    if (tenant?.permissions) {
+                                        sessionService.setPermissions(tenant.permissions);
+                                    }
+                                    
+                                    if (sessionData.relatedTenants) {
+                                        sessionService.setRelatedTenants(sessionData.relatedTenants);
+                                    }
+                                }
+                                
+                                // Notificar éxito independientemente de si getSession falló, 
+                                // pues ya tenemos el accessToken
+                                refreshSubject?.next(response.tokens.accessToken);
+                                refreshSubject?.complete();
+                                resetRefreshState();
+        
+                                // Reintentar request original
+                                const retryReq = req.clone({
+                                    setHeaders: {
+                                        Authorization: `Bearer ${response.tokens.accessToken}`,
+                                    },
+                                });
+                                return next(retryReq);
+                            }),
+                            catchError((sessionError) => {
+                                console.warn('[AuthInterceptor] getSession falló tras refresh, usando datos parciales:', sessionError);
+                                // Aunque falle getSession, ya tenemos token nuevo, notificar y continuar
+                                refreshSubject?.next(response.tokens.accessToken);
+                                refreshSubject?.complete();
+                                resetRefreshState();
+        
+                                const retryReq = req.clone({
+                                    setHeaders: {
+                                        Authorization: `Bearer ${response.tokens.accessToken}`,
+                                    },
+                                });
+                                return next(retryReq);
+                            })
+                        );
                     }
 
                     // No hay token en respuesta

@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
+import { catchError, map, of, switchMap } from 'rxjs';
 import { SessionService } from '../../services/session/session.service';
 
 export const isLoggedGuard: CanActivateFn = (route, state) => {
@@ -13,22 +13,43 @@ export const isLoggedGuard: CanActivateFn = (route, state) => {
         return true;
     }
 
-    // Si no hay sesión en memoria, intentar recuperarla del servidor
-    console.log('[IsLoggedGuard] Sin sesión en memoria. Intentando recuperar del servidor...');
-    return sessionService.getSession().pipe(
-        map((response: any) => {
-            if (response?.user && response?.tokens?.accessToken) {
-                console.log('[IsLoggedGuard] Sesión recuperada. Setup y permitiendo acceso.');
-                sessionService.setupSession(response);
-                return true;
+    // Si no hay sesión en memoria, intentar recuperarla:
+    // 1. Refrescar tokens para obtener un access token
+    // 2. Obtener los datos de la sesión (user, tenant, etc)
+    console.log('[IsLoggedGuard] Sin sesión en memoria. Intentando refrescar token...');
+    return sessionService.refreshTokens().pipe(
+        switchMap((refreshRes: any) => {
+            if (!refreshRes?.tokens?.accessToken) {
+                console.warn('[IsLoggedGuard] No se pudo obtener access token. Redirigiendo a login.');
+                router.navigate(['/']);
+                return of(false);
             }
-            // Respuesta inválida, redirigir
-            console.warn('[IsLoggedGuard] Respuesta de sesión inválida. Redirigiendo a login.');
-            router.navigate(['/']);
-            return false;
+            // Guardar token temporalmente en memoria para que getSession() u otros requests funcionen si lo necesitan,
+            // aunque getSession usa cookies de todas formas.
+            sessionService.setAccessToken(refreshRes.tokens.accessToken);
+
+            console.log('[IsLoggedGuard] Token obtenido. Recuperando datos de sesión...');
+            return sessionService.getSession().pipe(
+                map((sessionRes: any) => {
+                    if (sessionRes?.user) {
+                        console.log('[IsLoggedGuard] Sesión recuperada. Setup y permitiendo acceso.');
+                        // Construir el objeto completo que espera setupSession
+                        const fullSession = {
+                            ...sessionRes,
+                            tokens: refreshRes.tokens,
+                            currentTenant: sessionRes.currentTenant || sessionRes.tenant
+                        };
+                        sessionService.setupSession(fullSession);
+                        return true;
+                    }
+                    console.warn('[IsLoggedGuard] Respuesta de sesión inválida. Redirigiendo a login.');
+                    router.navigate(['/']);
+                    return false;
+                })
+            );
         }),
         catchError((error) => {
-            console.error('[IsLoggedGuard] Error al recuperar sesión:', error);
+            console.error('[IsLoggedGuard] Error al recuperar sesión/tokens:', error);
             router.navigate(['/']);
             return of(false);
         })
