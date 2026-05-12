@@ -65,8 +65,10 @@ export class ReportsComponent implements OnInit {
 
     request$.subscribe({
       next: (blob: Blob) => {
-        const fileURL = URL.createObjectURL(blob);
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const fileURL = URL.createObjectURL(pdfBlob);
         window.open(fileURL, '_blank');
+        setTimeout(() => URL.revokeObjectURL(fileURL), 10000);
       },
       error: () => this.toast.error('Error', 'No se pudo generar el PDF')
     });

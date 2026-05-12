@@ -269,9 +269,11 @@ export class OrderDetailComponent implements OnInit {
     const title = mode === 'production' ? 'Voucher de Producción' : 'Cuenta de Cobro';
     this.toast.show('info', 'Generando', `Descargando ${title}...`);
     this.orderService.downloadPdf(this.order.id, mode).subscribe({
-      next: (blob: Blob) => {
-        const fileURL = URL.createObjectURL(blob);
+      next: (blob) => {
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const fileURL = URL.createObjectURL(pdfBlob);
         window.open(fileURL, '_blank');
+        setTimeout(() => URL.revokeObjectURL(fileURL), 10000);
       },
       error: () => this.toast.error('Error', 'No se pudo generar el PDF')
     });

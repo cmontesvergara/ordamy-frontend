@@ -67,25 +67,35 @@ export class ExpensesComponent implements OnInit {
         this.expenses = res.data || [];
         this.total = res.total || 0;
         this.loading = false;
-
-        // Load attachments for each expense
-        this.expenses.forEach(expense => {
-          if (expense.id) {
-            this.loadAttachmentsForExpense(expense);
-          }
-        });
+        // Attachments are NOT pre-loaded here — they are fetched on-demand
+        // when the user clicks the icon or opens the edit modal.
       },
       error: () => { this.loading = false; },
     });
   }
 
-  loadAttachmentsForExpense(expense: any) {
+  /**
+   * Called when the user clicks the attachment icon in the table row.
+   * Loads attachments on-demand (single request) then opens the first one.
+   */
+  viewAttachmentForExpense(expense: any, event: Event) {
+    event.stopPropagation();
+    // If already loaded (e.g. user re-clicks), open directly
+    if (expense.attachments && expense.attachments.length > 0) {
+      this.viewAttachment(expense.attachments[0]);
+      return;
+    }
     this.expenseService.getAttachments(expense.id).subscribe({
       next: (res: any) => {
         expense.attachments = res.data || [];
+        if (expense.attachments.length > 0) {
+          this.viewAttachment(expense.attachments[0]);
+        } else {
+          this.toastService.warning('Sin soporte', 'Este egreso no tiene soportes adjuntos.');
+        }
       },
       error: () => {
-        expense.attachments = [];
+        this.toastService.error('Error', 'No se pudo cargar el soporte.');
       }
     });
   }

@@ -128,7 +128,8 @@ export class PortfolioComponent implements OnInit {
       status: this.statusFilter
     }).subscribe({
       next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(pdfBlob);
         window.open(url, '_blank');
         // Revoke after a delay to ensure the new tab has time to load it
         setTimeout(() => window.URL.revokeObjectURL(url), 10000);
