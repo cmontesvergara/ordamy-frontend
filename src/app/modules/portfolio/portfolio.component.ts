@@ -129,12 +129,9 @@ export class PortfolioComponent implements OnInit {
     }).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const dateStr = new Date().toISOString().split('T')[0];
-        a.download = `reporte-cartera-${dateStr}.pdf`;
-        a.click();
-        window.URL.revokeObjectURL(url);
+        window.open(url, '_blank');
+        // Revoke after a delay to ensure the new tab has time to load it
+        setTimeout(() => window.URL.revokeObjectURL(url), 10000);
         this.loading = false;
       },
       error: (err) => {
