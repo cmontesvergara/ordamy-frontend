@@ -183,7 +183,20 @@ export class SessionService {
         // El refresh necesita las cookies de sesión Y el x-tenant-id
         // El SDK en el middleware lee x-tenant-id para pasarlo al SSO Core
         // y que éste genere el access token con el tenant/permisos correctos
-        const tenantId = this.currentTenant?.id || '';
+        let tenantId = this.currentTenant?.id || '';
+
+        if (!tenantId) {
+            const token = this.getAccessToken();
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    tenantId = payload['https://bigso.co/tenant_id'] || payload.tenantId || '';
+                } catch (e) {
+                    console.error('[SessionService] Could not parse tenantId from token:', e);
+                }
+            }
+        }
+
         return this.http.post(
             `${environment.middlewareBaseUrl}/api/auth/refresh`,
             {},
