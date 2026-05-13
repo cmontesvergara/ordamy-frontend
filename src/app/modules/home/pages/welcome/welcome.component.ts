@@ -34,7 +34,7 @@ export class WelcomeComponent implements OnInit {
     ) {
         // Sanitize the SSO iframe URL for embedding
         const baseUrl = environment.ssoPortalUrl || 'https://sso.bigso.test';
-        this.ssoSignUpUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`${baseUrl}/auth/iframe-sign-up`);
+        this.ssoSignUpUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`${baseUrl}/auth/iframe-sign-up?appName=Ordamy`);
     }
 
     ngOnInit() {
