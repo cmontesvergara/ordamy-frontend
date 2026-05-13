@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="co">
 
 <head>
   <meta charset="utf-8">
@@ -21,7 +21,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: #f8fafc; /* Light background for the splash */
+      background-color: #f8fafc;
+      /* Light background for the splash */
       z-index: 9999;
       justify-content: center;
       align-items: center;
@@ -39,7 +40,8 @@
       width: 50px;
       height: 50px;
       border: 5px solid rgba(99, 102, 241, 0.2);
-      border-top-color: #6366f1; /* Brand color */
+      border-top-color: #6366f1;
+      /* Brand color */
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
@@ -55,12 +57,21 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.6;
+      }
     }
   </style>
 
