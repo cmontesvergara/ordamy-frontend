@@ -1,18 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../../../src/environments/environment';
 import { Tenant, TenantService } from '../../../../core/services/tenant/tenant.service';
-
 @Component({
     selector: 'app-welcome',
     standalone: true,
     imports: [FormsModule, CommonModule],
     templateUrl: './welcome.component.html',
-    styleUrls: [],
+    styleUrls: ['./welcome.component.scss'],
 })
 export class WelcomeComponent implements OnInit {
+    // SSO Sign-up Iframe
+    showSSOIframe: boolean = false;
+    ssoSignUpUrl: SafeResourceUrl;
+
     // Tenant Search
     tenantSearchQuery: string = '';
     tenantResults: Tenant[] = [];
@@ -25,8 +29,13 @@ export class WelcomeComponent implements OnInit {
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private tenantService: TenantService
-    ) { }
+        private tenantService: TenantService,
+        private sanitizer: DomSanitizer
+    ) {
+        // Sanitize the SSO iframe URL for embedding
+        const baseUrl = environment.ssoPortalUrl || 'https://sso.bigso.test';
+        this.ssoSignUpUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`${baseUrl}/auth/iframe-sign-up`);
+    }
 
     ngOnInit() {
         // Check if there's a stored tenant and redirect automatically
@@ -38,9 +47,12 @@ export class WelcomeComponent implements OnInit {
     }
 
     redirectToSSOSignUp() {
-        // Redirect to SSO registration with OrdAmy app_id
-        const ssoSignUpUrl = `${environment.ssoPortalUrl}/auth/sign-up?client_id=${environment.appId}`;
-        window.location.href = ssoSignUpUrl;
+        // Open SSO sign-up in iframe overlay
+        this.showSSOIframe = true;
+    }
+
+    closeSSOIframe() {
+        this.showSSOIframe = false;
     }
 
     navigateToTenantAuth() {
