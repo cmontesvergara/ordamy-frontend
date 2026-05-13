@@ -113,7 +113,17 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.sessionService.clearSession()
+    this.sessionService.logout().subscribe({
+      next: () => {
+        this.sessionService.clearSession();
+        this.router.navigate(['/']);
+      },
+      error: () => {
+        // Should never reach here (logout() always completes), but just in case
+        this.sessionService.clearSession();
+        this.router.navigate(['/']);
+      }
+    });
   }
 
   onTouchStart(e: TouchEvent) {

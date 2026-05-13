@@ -171,13 +171,37 @@ export class SessionService {
         this.currentTenant = null;
         this.permissions = null;
         this.relatedTenants = [];
-        // Clear from sessionStorage
+        // Clear from sessionStorage (keep localStorage so tenant info survives)
         try {
             sessionStorage.removeItem(STORAGE_KEY);
         } catch (error) {
             console.error('[SessionService] Error clearing storage:', error);
         }
     }
+
+    /**
+     * Full logout: calls the middleware to clear HttpOnly cookies,
+     * clears the local session, and returns an Observable that always completes.
+     * The caller is responsible for redirecting.
+     */
+    logout(): Observable<void> {
+        const accessToken = this.getAccessToken() || '';
+        return this.http.post(
+            `${environment.middlewareBaseUrl}/api/auth/logout`,
+            {},
+            {
+                withCredentials: true,
+                headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+            }
+        ).pipe(
+            switchMap(() => of(void 0)),
+            catchError((err) => {
+                console.warn('[SessionService] Logout HTTP call failed (clearing anyway):', err?.message);
+                return of(void 0);
+            })
+        );
+    }
+
 
     refreshTokens(): Observable<any> {
         // El refresh necesita las cookies de sesión Y el x-tenant-id
