@@ -163,7 +163,7 @@ export class OrgRedirectComponent implements OnInit {
                         jwksUrl: environment.jwksUrl,
                         debug: !environment.production,
                         theme: 'light',
-                        timeout: 60000,
+                        timeout: 300000,
                         redirectUri: `${environment.baseUrl}/auth/callback`,
                         tenantId: decodedTenantId,
                     });
