@@ -20,5 +20,10 @@ export const routes: Routes = [
                 (m) => m.LOGGED_ROUTES,
             ),
     },
+    {
+        path: 'org',
+        loadChildren: () =>
+            import('./modules/public/public.routes').then((m) => m.PUBLIC_ROUTES),
+    },
     { path: '**', redirectTo: 'dashboard' },
 ];

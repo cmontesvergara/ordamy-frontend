@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-background flex flex-col font-inter text-foreground selection:bg-primary/20">
+      
+  <!-- Header -->
+  <header class="sticky top-0 z-50 flex items-center justify-between h-14 px-6 bg-background/80 backdrop-blur-md border-b border-border shadow-sm">
+    <div class="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
+      </svg>
+      Ordamy
+    </div>
+    <div class="text-sm font-semibold tracking-tight text-foreground">{{ tenantInfo?.name || tenantSlug }}</div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 w-full max-w-xl mx-auto px-4 py-8 animate-in fade-in slide-in-from-bottom-4">
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center pt-16">
+      <div class="spinner mb-4"></div>
+      <p class="text-sm text-muted-foreground font-medium">Cargando tus pedidos...</p>
+    </div>
+
+    <!-- Session Missing Error -->
+    <div *ngIf="!loading && sessionMissing" class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-8 text-center">
+      <div class="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 text-muted-foreground">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold tracking-tight mb-2">Sesión expirada</h3>
+      <p class="text-sm text-muted-foreground leading-relaxed mb-6">
+        Tu sesión ha expirado. Vuelve a ingresar tu teléfono para continuar.
+      </p>
+      <button (click)="goBack()" class="inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full max-w-[240px]">
+        Ingresar teléfono
+      </button>
+    </div>
+
+    <!-- Orders List -->
+    <div *ngIf="!loading && !sessionMissing">
+      
+      <button (click)="goBack()" class="mb-6 inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group">
+        <svg class="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        Cambiar teléfono
+      </button>
+
+      <h1 class="text-2xl font-bold tracking-tight text-foreground mb-1">
+        Hola, {{ customerName }}
+      </h1>
+      <p class="text-sm text-muted-foreground mb-6">
+        Tus pedidos en curso con <strong class="text-foreground font-medium">{{ tenantInfo?.name }}</strong>
+      </p>
+
+      <!-- Empty state -->
+      <div *ngIf="orders.length === 0" class="bg-card text-card-foreground border border-border border-dashed shadow-sm rounded-2xl p-8 text-center mt-4">
+        <div class="w-12 h-12 bg-muted text-muted-foreground rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/>
+          </svg>
+        </div>
+        <h3 class="text-base font-bold tracking-tight mb-2">Sin pedidos activos</h3>
+        <p class="text-sm text-muted-foreground leading-relaxed">
+          No tienes pedidos activos en este momento.<br>
+          Si crees que es un error, comunícate con el negocio.
+        </p>
+      </div>
+
+      <!-- List -->
+      <div class="space-y-4">
+        <div
+          *ngFor="let order of paginatedOrders"
+          (click)="viewDetail(order)"
+          (keyup.enter)="viewDetail(order)"
+          role="button"
+          tabindex="0"
+          class="group block bg-card text-card-foreground border border-border shadow-sm hover:shadow-md rounded-2xl p-5 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          <div class="flex justify-between items-start mb-3 gap-4">
+            <div>
+              <div class="font-bold text-foreground text-base tracking-tight">{{ order.orderNumber }}</div>
+              <div class="text-xs font-medium text-muted-foreground mt-0.5">{{ order.createdAt | date:'d MMM yyyy' }}</div>
+            </div>
+            <div class="flex flex-col items-end gap-1.5">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider {{ getOpMeta(order.operationalStatus).bgClass }} {{ getOpMeta(order.operationalStatus).textClass }}">
+                {{ getOpMeta(order.operationalStatus).label }}
+              </span>
+              <span class="inline-flex items-center text-[10px] font-semibold {{ getPaymentColors(order.paymentStatus) }}">
+                {{ getPaymentLabel(order.paymentStatus) }}
+              </span>
+            </div>
+          </div>
+
+          <p class="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-4">
+            {{ order.itemSummary }}
+          </p>
+
+          <div class="pt-4 border-t border-border flex justify-between items-end">
+            <div>
+              <div class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Total</div>
+              <div class="font-bold text-foreground">$ {{ order.total | number:'1.0-0' }}</div>
+              <div *ngIf="order.balance > 0" class="text-xs font-medium text-destructive mt-0.5">
+                Saldo: $ {{ order.balance | number:'1.0-0' }}
+              </div>
+            </div>
+            
+            <div class="text-sm font-semibold text-primary inline-flex items-center group-hover:underline decoration-primary/50 underline-offset-4">
+              Ver detalle
+              <svg class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div *ngIf="totalPages > 1" class="mt-6 flex items-center justify-between border-t border-border pt-6">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+          class="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary border border-border bg-background hover:bg-muted disabled:opacity-50 disabled:pointer-events-none"
+        >
+          <svg class="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+          Anterior
+        </button>
+        <div class="text-sm font-medium text-muted-foreground">
+          Página {{ currentPage }} de {{ totalPages }}
+        </div>
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+          class="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary border border-border bg-background hover:bg-muted disabled:opacity-50 disabled:pointer-events-none"
+        >
+          Siguiente
+          <svg class="ml-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Contact hint -->
+      <div *ngIf="orders.length > 0" class="mt-8 bg-muted/40 rounded-xl p-4 text-center flex flex-col items-center">
+        <p class="text-sm text-muted-foreground mb-3">
+          ¿No ves un pedido? Comunícate con <strong class="text-foreground font-medium">{{ tenantInfo?.name }}</strong>.
+        </p>
+        <a *ngIf="tenantWhatsapp" [href]="'https://wa.me/57' + tenantWhatsapp" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-xs font-semibold text-foreground hover:text-[#25D366] transition-colors bg-background border border-border rounded-lg px-3 py-1.5 shadow-sm">
+          <svg class="w-3.5 h-3.5 text-[#25D366]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
+          </svg>
+          WhatsApp
+        </a>
+      </div>
+
+      <!-- Sell banner -->
+      <div class="mt-8 bg-gradient-to-br from-primary/5 to-transparent border border-border/60 rounded-2xl p-6">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-primary tracking-tight mb-2">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
+          </svg>
+          Ordamy
+        </div>
+        <p class="text-sm text-muted-foreground leading-relaxed mb-4">
+          ¿Tienes un negocio? Tus clientes también pueden consultar el estado de sus pedidos en línea en tiempo real.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <a href="https://ordamy.bigso.co/welcome" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-lg text-xs font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3">
+            Crea tu cuenta gratis
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="py-6 text-center text-[11px] text-muted-foreground font-medium tracking-wide border-t border-border mt-auto bg-card">
+    powered by <a href="https://ordamy.bigso.co" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Bigso Labs</a>
+  </footer>
+</div>

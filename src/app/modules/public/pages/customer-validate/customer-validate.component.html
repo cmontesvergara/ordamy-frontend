@@ -1,0 +1,169 @@
+<div class="min-h-screen bg-background flex flex-col font-inter text-foreground selection:bg-primary/20">
+      
+  <!-- Header -->
+  <header class="sticky top-0 z-50 flex items-center justify-between h-14 px-6 bg-background/80 backdrop-blur-md border-b border-border">
+    <div class="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
+      </svg>
+      Ordamy
+    </div>
+    <div class="text-sm font-semibold tracking-tight text-foreground">{{ tenant?.name || tenantSlug }}</div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 w-full max-w-md mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4">
+    
+    <!-- Loading State -->
+    <div *ngIf="loadingTenant" class="flex flex-col items-center justify-center pt-16">
+      <div class="spinner mb-4"></div>
+      <p class="text-sm text-muted-foreground font-medium">Verificando portal...</p>
+    </div>
+
+    <!-- Error State: Tenant Not Found -->
+    <div *ngIf="!loadingTenant && tenantError" class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-8 text-center">
+      <div class="w-12 h-12 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold tracking-tight mb-2">Portal no disponible</h3>
+      <p class="text-sm text-muted-foreground leading-relaxed">
+        La URL que ingresaste no corresponde a ningún portal activo. Verifica el enlace que te compartieron.
+      </p>
+    </div>
+
+    <!-- Validation Form -->
+    <div *ngIf="!loadingTenant && !tenantError && tenant && !showNoResults" class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-6 md:p-8">
+      
+      <!-- Avatar & Welcome -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm text-xl font-bold tracking-tight">
+          {{ initials }}
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight text-foreground mb-1">
+          Tus pedidos
+        </h1>
+        <p class="text-sm text-muted-foreground">
+          Consulta el estado de tus órdenes en <strong class="text-foreground font-semibold">{{ tenant.name }}</strong>
+        </p>
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-4">
+        <div class="space-y-2">
+          <label for="phone" class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Número de teléfono
+          </label>
+          <input
+            id="phone"
+            class="w-full flex h-11 rounded-xl border border-border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
+            [class.border-destructive]="submitted && !phone"
+            [class.focus-visible:ring-destructive]="submitted && !phone"
+            type="tel"
+            placeholder="Ej. 300 123 4567"
+            [(ngModel)]="phone"
+            (keyup.enter)="validate()"
+            autocomplete="tel"
+            inputmode="numeric"
+            maxlength="15"
+          />
+          <p class="text-[11px] text-muted-foreground leading-relaxed">
+            Ingresa el número sin el código de país (+57).
+          </p>
+          <p *ngIf="submitted && !phone" class="text-xs font-medium text-destructive animate-in fade-in">
+            Ingresa tu número de teléfono.
+          </p>
+          <p *ngIf="apiError" class="text-xs font-medium text-destructive animate-in fade-in">
+            {{ apiError }}
+          </p>
+        </div>
+
+        <button
+          (click)="validate()"
+          [disabled]="loading"
+          class="w-full inline-flex items-center justify-center rounded-xl text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-4 py-2 mt-2 shadow-sm"
+        >
+          <ng-container *ngIf="!loading">
+            Ver mis pedidos
+            <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+            </svg>
+          </ng-container>
+          <ng-container *ngIf="loading">
+            <svg class="w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
+            Buscando...
+          </ng-container>
+        </button>
+      </div>
+    </div>
+
+    <!-- No Results Error State -->
+    <div *ngIf="!loadingTenant && !tenantError && showNoResults" class="mt-6 bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-6 text-center animate-in fade-in slide-in-from-bottom-4">
+      <div class="w-12 h-12 bg-amber-500/10 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold tracking-tight mb-2">No encontramos pedidos</h3>
+      <p class="text-sm text-muted-foreground mb-4">
+        No hay pedidos activos asociados al número en <strong class="text-foreground font-medium">{{ tenant?.name }}</strong>.
+      </p>
+      
+      <div class="bg-muted/50 rounded-xl p-4 text-left mb-6">
+        <h4 class="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
+          <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          Sugerencias
+        </h4>
+        <ul class="text-sm text-muted-foreground space-y-1.5 ml-6 list-disc marker:text-muted-foreground/50">
+          <li>Revisa que el número sea el que dejaste al comprar.</li>
+          <li>No incluyas el código de país (ej. +57).</li>
+        </ul>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <button (click)="reset()" class="inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary border border-border bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+          </svg>
+          Intentar con otro número
+        </button>
+        <a *ngIf="tenantWhatsapp" [href]="'https://wa.me/57' + tenantWhatsapp" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-colors bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 h-10 px-4 py-2">
+          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
+          </svg>
+          Contactar por WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <ng-container *ngTemplateOutlet="sellBanner"></ng-container>
+  </main>
+
+  <!-- Banner powered by Ordamy -->
+  <ng-template #sellBanner>
+    <div *ngIf="!loadingTenant && !tenantError" class="mt-6 bg-gradient-to-br from-primary/5 to-transparent border border-border/60 rounded-2xl p-6 animate-in fade-in">
+      <div class="flex items-center gap-1.5 text-xs font-bold text-primary tracking-tight mb-2">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
+        </svg>
+        Ordamy
+      </div>
+      <p class="text-sm text-muted-foreground leading-relaxed mb-4">
+        ¿Tienes un negocio? <strong>{{ tenant?.name }}</strong> usa Ordamy para gestionar sus pedidos, y por eso tú puedes ver esto.
+      </p>
+      <div class="flex flex-wrap gap-2">
+        <a href="https://ordamy.bigso.co/welcome" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-lg text-xs font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3">
+          Crea tu cuenta gratis
+        </a>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Footer -->
+  <footer class="py-6 text-center text-[11px] text-muted-foreground font-medium tracking-wide">
+    powered by <a href="https://ordamy.bigso.co" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Bigso Labs</a>
+  </footer>
+</div>

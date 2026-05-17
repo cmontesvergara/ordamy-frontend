@@ -1,0 +1,243 @@
+<div class="min-h-screen bg-background flex flex-col font-inter text-foreground selection:bg-primary/20">
+      
+  <!-- Header -->
+  <header class="sticky top-0 z-50 flex items-center justify-between h-14 px-6 bg-background/80 backdrop-blur-md border-b border-border shadow-sm">
+    <div class="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
+      </svg>
+      Ordamy
+    </div>
+    <div class="text-sm font-semibold tracking-tight text-foreground">{{ tenantInfo?.name || tenantSlug }}</div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 w-full max-w-xl mx-auto px-4 py-8 animate-in fade-in slide-in-from-bottom-4">
+    
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center pt-16">
+      <div class="spinner mb-4"></div>
+      <p class="text-sm text-muted-foreground font-medium">Cargando tu pedido...</p>
+    </div>
+
+    <!-- Session Missing -->
+    <div *ngIf="!loading && sessionMissing" class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-8 text-center">
+      <div class="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 text-muted-foreground">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold tracking-tight mb-2">Acceso requerido</h3>
+      <p class="text-sm text-muted-foreground mb-6">Para ver el detalle de este pedido, necesitas validar tu teléfono primero.</p>
+      <button (click)="goToValidate()" class="inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full max-w-[240px]">
+        Validar teléfono
+      </button>
+    </div>
+
+    <!-- Order Not Found -->
+    <div *ngIf="!loading && !sessionMissing && errorState" class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-8 text-center">
+      <div class="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4 text-destructive">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold tracking-tight mb-2">Pedido no encontrado</h3>
+      <p class="text-sm text-muted-foreground mb-6">El enlace expiró o no corresponde a tu cuenta.</p>
+      <button (click)="goToList()" class="inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-colors border border-border hover:bg-muted h-10 px-4 py-2 w-full max-w-[240px]">
+        Ir a mis pedidos
+      </button>
+    </div>
+
+    <!-- Detail View -->
+    <div *ngIf="!loading && !sessionMissing && !errorState && order" class="space-y-6">
+      
+      <button (click)="goToList()" class="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group">
+        <svg class="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        Mis pedidos
+      </button>
+
+      <!-- Status & Title Card -->
+      <div class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl overflow-hidden">
+        <div class="p-5 md:p-6 pb-0">
+          <div class="flex justify-between items-start flex-wrap gap-4 mb-6">
+            <div>
+              <h1 class="text-2xl font-bold tracking-tight text-foreground mb-1">{{ order.orderNumber }}</h1>
+              <p class="text-sm font-medium text-muted-foreground">
+                {{ order.customer.name }} &middot; {{ order.createdAt | date:'d MMM yyyy' }}
+              </p>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider {{ currentOpMeta.bgClass }} {{ currentOpMeta.textClass }}">
+              {{ currentOpMeta.label }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="px-5 md:px-6 pb-6 pt-2">
+          <h3 class="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Progreso del pedido</h3>
+          <div class="flex items-start justify-between relative">
+            <div class="absolute top-[11px] left-[10%] right-[10%] h-[2px] bg-border z-0"></div>
+            <div class="absolute top-[11px] left-[10%] h-[2px] bg-primary z-0 transition-all duration-500 ease-out" [style.width.%]="(currentStepIndex / 4) * 80"></div>
+            
+            <div *ngFor="let step of timelineSteps; let i = index" class="relative z-10 flex flex-col items-center flex-1">
+              <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center bg-card transition-colors duration-300"
+                   [class.border-primary]="i <= currentStepIndex"
+                   [class.border-border]="i > currentStepIndex"
+                   [class.bg-primary]="i <= currentStepIndex"
+                   [class.text-primary-foreground]="i <= currentStepIndex"
+                   [class.text-muted]="i > currentStepIndex">
+                <svg *ngIf="i < currentStepIndex" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                </svg>
+                <div *ngIf="i === currentStepIndex && order.operationalStatus !== 'CANCELLED'" class="w-1.5 h-1.5 bg-current rounded-full"></div>
+                <svg *ngIf="order.operationalStatus === 'CANCELLED' && i === currentStepIndex" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </div>
+              <span class="text-[10px] font-semibold mt-2 text-center"
+                    [class.text-primary]="i === currentStepIndex"
+                    [class.text-foreground]="i < currentStepIndex"
+                    [class.text-muted-foreground]="i > currentStepIndex">
+                {{ step.label }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-muted/30 border-t border-border p-5 md:p-6">
+          <div class="flex gap-3">
+            <svg class="w-5 h-5 text-primary shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+            </svg>
+            <div>
+              <div class="text-sm font-semibold text-foreground mb-1">Estado actual: {{ currentOpMeta.label }}</div>
+              <div class="text-sm text-muted-foreground leading-relaxed">
+                {{ currentOpMeta.explanation }}
+                <br><span class="font-medium mt-1 inline-block text-foreground">{{ currentOpMeta.action }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Card -->
+      <div class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-5 md:p-6">
+        <h3 class="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Estado de pago</h3>
+        
+        <div *ngIf="order.balance > 0" class="mb-5 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex gap-3">
+          <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <div>
+            <div class="text-sm font-bold text-amber-700 mb-0.5">Saldo pendiente de $ {{ order.balance | number:'1.0-0' }}</div>
+            <div class="text-xs text-amber-700/80 leading-relaxed">Comunícate con <strong>{{ tenantInfo?.name }}</strong> para coordinar el pago.</div>
+          </div>
+        </div>
+
+        <div class="space-y-2.5">
+          <div class="flex justify-between text-sm" *ngIf="order.paid > 0">
+            <span class="text-muted-foreground">Pagado</span>
+            <span class="font-medium text-foreground">$ {{ order.paid | number:'1.0-0' }}</span>
+          </div>
+          <div class="flex justify-between text-sm" *ngIf="order.balance > 0">
+            <span class="text-muted-foreground">Saldo pendiente</span>
+            <span class="font-semibold text-destructive">$ {{ order.balance | number:'1.0-0' }}</span>
+          </div>
+          <div class="flex justify-between text-base font-bold pt-3 mt-3 border-t border-border text-foreground">
+            <span>Total del pedido</span>
+            <span>$ {{ order.total | number:'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="order.dueDate" class="mt-5 pt-5 border-t border-border flex items-center justify-between text-sm">
+          <span class="font-semibold text-muted-foreground">Fecha estimada de entrega</span>
+          <span class="font-medium text-foreground">{{ order.dueDate | date:'d MMMM yyyy' }}</span>
+        </div>
+      </div>
+
+      <!-- Items Card -->
+      <div class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-5 md:p-6">
+        <h3 class="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Productos</h3>
+        <div class="divide-y divide-border">
+          <div *ngFor="let item of order.items" class="py-3 first:pt-0 last:pb-0 flex justify-between items-start gap-4">
+            <div>
+              <div class="text-sm font-medium text-foreground leading-snug">{{ item.description }}</div>
+              <div class="text-xs text-muted-foreground mt-1">{{ item.quantity }} × $ {{ item.unitPrice | number:'1.0-0' }}</div>
+            </div>
+            <div class="text-sm font-semibold text-foreground whitespace-nowrap">
+              $ {{ item.lineTotal | number:'1.0-0' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div *ngIf="order.history && order.history.length" class="bg-card text-card-foreground border border-border shadow-sm rounded-2xl p-5 md:p-6">
+        <h3 class="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Historial</h3>
+        <div class="relative pl-3">
+          <div class="absolute left-4 top-2 bottom-0 w-px bg-border"></div>
+          <div *ngFor="let event of order.history" class="relative mb-5 last:mb-0">
+            <div class="absolute left-[3px] top-1.5 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-card z-10"></div>
+            <div class="pl-6">
+              <div class="text-sm font-medium text-foreground leading-snug">{{ translateStatus(event.status) }} &mdash; {{ event.description }}</div>
+              <div class="text-[11px] font-medium text-muted-foreground mt-0.5">{{ event.changedAt | date:'d MMM yyyy, HH:mm' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="bg-muted/40 border border-border/60 rounded-2xl p-5 md:p-6">
+        <h3 class="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-3">¿Necesitas ayuda?</h3>
+        <p class="text-sm text-muted-foreground mb-4">
+          Comunícate directamente con <strong class="text-foreground font-medium">{{ tenantInfo?.name }}</strong>:
+        </p>
+        <div class="space-y-3">
+          <a *ngIf="tenantInfo?.phone" [href]="'tel:' + tenantInfo!.phone" class="flex items-center gap-3 text-sm font-semibold text-foreground hover:text-primary transition-colors bg-background border border-border rounded-xl px-4 py-2.5 shadow-sm">
+            <svg class="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.338c0 5.342 1.908 10.246 5.058 14.077a.75.75 0 001.167.07 18.39 18.39 0 008.45-8.45.75.75 0 00-.07-1.167A18.49 18.49 0 0011.99 6.5c0-.101.002-.203.005-.305A18.443 18.443 0 0010.5 6.3a18.486 18.486 0 00-8.25.038z"/>
+            </svg>
+            {{ tenantInfo!.phone }}
+          </a>
+          <a *ngIf="tenantWhatsapp" [href]="'https://wa.me/57' + tenantWhatsapp" target="_blank" rel="noopener" class="flex items-center gap-3 text-sm font-semibold text-foreground hover:text-[#25D366] transition-colors bg-background border border-border rounded-xl px-4 py-2.5 shadow-sm">
+            <svg class="w-4 h-4 text-[#25D366]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
+            </svg>
+            Escribir por WhatsApp
+          </a>
+          <div *ngIf="!tenantInfo?.phone && !tenantWhatsapp" class="flex items-start gap-3 text-sm text-muted-foreground">
+             <svg class="w-4 h-4 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+            </svg>
+            <span>Por favor, comunícate en el local físico o redes sociales.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sell banner -->
+      <div class="mt-8 bg-gradient-to-br from-primary/5 to-transparent border border-border/60 rounded-2xl p-6">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-primary tracking-tight mb-2">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
+          </svg>
+          Ordamy
+        </div>
+        <p class="text-sm text-muted-foreground leading-relaxed mb-4">
+          <strong>{{ tenantInfo?.name }}</strong> usa Ordamy para gestionar sus pedidos. ¿Tienes un negocio? Usa Ordamy para impresionar a tus clientes con seguimiento en línea.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <a href="https://ordamy.bigso.co/welcome" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-lg text-xs font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3">
+            Crea tu cuenta gratis
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="py-6 text-center text-[11px] text-muted-foreground font-medium tracking-wide border-t border-border mt-auto bg-card">
+    powered by <a href="https://ordamy.bigso.co" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Bigso Labs</a>
+  </footer>
+</div>
