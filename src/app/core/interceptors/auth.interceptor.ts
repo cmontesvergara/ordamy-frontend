@@ -25,9 +25,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const isApiRequest = req.url.startsWith(environment.middlewareBaseUrl);
     const isAuthRequest = req.url.includes('/auth/') || req.url.includes('/api/auth/');
     const isRefreshRequest = req.url.includes('/auth/refresh');
+    const isPublicRequest = req.url.includes('/api/public') || req.url.endsWith('/public');
 
-    // Si no es request a nuestra API, no agregamos token
-    if (!isApiRequest) {
+    // Si no es request a nuestra API, o es un request público, pasamos directo
+    if (!isApiRequest || isPublicRequest) {
         return next(req);
     }
 

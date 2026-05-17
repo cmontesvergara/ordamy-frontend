@@ -8,6 +8,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const toastService = inject(ToastService);
     const sessionService = inject(SessionService);
 
+    const isPublicRequest = req.url.includes('/api/public') || req.url.endsWith('/public');
+
+    // Si es un request público, no interceptamos los errores globales
+    if (isPublicRequest) {
+        return next(req);
+    }
+
     return next(req).pipe(
         catchError((error) => {
             if (error.status === 401) {
