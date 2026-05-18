@@ -2,13 +2,26 @@
       
   <!-- Header -->
   <header class="sticky top-0 z-50 flex items-center justify-between h-14 px-6 bg-background/80 backdrop-blur-md border-b border-border">
+    <button 
+      *ngIf="!loadingTenant && !tenantError" 
+      type="button" 
+      (click)="goBack()" 
+      class="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+    >
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+      </svg>
+      Volver
+    </button>
+    <div *ngIf="loadingTenant || tenantError" class="text-sm font-semibold tracking-tight text-foreground">
+      {{ tenant?.name || tenantSlug }}
+    </div>
     <div class="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
       </svg>
       Ordamy
     </div>
-    <div class="text-sm font-semibold tracking-tight text-foreground">{{ tenant?.name || tenantSlug }}</div>
   </header>
 
   <!-- Main Content -->
@@ -159,7 +172,7 @@
       </div>
       <h3 class="text-lg font-bold tracking-tight mb-2">No encontramos órdenes</h3>
       <p class="text-sm text-muted-foreground mb-4">
-        No hay órdenes activos asociados a este {{ credentialType === 'phone' ? 'teléfono' : 'documento' }} en <strong class="text-foreground font-medium">{{ tenant?.name }}</strong>.
+        No hay órdenes activas asociadas a este {{ credentialType === 'phone' ? 'teléfono' : 'documento' }} en <strong class="text-foreground font-medium">{{ tenant?.name }}</strong>.
       </p>
       
       <div class="bg-muted/50 rounded-xl p-4 text-left mb-6">

@@ -145,6 +145,10 @@ export class CustomerValidateComponent implements OnInit {
     this.document = '';
   }
 
+  goBack(): void {
+    this.router.navigate(['/org', this.tenantSlug]);
+  }
+
   switchCredentialType(): void {
     this.credentialType = this.credentialType === 'phone' ? 'document' : 'phone';
     this.submitted = false;

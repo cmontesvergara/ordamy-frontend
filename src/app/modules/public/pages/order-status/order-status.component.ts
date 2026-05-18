@@ -127,7 +127,7 @@ export class OrderStatusComponent implements OnInit {
   }
 
   goToValidate(): void {
-    this.router.navigate(['/org', this.tenantSlug]);
+    this.router.navigate(['/org', this.tenantSlug, 'consultar']);
   }
 
   get tenantWhatsapp(): string | null {
