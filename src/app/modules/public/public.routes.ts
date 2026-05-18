@@ -10,12 +10,12 @@ export const PUBLIC_ROUTES: Routes = [
           import('./pages/customer-validate/customer-validate.component').then(m => m.CustomerValidateComponent),
       },
       {
-        path: 'pedidos',
+        path: 'ordenes',
         loadComponent: () =>
           import('./pages/order-list/order-list.component').then(m => m.OrderListComponent),
       },
       {
-        path: 'pedidos/:orderId',
+        path: 'ordenes/:orderId',
         loadComponent: () =>
           import('./pages/order-status/order-status.component').then(m => m.OrderStatusComponent),
       },

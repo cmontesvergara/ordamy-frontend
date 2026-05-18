@@ -13,27 +13,27 @@ const STEPS = ['PENDING', 'APPROVED', 'IN_PRODUCTION', 'PRODUCED', 'DELIVERED'];
 const OP_META: Record<string, { label: string; bgClass: string; textClass: string; explanation: string; action: string }> = {
   PENDING: {
     label: 'Recibida', bgClass: 'bg-muted', textClass: 'text-muted-foreground',
-    explanation: 'Tu pedido fue registrado exitosamente y está en espera de que el equipo lo revise y apruebe.',
+    explanation: 'Tu orden fue registrado exitosamente y está en espera de que el equipo lo revise y apruebe.',
     action: 'No necesitas hacer nada ahora. Espera la confirmación.'
   },
   APPROVED: {
     label: 'Aprobada', bgClass: 'bg-blue-100', textClass: 'text-blue-700',
-    explanation: 'Tu pedido fue revisado y aprobado. Está listo para iniciar producción.',
+    explanation: 'Tu orden fue revisado y aprobado. Está listo para iniciar producción.',
     action: 'Si tienes saldo pendiente, este es el mejor momento para coordinarlo.'
   },
   IN_PRODUCTION: {
     label: 'En producción', bgClass: 'bg-indigo-100', textClass: 'text-indigo-700',
-    explanation: 'El equipo está fabricando tu pedido activamente en este momento.',
+    explanation: 'El equipo está fabricando tu orden activamente en este momento.',
     action: 'No necesitas hacer nada. Pronto recibirás aviso cuando esté listo.'
   },
   PRODUCED: {
     label: 'Lista para entrega', bgClass: 'bg-emerald-100', textClass: 'text-emerald-700',
-    explanation: '¡Tu pedido está terminado! Solo falta coordinar la entrega o el recogido.',
-    action: 'Comunícate para coordinar cuándo y cómo recibes tu pedido.'
+    explanation: '¡Tu orden está terminado! Solo falta coordinar la entrega o el recogido.',
+    action: 'Comunícate para coordinar cuándo y cómo recibes tu orden.'
   },
   DELIVERED: {
     label: 'Entregada', bgClass: 'bg-emerald-100', textClass: 'text-emerald-700',
-    explanation: 'Tu pedido fue entregado exitosamente. Esperamos que estés muy satisfecho.',
+    explanation: 'Tu orden fue entregado exitosamente. Esperamos que estés muy satisfecho.',
     action: '¡Gracias por tu confianza! Esperamos verte pronto de nuevo.'
   },
   CANCELLED: {
@@ -80,17 +80,18 @@ export class OrderStatusComponent implements OnInit {
     this.tenantSlug = this.route.snapshot.paramMap.get('tenantSlug') || '';
     this.orderId    = this.route.snapshot.paramMap.get('orderId') || '';
 
-    const phone    = sessionStorage.getItem(`tracker_phone_${this.tenantSlug}`);
+    const phone = sessionStorage.getItem(`tracker_phone_${this.tenantSlug}`);
+    const document = sessionStorage.getItem(`tracker_document_${this.tenantSlug}`);
     const tenantRaw = sessionStorage.getItem(`tracker_tenant_${this.tenantSlug}`);
     if (tenantRaw) { try { this.tenantInfo = JSON.parse(tenantRaw); } catch {} }
 
-    if (!phone) {
+    if (!phone && !document) {
       this.loading = false;
       this.sessionMissing = true;
       return;
     }
 
-    this.publicOrderService.getOrderDetail(this.tenantSlug, this.orderId, phone).subscribe({
+    this.publicOrderService.getOrderDetail(this.tenantSlug, this.orderId, phone ?? undefined, document ?? undefined).subscribe({
       next: (res) => {
         this.loading = false;
         if (res.success && res.order) {
@@ -122,7 +123,7 @@ export class OrderStatusComponent implements OnInit {
   }
 
   goToList(): void {
-    this.router.navigate(['/org', this.tenantSlug, 'pedidos']);
+    this.router.navigate(['/org', this.tenantSlug, 'ordenes']);
   }
 
   goToValidate(): void {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
@@ -68,22 +68,30 @@ export class PublicOrderService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Validate customer by phone and get all their active orders
+   * Validate customer by phone or document and get all their active orders
    */
-  getCustomerOrders(tenantSlug: string, phone: string): Observable<CustomerOrdersResponse> {
+  getCustomerOrders(tenantSlug: string, phone?: string, document?: string): Observable<CustomerOrdersResponse> {
+    let params = new HttpParams();
+    if (phone) { params = params.set('phone', phone); }
+    if (document) { params = params.set('document', document); }
+    
     return this.http.get<CustomerOrdersResponse>(
       `${this.base}/${tenantSlug}/orders`,
-      { params: { phone } }
+      { params }
     );
   }
 
   /**
-   * Get full detail of a specific order — re-validates phone
+   * Get full detail of a specific order — re-validates phone or document
    */
-  getOrderDetail(tenantSlug: string, orderId: string, phone: string): Observable<OrderDetailResponse> {
+  getOrderDetail(tenantSlug: string, orderId: string, phone?: string, document?: string): Observable<OrderDetailResponse> {
+    let params = new HttpParams();
+    if (phone) { params = params.set('phone', phone); }
+    if (document) { params = params.set('document', document); }
+    
     return this.http.get<OrderDetailResponse>(
       `${this.base}/${tenantSlug}/orders/${orderId}`,
-      { params: { phone } }
+      { params }
     );
   }
 }

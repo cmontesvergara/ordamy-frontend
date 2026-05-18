@@ -48,9 +48,10 @@ export class OrderListComponent implements OnInit {
   ngOnInit(): void {
     this.tenantSlug = this.route.snapshot.paramMap.get('tenantSlug') || '';
     const phone = sessionStorage.getItem(`tracker_phone_${this.tenantSlug}`);
+    const document = sessionStorage.getItem(`tracker_document_${this.tenantSlug}`);
     const tenantRaw = sessionStorage.getItem(`tracker_tenant_${this.tenantSlug}`);
 
-    if (!phone) {
+    if (!phone && !document) {
       this.loading = false;
       this.sessionMissing = true;
       return;
@@ -61,7 +62,7 @@ export class OrderListComponent implements OnInit {
       try { this.tenantInfo = JSON.parse(tenantRaw); } catch {}
     }
 
-    this.publicOrderService.getCustomerOrders(this.tenantSlug, phone).subscribe({
+    this.publicOrderService.getCustomerOrders(this.tenantSlug, phone || '', document || '').subscribe({
       next: (res) => {
         this.loading = false;
         if (res.success) {
@@ -101,11 +102,12 @@ export class OrderListComponent implements OnInit {
   }
 
   viewDetail(order: PublicOrderSummary): void {
-    this.router.navigate(['/org', this.tenantSlug, 'pedidos', order.id]);
+    this.router.navigate(['/org', this.tenantSlug, 'ordenes', order.id]);
   }
 
   goBack(): void {
     sessionStorage.removeItem(`tracker_phone_${this.tenantSlug}`);
+    sessionStorage.removeItem(`tracker_document_${this.tenantSlug}`);
     sessionStorage.removeItem(`tracker_customer_${this.tenantSlug}`);
     this.router.navigate(['/org', this.tenantSlug]);
   }

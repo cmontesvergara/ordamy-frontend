@@ -17,7 +17,7 @@
     <!-- Loading -->
     <div *ngIf="loading" class="flex flex-col items-center justify-center pt-16">
       <div class="spinner mb-4"></div>
-      <p class="text-sm text-muted-foreground font-medium">Cargando tu pedido...</p>
+      <p class="text-sm text-muted-foreground font-medium">Cargando tu orden...</p>
     </div>
 
     <!-- Session Missing -->
@@ -28,7 +28,7 @@
         </svg>
       </div>
       <h3 class="text-lg font-bold tracking-tight mb-2">Acceso requerido</h3>
-      <p class="text-sm text-muted-foreground mb-6">Para ver el detalle de este pedido, necesitas validar tu teléfono primero.</p>
+      <p class="text-sm text-muted-foreground mb-6">Para ver el detalle de este orden, necesitas validar tu teléfono primero.</p>
       <button (click)="goToValidate()" class="inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full max-w-[240px]">
         Validar teléfono
       </button>
@@ -41,10 +41,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
         </svg>
       </div>
-      <h3 class="text-lg font-bold tracking-tight mb-2">Pedido no encontrado</h3>
+      <h3 class="text-lg font-bold tracking-tight mb-2">Orden no encontrado</h3>
       <p class="text-sm text-muted-foreground mb-6">El enlace expiró o no corresponde a tu cuenta.</p>
       <button (click)="goToList()" class="inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-colors border border-border hover:bg-muted h-10 px-4 py-2 w-full max-w-[240px]">
-        Ir a mis pedidos
+        Ir a mis órdenes
       </button>
     </div>
 
@@ -55,7 +55,7 @@
         <svg class="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
         </svg>
-        Mis pedidos
+        Mis órdenes
       </button>
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
@@ -81,7 +81,7 @@
 
         <!-- Timeline -->
         <div class="px-5 md:px-6 pb-6 pt-2">
-          <h3 class="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Progreso del pedido</h3>
+          <h3 class="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Progreso del orden</h3>
           <div class="flex items-start justify-between relative">
             <div class="absolute top-[11px] left-[10%] right-[10%] h-[2px] bg-border z-0"></div>
             <div class="absolute top-[11px] left-[10%] h-[2px] bg-primary z-0 transition-all duration-500 ease-out" [style.width.%]="(currentStepIndex / 4) * 80"></div>
@@ -187,7 +187,7 @@
               <span class="font-semibold text-destructive">$ {{ order.balance | number:'1.0-0' }}</span>
             </div>
             <div class="flex justify-between text-base font-bold pt-3 mt-3 border-t border-border text-foreground">
-              <span>Total del pedido</span>
+              <span>Total del orden</span>
               <span>$ {{ order.total | number:'1.0-0' }}</span>
             </div>
           </div>
@@ -235,7 +235,7 @@
           Ordamy
         </div>
         <p class="text-sm text-muted-foreground leading-relaxed mb-4">
-          <strong>{{ tenantInfo?.name }}</strong> usa Ordamy para gestionar sus pedidos. ¿Tienes un negocio? Usa Ordamy para impresionar a tus clientes con seguimiento en línea.
+          <strong>{{ tenantInfo?.name }}</strong> usa Ordamy para gestionar sus órdenes. ¿Tienes un negocio? Usa Ordamy para impresionar a tus clientes con seguimiento en línea.
         </p>
         <div class="flex flex-wrap gap-2">
           <a href="https://ordamy.bigso.co/welcome" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-lg text-xs font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3">
