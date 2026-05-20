@@ -316,8 +316,8 @@ export class TenantLandingComponent implements OnInit {
       console.error('[Ordamy] No tenant data available');
       return;
     }
-    // Use the tenant ID from API response (already in base64)
-    const tenantId = this.tenant.id;
-    this.sdkService.login(tenantId);
+    // Decode the base64 tenant ID before passing to SSO
+    const decodedTenantId = this.tenantService.decodeId(this.tenant.id);
+    this.sdkService.login(decodedTenantId);
   }
 }
