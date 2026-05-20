@@ -60,6 +60,7 @@ export interface TenantContact {
 
 
 export interface TenantLandingInfo {
+  id: string;
   name: string;
   slug: string;
   branding: TenantBranding;
@@ -315,8 +316,8 @@ export class TenantLandingComponent implements OnInit {
       console.error('[Ordamy] No tenant data available');
       return;
     }
-    const decodedTenantId = this.tenantService.decodeId(this.tenantSlug);
-    this.sdkService.login(decodedTenantId);
-
+    // Use the tenant ID from API response (already in base64)
+    const tenantId = this.tenant.id;
+    this.sdkService.login(tenantId);
   }
 }
