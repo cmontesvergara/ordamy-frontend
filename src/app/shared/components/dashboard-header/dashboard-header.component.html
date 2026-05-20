@@ -1,0 +1,50 @@
+<!-- Dashboard Header -->
+<header class="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
+    <!-- Left: Logo -->
+    <a href="/" class="flex items-center gap-2">
+      <span class="text-xl font-bold tracking-tight text-slate-900"
+        style="font-size: 16px; letter-spacing: -0.5px;"
+      >ORDAMY</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-400 tracking-wider" style="font-size: 10px; letter-spacing: 0.04em;"
+      >by BIGSO</span>
+    </a>
+
+    <!-- Right: Profile + Logout -->
+    <div class="flex items-center gap-4">
+      @if (showProfile && customerName) {
+        <!-- Profile Badge -->
+        <div class="flex items-center gap-3 pr-4 border-r border-border">
+          <div class="text-right hidden sm:block">
+            <p class="text-sm font-semibold text-foreground">{{ customerName }}</p>
+            <p class="text-xs text-muted-foreground">{{ tenantName }}</p>
+          </div>
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold shadow-lg"
+          >
+            {{ getInitials(customerName) }}
+          </div>
+        </div>
+      }
+
+      @if (showLogout) {
+        <!-- Logout -->
+        <button
+          (click)="onLogout()"
+          class="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+          title="Cerrar sesión"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
+        </button>
+      }
+    </div>
+  </div>
+</header>

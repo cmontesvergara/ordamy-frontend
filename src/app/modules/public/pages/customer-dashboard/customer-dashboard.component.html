@@ -1,0 +1,353 @@
+<div class="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col">
+
+  <!-- Dashboard Header -->
+  <app-dashboard-header
+    [customerName]="customerName"
+    [tenantName]="tenantInfo?.name || ''"
+    (logout)="logout()"
+  ></app-dashboard-header>
+
+  <!-- Main Dashboard -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Welcome Banner -->
+    <div class="mb-8">
+      <div
+        class="bg-gradient-to-r from-primary/10 via-primary/5 to-background rounded-2xl p-6 sm:p-8 border border-primary/20">
+        <div class="flex items-start sm:items-center justify-between gap-4">
+          <div>
+            <p class="text-sm text-primary font-medium mb-1">Bienvenido de vuelta</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-foreground">{{ customerName }}</h1>
+            <p class="text-muted-foreground mt-1">
+              Cliente de <span class="font-semibold text-foreground">{{ tenantInfo?.name }}</span>
+            </p>
+          </div>
+
+          <div class="hidden sm:block text-right">
+            <p class="text-3xl font-bold text-foreground">{{ orders.length }}</p>
+            <p class="text-sm text-muted-foreground">órdenes totales</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-card border border-border rounded-xl p-4 hover:shadow-lg transition-shadow">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-foreground">{{ activeOrdersCount }}</p>
+            <p class="text-xs text-muted-foreground">En proceso</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-card border border-border rounded-xl p-4 hover:shadow-lg transition-shadow">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-foreground">{{ deliveredOrdersCount }}</p>
+            <p class="text-xs text-muted-foreground">Entregadas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-card border border-border rounded-xl p-4 hover:shadow-lg transition-shadow">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-foreground">${{ totalSpent | number:'1.0-0' }}</p>
+            <p class="text-xs text-muted-foreground">Total gastado</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-card border border-border rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer"
+        (click)="goToContact()">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-foreground">Soporte y contacto</p>
+            <p class="text-xs text-muted-foreground">{{ tenantInfo?.name }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Split View: Orders List + Preview -->
+    <div class="grid gap-6 grid-cols-1 lg:grid-cols-5 items-start">
+
+      <!-- Left Column: Orders List -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- Orders Section -->
+        <div class="bg-card border border-border rounded-2xl overflow-hidden h-[500px] flex flex-col">
+          <div class="p-6 border-b border-border flex-shrink-0">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-bold text-foreground">Mis órdenes</h2>
+                <p class="text-sm text-muted-foreground mt-1">Historial de compras con {{ tenantInfo?.name }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-6">
+            <!-- Loading State -->
+            <div *ngIf="loadingOrders" class="space-y-4">
+              <div *ngFor="let i of [1,2,3]" class="animate-pulse">
+                <div class="h-24 bg-muted rounded-xl"></div>
+              </div>
+            </div>
+
+            <!-- Orders List -->
+            <div *ngIf="!loadingOrders">
+              <div *ngFor="let order of paginatedOrders" (click)="viewOrderDetail(order)"
+                class="group bg-card border rounded-xl p-5 cursor-pointer transition-all duration-200 mb-4 last:mb-0"
+                [class.border-border]="selectedOrder?.id !== order.id" [class.ring-2]="selectedOrder?.id === order.id"
+                [class.ring-primary]="selectedOrder?.id === order.id"
+                [class.border-primary]="selectedOrder?.id === order.id">
+                <div class="flex items-start justify-between mb-3">
+                  <div>
+                    <p class="font-semibold text-foreground">Orden #{{ order.orderNumber }}</p>
+                    <p class="text-xs text-muted-foreground">{{ formatDate(order.createdAt) }}</p>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full text-xs font-medium"
+                    [class]="getOpMeta(order.operationalStatus).bgClass + ' ' + getOpMeta(order.operationalStatus).textClass">
+                    {{ getOpMeta(order.operationalStatus).label }}
+                  </span>
+                </div>
+
+                <!-- Items summary -->
+                <div class="mb-3">
+                  <p class="text-sm text-foreground line-clamp-2">{{ order.itemSummary }}</p>
+                </div>
+
+                <!-- Footer: Total + Payment -->
+                <div class="flex items-center justify-between pt-3 border-t border-border">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs" [class]="getPaymentColors(order.paymentStatus)">
+                      {{ getPaymentLabel(order.paymentStatus) }}
+                    </span>
+                    <span *ngIf="order.balance && order.balance > 0" class="text-xs text-muted-foreground">
+                      • Saldo: ${{ order.balance | number:'1.0-0' }}
+                    </span>
+                  </div>
+                  <span class="font-bold text-foreground">${{ order.total | number:'1.0-0' }}</span>
+                </div>
+              </div>
+
+              <!-- Empty State -->
+              <div *ngIf="orders.length === 0" class="text-center py-12">
+                <div class="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-foreground mb-2">Sin órdenes aún</h3>
+                <p class="text-muted-foreground max-w-sm mx-auto">
+                  Cuando realices una compra con {{ tenantInfo?.name }}, aparecerá aquí.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Pagination (always visible at bottom) -->
+          <div *ngIf="!loadingOrders && totalPages > 1" class="p-4 border-t border-border flex-shrink-0">
+            <div class="flex items-center justify-center gap-2">
+              <button (click)="changePage(currentPage - 1); $event.stopPropagation()" [disabled]="currentPage === 1"
+                class="p-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <span class="text-sm text-muted-foreground px-4">
+                Página {{ currentPage }} de {{ totalPages }}
+              </span>
+
+              <button (click)="changePage(currentPage + 1); $event.stopPropagation()"
+                [disabled]="currentPage === totalPages"
+                class="p-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Quick Links (only when no preview) -->
+      <div *ngIf="!selectedOrder" class="lg:col-span-3">
+
+        <div class="bg-muted/40 border border-border/60 rounded-2xl p-5 md:p-6">
+          <h3 class="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-3">¿Necesitas ayuda?</h3>
+          <p class="text-sm text-muted-foreground mb-4">
+            Comunícate directamente con <strong class="text-foreground font-medium">{{ tenantInfo?.name }}</strong>:
+          </p>
+          <div class="space-y-3">
+            <a *ngIf="tenantInfo?.phone" [href]="'tel:' + tenantInfo!.phone"
+              class="flex items-center gap-3 text-sm font-semibold text-foreground hover:text-primary transition-colors bg-background border border-border rounded-xl px-4 py-2.5 shadow-sm">
+              <svg class="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 6.338c0 5.342 1.908 10.246 5.058 14.077a.75.75 0 001.167.07 18.39 18.39 0 008.45-8.45.75.75 0 00-.07-1.167A18.49 18.49 0 0011.99 6.5c0-.101.002-.203.005-.305A18.443 18.443 0 0010.5 6.3a18.486 18.486 0 00-8.25.038z" />
+              </svg>
+              {{ tenantInfo!.phone }}
+            </a>
+            <a *ngIf="tenantWhatsapp" [href]="'https://wa.me/57' + tenantWhatsapp" target="_blank" rel="noopener"
+              class="flex items-center gap-3 text-sm font-semibold text-foreground hover:text-[#25D366] transition-colors bg-background border border-border rounded-xl px-4 py-2.5 shadow-sm">
+              <svg class="w-4 h-4 text-[#25D366]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+              </svg>
+              Escribir por WhatsApp
+            </a>
+            <div *ngIf="!tenantInfo?.phone && !tenantWhatsapp"
+              class="flex items-start gap-3 text-sm text-muted-foreground">
+              <svg class="w-4 h-4 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+              </svg>
+              <span>Por favor, comunícate en el local físico o redes sociales.</span>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="mt-8 bg-gradient-to-br from-primary/5 to-transparent border border-border/60 rounded-2xl p-6">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-primary tracking-tight mb-2">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+            </svg>
+            Ordamy
+          </div>
+          <p class="text-sm text-muted-foreground leading-relaxed mb-4">
+            <strong>{{ tenantInfo?.name }}</strong> usa Ordamy para gestionar sus órdenes. ¿Tienes un negocio? Usa
+            Ordamy para impresionar a tus clientes con seguimiento en línea.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <a href="https://ordamy.bigso.co/welcome" target="_blank" rel="noopener"
+              class="inline-flex items-center justify-center rounded-lg text-xs font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3">
+              Crea tu cuenta gratis
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Preview Panel -->
+      <div *ngIf="selectedOrder" class="lg:col-span-3">
+        <div class="bg-card border border-border rounded-2xl overflow-hidden h-[500px] flex flex-col">
+          <!-- Preview Header -->
+          <div class="p-6 border-b border-border flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-foreground">Orden #{{ selectedOrder.orderNumber }}</h3>
+              <p class="text-sm text-muted-foreground">{{ formatDate(selectedOrder.createdAt) }}</p>
+            </div>
+            <button (click)="closePreview()"
+              class="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              title="Cerrar preview">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Preview Content -->
+          <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Status Badge -->
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1.5 rounded-full text-sm font-medium"
+                [class]="getOpMeta(selectedOrder.operationalStatus).bgClass + ' ' + getOpMeta(selectedOrder.operationalStatus).textClass">
+                {{ getOpMeta(selectedOrder.operationalStatus).label }}
+              </span>
+              <span class="text-sm text-muted-foreground">•</span>
+              <span class="text-sm font-medium" [class]="getPaymentColors(selectedOrder.paymentStatus)">
+                {{ getPaymentLabel(selectedOrder.paymentStatus) }}
+              </span>
+
+
+              <button (click)="goToFullDetail(selectedOrder)"
+                class="ml-auto w-1/3 py-2 px-2 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                <span>Ver mas detalles</span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="bg-muted/50 rounded-xl p-4">
+              <p class="text-sm text-muted-foreground mb-1">Total de la orden</p>
+              <p class="text-3xl font-bold text-foreground">${{ selectedOrder.total | number:'1.0-0' }}</p>
+              <div *ngIf="selectedOrder.balance && selectedOrder.balance > 0"
+                class="mt-2 pt-2 border-t border-border/50">
+                <p class="text-sm text-muted-foreground">
+                  Saldo pendiente: <span class="font-semibold text-destructive">${{ selectedOrder.balance |
+                    number:'1.0-0' }}</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Item Description -->
+            <div>
+              <p class="text-sm font-medium text-muted-foreground mb-2">Descripción</p>
+              <p class="text-foreground">{{ selectedOrder.itemSummary }}</p>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-muted/30 rounded-lg p-3">
+                <p class="text-xs text-muted-foreground mb-1">Estado de entrega</p>
+                <p class="text-sm font-medium text-foreground">{{ getOpMeta(selectedOrder.operationalStatus).label }}
+                </p>
+              </div>
+              <div class="bg-muted/30 rounded-lg p-3">
+                <p class="text-xs text-muted-foreground mb-1">Estado de pago</p>
+                <p class="text-sm font-medium" [class]="getPaymentColors(selectedOrder.paymentStatus)">
+                  {{ getPaymentLabel(selectedOrder.paymentStatus) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-6 text-center text-sm text-muted-foreground border-t border-border bg-card">
+    <p>powered by <a href="https://ordamy.bigso.co" target="_blank" rel="noopener"
+        class="text-primary hover:underline">Bigso Labs</a></p>
+  </footer>
+</div>

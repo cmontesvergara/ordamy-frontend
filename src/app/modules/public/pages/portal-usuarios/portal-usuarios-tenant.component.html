@@ -1,0 +1,255 @@
+<!-- Header Component -->
+<app-public-header 
+    [ctas]="headerCtas"
+    (ctaClick)="onHeaderCta($event)"></app-public-header>
+
+<main>
+
+    <!-- ESTADO: Loading (cargando tenant) -->
+    <section *ngIf="viewState === 'loading'" style="min-height: calc(100vh - 64px); padding-top: 60px;"
+        class="flex flex-col justify-center">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style="border-color: #e05a20;"></div>
+            <p class="mt-4 text-slate-500">Cargando información del negocio...</p>
+        </div>
+    </section>
+
+    <!-- ESTADO: Error (tenant no encontrado) -->
+    <section *ngIf="viewState === 'error'" style="min-height: calc(100vh - 64px); padding-top: 60px;"
+        class="flex flex-col justify-center">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-red-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Negocio no encontrado</h2>
+            <p class="text-slate-500 mb-2">{{ apiError }}</p>
+            <button (click)="changeTenant()"
+                class="inline-flex items-center justify-center px-6 py-3 rounded-md text-sm font-semibold text-white transition-all hover:opacity-90"
+                style="background-color: #e05a20;">
+                Buscar otro negocio
+            </button>
+        </div>
+    </section>
+
+    <!-- ESTADO: Validating (consultando API) -->
+    <section *ngIf="viewState === 'validating'" style="min-height: calc(100vh - 64px); padding-top: 60px;"
+        class="flex flex-col justify-center">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
+                style="background-color: rgba(224, 90, 32, 0.1);">
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2" style="border-color: #e05a20;"></div>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Consultando...</h2>
+            <p class="text-slate-500">Buscando tus órdenes en {{ tenantInfo?.name }}</p>
+        </div>
+    </section>
+
+    <!-- ESTADO: No Results (no se encontraron órdenes) -->
+    <section *ngIf="viewState === 'no-results'" style="min-height: calc(100vh - 64px); padding-top: 60px;"
+        class="flex flex-col justify-center">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-md mx-auto">
+                <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl"
+                    style="background-color: #fef3c7;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color: #d97706;" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z" />
+                    </svg>
+                </div>
+
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">No encontramos órdenes</h2>
+                <p class="text-slate-500 mb-6">
+                    No hay órdenes activas asociadas a este {{ getLabel().toLowerCase() }} en <strong>{{
+                        tenantInfo?.name }}</strong>.
+                </p>
+
+                <!-- Sugerencias -->
+                <div class="bg-slate-50 rounded-xl p-4 text-left mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" style="color: #e05a20;" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Sugerencias
+                    </h4>
+                    <ul class="text-sm text-slate-500 space-y-2 ml-5 list-disc">
+                        <li *ngIf="credentialType === 'phone'">Revisa que el número sea el que dejaste al comprar.</li>
+                        <li *ngIf="credentialType === 'phone'">No incluyas el código de país (ej. +57).</li>
+                        <li *ngIf="credentialType === 'document'">Verifica que el documento sea el registrado en tu
+                            perfil.</li>
+                        <li *ngIf="credentialType === 'document'">No incluyas puntos ni guiones.</li>
+                        <li>Si la orden es muy reciente, puede que aún no esté en el sistema.</li>
+                    </ul>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <button (click)="retry()"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:shadow-md"
+                        style="border: 2px solid #e5ddd4; color: #475569;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Intentar con otro dato
+                    </button>
+
+                    <a *ngIf="tenantInfo?.whatsapp" [href]="'https://wa.me/57' + tenantInfo?.whatsapp" target="_blank"
+                        rel="noopener"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold transition-all"
+                        style="background-color: rgba(37, 211, 102, 0.1); color: #25d366;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.311 9.311 0 01-4.51-1.179l-.323-.193-3.346.879.894-3.266-.193-.323a9.336 9.336 0 01-1.393-4.948c0-5.157 4.193-9.35 9.35-9.35 2.5 0 4.851.974 6.617 2.744a9.287 9.287 0 012.733 6.617c0 5.157-4.193 9.35-9.35 9.35m0-20.9C6.588.975.975 6.588.975 13.75c0 2.296.657 4.447 1.793 6.275L.975 24l4.447-1.169a11.767 11.767 0 006.328 1.835c7.162 0 12.775-5.613 12.775-12.775C24.5 6.588 18.887.975 11.725.975" />
+                        </svg>
+                        Contactar por WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ESTADO: Form (formulario de identificación) -->
+    <section *ngIf="viewState === 'form'"
+        style="background: linear-gradient(135deg, #fdf6ef 0%, #fff 100%); min-height: calc(100vh - 64px); padding-top: 60px; padding-bottom: 80px;"
+        class="flex flex-col justify-center">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+
+                <!-- Avatar del tenant -->
+                <div *ngIf="shouldShowImage" class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl overflow-hidden"
+                    style="box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
+                    <img [src]="displayImageUrl" (error)="onImageError()" class="w-full h-full object-cover" alt="Logo de {{ tenantInfo?.name }}">
+                </div>
+                <div *ngIf="!shouldShowImage" class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl text-white text-2xl font-bold"
+                    style="background-color: #e05a20; box-shadow: 0 8px 24px rgba(224, 90, 32, 0.3);">
+                    {{ getInitials(tenantInfo?.name || '') }}
+                </div>
+
+                <!-- Badge de confirmación -->
+                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium mb-4"
+                    style="background-color: rgba(16, 185, 129, 0.1); color: #059669;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Proveedor seleccionado
+                </div>
+
+                <!-- Nombre del tenant -->
+                <h2 class="text-3xl font-bold text-slate-900 mb-2" style="letter-spacing: -0.02em;">
+                    {{ tenantInfo?.name }}
+                </h2>
+
+                <p class="text-lg text-slate-500 mb-8">
+                    Ingresa tu información para consultar tus órdenes
+                </p>
+
+                <!-- Formulario de identificación -->
+                <div class="mx-auto max-w-md">
+                    <div class="bg-white rounded-2xl border p-8"
+                        style="border-color: #e5ddd4; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+
+                        <!-- Selector de tipo -->
+                        <div class="flex rounded-xl p-1 mb-6" style="background-color: #f4f2ee;">
+                            <button type="button" (click)="setCredentialType('document')"
+                                class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200"
+                                [style.background-color]="credentialType === 'document' ? '#fff' : 'transparent'"
+                                [style.color]="credentialType === 'document' ? '#e05a20' : '#64748b'"
+                                [style.box-shadow]="credentialType === 'document' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'">
+                                Documento
+                            </button>
+                            <button type="button" (click)="setCredentialType('phone')"
+                                class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200"
+                                [style.background-color]="credentialType === 'phone' ? '#fff' : 'transparent'"
+                                [style.color]="credentialType === 'phone' ? '#e05a20' : '#64748b'"
+                                [style.box-shadow]="credentialType === 'phone' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'">
+                                Teléfono
+                            </button>
+                            <button type="button" (click)="setCredentialType('order')"
+                                class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200"
+                                [style.background-color]="credentialType === 'order' ? '#fff' : 'transparent'"
+                                [style.color]="credentialType === 'order' ? '#e05a20' : '#64748b'"
+                                [style.box-shadow]="credentialType === 'order' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'">
+                                N° Orden
+                            </button>
+                        </div>
+
+                        <!-- Campo de entrada -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">{{ getLabel() }}</label>
+                            <input type="text" [(ngModel)]="credentialValue" [placeholder]="getPlaceholder()"
+                                class="w-full px-4 py-3 rounded-xl border text-slate-900 placeholder-slate-400 focus:outline-none transition-all"
+                                [style.border-color]="submitted && !credentialValue.trim() ? '#ef4444' : credentialValue ? '#e05a20' : '#e5ddd4'"
+                                [style.box-shadow]="credentialValue ? '0 0 0 3px rgba(224, 90, 32, 0.1)' : 'none'"
+                                (keyup.enter)="validateAndSearch()" />
+                            <p *ngIf="submitted && !credentialValue.trim()" class="mt-2 text-sm text-red-500">
+                                Por favor ingresa {{ getLabel().toLowerCase() }}
+                            </p>
+                        </div>
+
+                        <!-- Botón de consulta -->
+                        <button type="button" (click)="validateAndSearch()"
+                            class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-semibold text-white transition-all duration-150 hover:shadow-lg hover:-translate-y-0.5"
+                            style="background-color: #e05a20; box-shadow: 0 4px 14px rgba(224, 90, 32, 0.4);">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            Consultar
+                        </button>
+
+                        <!-- Ayuda -->
+                        <div class="mt-6 text-center">
+                            <p class="text-sm text-slate-400">
+                                ¿No es tu proveedor?
+                                <a href="#" (click)="$event.preventDefault(); changeTenant()"
+                                    class="text-slate-500 hover:text-slate-700 underline">
+                                    Cambiar proveedor
+                                </a>
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Info adicional -->
+                <p class="mt-8 text-sm text-slate-400">
+                    ¿Necesitas ayuda?
+                    <a href="https://wa.me/573008578561" class="text-slate-500 hover:text-slate-700 underline">Contacta
+                        a soporte</a>
+                </p>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="w-full border-t py-10" style="background-color: #f8fafc; border-color: #e2e8f0;">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <div class="flex items-center gap-2">
+                <span class="text-base font-bold text-slate-900">ORDAMY</span>
+                <span class="text-slate-300">|</span>
+                <span class="text-xs text-slate-400 tracking-wider">by BIGSO</span>
+            </div>
+
+
+
+            <p class="text-sm text-slate-400">
+                © 2026 Bigso Labs S.A.S. Todos los derechos reservados.
+            </p>
+
+        </div>
+    </div>
+</footer>

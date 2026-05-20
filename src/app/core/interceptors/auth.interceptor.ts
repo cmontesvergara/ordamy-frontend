@@ -25,7 +25,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const isApiRequest = req.url.startsWith(environment.middlewareBaseUrl);
     const isAuthRequest = req.url.includes('/auth/') || req.url.includes('/api/auth/');
     const isRefreshRequest = req.url.includes('/auth/refresh');
-    const isPublicRequest = req.url.includes('/api/public') || req.url.endsWith('/public');
+    const isPublicRequest = req.url.includes('/api/public') || req.url.includes('/api/tenants/public') || req.url.endsWith('/public');
 
     // Si no es request a nuestra API, o es un request público, pasamos directo
     if (!isApiRequest || isPublicRequest) {
@@ -53,11 +53,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     // Handler para errores 401 y refresh
     const handle401Error = (error: any) => {
         console.error('[AuthInterceptor] Error:', error.status, error.message, 'URL:', req.url);
-        
+
         // Si es 401, intentar refresh
         if (error.status === 401) {
             console.warn('[AuthInterceptor] 401 detectado');
-            
+
             // Si es el request de refresh mismo que falló, no intentar de nuevo
             if (isRefreshRequest) {
                 console.error('[AuthInterceptor] Refresh request failed with 401');
@@ -108,11 +108,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 timeout(10000), // 10 second timeout
                 switchMap((response: any) => {
                     console.log('[AuthInterceptor] Refresh exitoso:', response);
-                    
+
                     if (response?.tokens?.accessToken) {
                         // Primero guardar el access token para que las peticiones subsiguientes funcionen
                         sessionService.setAccessToken(response.tokens.accessToken);
-                        
+
                         // Sincronizar el resto de la sesión (user, tenant, permissions)
                         return sessionService.getSession().pipe(
                             switchMap((sessionData: any) => {
@@ -124,27 +124,27 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                                         userId: userToSet.userId || userToSet.id
                                     };
                                     sessionService.setUser(normalizedUser);
-                                    
+
                                     const tenant = sessionData.tenant || sessionData.currentTenant;
                                     if (tenant) {
                                         sessionService.setCurrentTenant(tenant);
                                     }
-                                    
+
                                     if (tenant?.permissions) {
                                         sessionService.setPermissions(tenant.permissions);
                                     }
-                                    
+
                                     if (sessionData.relatedTenants) {
                                         sessionService.setRelatedTenants(sessionData.relatedTenants);
                                     }
                                 }
-                                
+
                                 // Notificar éxito independientemente de si getSession falló, 
                                 // pues ya tenemos el accessToken
                                 refreshSubject?.next(response.tokens.accessToken);
                                 refreshSubject?.complete();
                                 resetRefreshState();
-        
+
                                 // Reintentar request original
                                 const retryReq = req.clone({
                                     setHeaders: {
@@ -159,7 +159,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                                 refreshSubject?.next(response.tokens.accessToken);
                                 refreshSubject?.complete();
                                 resetRefreshState();
-        
+
                                 const retryReq = req.clone({
                                     setHeaders: {
                                         Authorization: `Bearer ${response.tokens.accessToken}`,
@@ -175,22 +175,22 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 }),
                 catchError((refreshError) => {
                     console.error('[AuthInterceptor] Refresh falló:', refreshError);
-                    
+
                     // Notificar error
                     refreshSubject?.error(refreshError);
                     resetRefreshState();
-                    
+
                     // Limpiar sesión y redirigir
                     sessionService.clearSession();
-                    
+
                     // Mostrar mensaje al usuario
                     toastService.error('Sesión expirada', 'Por favor inicia sesión nuevamente');
-                    
+
                     // Redirigir a login después de un momento
                     setTimeout(() => {
                         window.location.href = '/auth/login';
                     }, 2000);
-                    
+
                     return throwError(() => refreshError);
                 })
             );

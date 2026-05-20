@@ -7,7 +7,9 @@
     "start:local": "NODE_EXTRA_CA_CERTS='$(mkcert -CAROOT)/rootCA.pem' && ng serve --port 4001 --host 0.0.0.0",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,scss,html}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,scss,html}\""
   },
   "private": true,
   "dependencies": {
@@ -38,6 +40,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.5.6",
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.9.3"
   }

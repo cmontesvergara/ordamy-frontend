@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import {
-  PublicOrderService,
-  PublicOrderSummary,
-  PublicTenantInfo,
-  PublicTenantContact
+import { DashboardHeaderComponent } from '../../../../shared/components/dashboard-header/dashboard-header.component';
+import { 
+  PublicOrderService, 
+  PublicTenantInfo, 
+  PublicOrderSummary 
 } from '../../../../core/services/public/public-order.service';
 
 const OP_META: Record<string, { label: string; bgClass: string; textClass: string }> = {
@@ -19,70 +19,111 @@ const OP_META: Record<string, { label: string; bgClass: string; textClass: strin
 };
 
 @Component({
-  selector: 'app-order-list',
+  selector: 'app-customer-dashboard',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './order-list.component.html',
+  imports: [CommonModule, DashboardHeaderComponent],
+  templateUrl: './customer-dashboard.component.html',
   styleUrls: ['../../_tracker.scss']
 })
-export class OrderListComponent implements OnInit {
+export class CustomerDashboardComponent implements OnInit {
   tenantSlug = '';
   customerName = '';
   tenantInfo: PublicTenantInfo | null = null;
-  orders: PublicOrderSummary[] = [];
-  paginatedOrders: PublicOrderSummary[] = [];
   
+  // Orders
+  orders: PublicOrderSummary[] = [];
+  loadingOrders = true;
+  showOrdersSection = true;
+  sessionMissing = false;
+
+  // Selected order for preview
+  selectedOrder: PublicOrderSummary | null = null;
+
   // Pagination
   currentPage = 1;
   pageSize = 5;
   totalPages = 1;
-
-  loading = true;
-  sessionMissing = false;
+  paginatedOrders: PublicOrderSummary[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private publicOrderService: PublicOrderService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.tenantSlug = this.route.snapshot.paramMap.get('tenantSlug') || '';
+
+    // Get stored session data
     const phone = sessionStorage.getItem(`tracker_phone_${this.tenantSlug}`);
     const document = sessionStorage.getItem(`tracker_document_${this.tenantSlug}`);
     const tenantRaw = sessionStorage.getItem(`tracker_tenant_${this.tenantSlug}`);
 
     if (!phone && !document) {
-      this.loading = false;
-      this.sessionMissing = true;
+      // No session, redirect to portal usuarios tenant page
+      this.router.navigate(['portal-usuarios', this.tenantSlug]);
       return;
     }
 
-    this.customerName = sessionStorage.getItem(`tracker_customer_${this.tenantSlug}`) || '';
+    this.customerName = sessionStorage.getItem(`tracker_customer_${this.tenantSlug}`) || 'Cliente';
+
     if (tenantRaw) {
-      try { this.tenantInfo = JSON.parse(tenantRaw); } catch {}
+      try {
+        this.tenantInfo = JSON.parse(tenantRaw);
+      } catch {
+        this.tenantInfo = null;
+      }
     }
 
+    // Load orders
+    this.loadOrders(phone, document);
+  }
+
+  loadOrders(phone: string | null, document: string | null): void {
+    this.loadingOrders = true;
+    
     this.publicOrderService.getCustomerOrders(this.tenantSlug, phone || '', document || '').subscribe({
       next: (res) => {
-        this.loading = false;
+        this.loadingOrders = false;
         if (res.success) {
           this.orders = res.orders || [];
+          this.updatePagination();
           this.customerName = res.customer?.name || this.customerName;
           if (res.tenant) {
             this.tenantInfo = res.tenant;
             sessionStorage.setItem(`tracker_tenant_${this.tenantSlug}`, JSON.stringify(res.tenant));
           }
-          this.updatePagination();
         }
       },
       error: (err: HttpErrorResponse) => {
-        this.loading = false;
+        this.loadingOrders = false;
         if (err.status === 401 || err.status === 404) {
           this.sessionMissing = true;
         }
       }
     });
+  }
+
+  viewOrderDetail(order: PublicOrderSummary): void {
+    // On mobile, navigate directly to detail instead of showing preview
+    if (window.innerWidth < 1024) {
+      this.goToFullDetail(order);
+    } else {
+      this.selectedOrder = order;
+    }
+  }
+
+  closePreview(): void {
+    this.selectedOrder = null;
+  }
+
+  goToFullDetail(order: PublicOrderSummary): void {
+    this.router.navigate(['portal-usuarios', this.tenantSlug, 'ordenes', order.id]);
+  }
+
+  viewAllOrders(): void {
+    this.pageSize = 20; // Show more orders
+    this.updatePagination();
   }
 
   updatePagination(): void {
@@ -98,19 +139,15 @@ export class OrderListComponent implements OnInit {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updatePagination();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  viewDetail(order: PublicOrderSummary): void {
-    this.router.navigate(['/org', 'portal-usuarios', this.tenantSlug, 'ordenes', order.id]);
+  goToTrack(): void {
+    this.router.navigate(['portal-usuarios', this.tenantSlug, 'rastrear']);
   }
 
-  goBack(): void {
-    sessionStorage.removeItem(`tracker_phone_${this.tenantSlug}`);
-    sessionStorage.removeItem(`tracker_document_${this.tenantSlug}`);
-    sessionStorage.removeItem(`tracker_customer_${this.tenantSlug}`);
-    this.router.navigate(['/org', 'portal-usuarios', this.tenantSlug]);
+  goToContact(): void {
+    this.router.navigate(['/org', this.tenantSlug]);
   }
 
   getOpMeta(status: string) {
@@ -138,9 +175,42 @@ export class OrderListComponent implements OnInit {
   get tenantWhatsapp(): string | null {
     if (this.tenantInfo?.whatsapp) return this.tenantInfo.whatsapp;
     if (this.tenantInfo?.contacts) {
-      const wa = this.tenantInfo.contacts.find((c: PublicTenantContact) => c.type === 'whatsapp');
+      const wa = this.tenantInfo.contacts.find((c) => c.type === 'whatsapp');
       if (wa && wa.value) return wa.value;
     }
     return null;
+  }
+
+
+  // Computed properties for stats
+  get activeOrdersCount(): number {
+    return this.orders.filter(o => ['PENDING', 'APPROVED', 'IN_PRODUCTION'].includes(o.operationalStatus)).length;
+  }
+
+  get deliveredOrdersCount(): number {
+    return this.orders.filter(o => o.operationalStatus === 'DELIVERED').length;
+  }
+
+  get totalSpent(): number {
+    return this.orders.reduce((sum, o) => sum + o.total, 0);
+  }
+
+
+  logout(): void {
+    // Clear session for this tenant
+    sessionStorage.removeItem(`tracker_phone_${this.tenantSlug}`);
+    sessionStorage.removeItem(`tracker_document_${this.tenantSlug}`);
+    sessionStorage.removeItem(`tracker_customer_${this.tenantSlug}`);
+    sessionStorage.removeItem(`tracker_tenant_${this.tenantSlug}`);
+    // Redirect to portal usuarios tenant page
+    this.router.navigate(['portal-usuarios', this.tenantSlug]);
+  }
+
+  getInitials(name: string): string {
+    return name.split(' ').slice(0, 2).map((w: string) => w[0]?.toUpperCase() || '').join('');
+  }
+
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 }

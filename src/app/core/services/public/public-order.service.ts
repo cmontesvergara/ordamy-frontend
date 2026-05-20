@@ -3,14 +3,22 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
+export interface PublicTenantContact {
+  type: 'phone' | 'whatsapp' | 'email' | 'other';
+  label: string;
+  value: string;
+}
+
 export interface PublicTenantInfo {
   name: string;
   slug: string;
   phone: string | null;
   email: string | null;
   whatsapp: string | null;
-  settings?: {
-    contact?: { name: string; value: string }[];
+  contacts?: PublicTenantContact[];
+  branding?: {
+    primaryColor?: string;
+    logo?: { url: string | null };
   };
 }
 

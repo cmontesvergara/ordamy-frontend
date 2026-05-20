@@ -1,0 +1,93 @@
+<!-- Header Component -->
+<app-public-header 
+    [ctas]="headerCtas"
+    (ctaClick)="onHeaderCta($event)"></app-public-header>
+
+<main>
+
+    <!-- Hero: buscador de tenant -->
+    <section aria-labelledby="portal-heading"
+        style="background-color: #fdf6ef; min-height: calc(100vh - 64px); padding-top: 80px; padding-bottom: 80px;"
+        class="flex flex-col justify-center">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+
+                <!-- Icono de portal -->
+                <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
+                    style="background-color: rgba(224, 90, 32, 0.1);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="1.5" style="color: #e05a20;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17 20h5v-2a4 4 0 00-5-5m-6 7H2v-2a4 4 0 015-5m6 0a4 4 0 10-8 0 4 4 0 008 0zm6-8a4 4 0 10-8 0 4 4 0 008 0z" />
+                    </svg>
+                </div>
+
+                <h1 id="portal-heading" class="text-3xl font-bold text-slate-900 sm:text-4xl md:text-5xl tracking-tight"
+                    style="letter-spacing: -0.02em; line-height: 1.15;">
+                    ¿Con qué negocio
+                    <span class="block" style="color: #e05a20;">trabajas hoy?</span>
+                </h1>
+
+                <p class="mx-auto mt-4 max-w-xl text-lg text-slate-500" style="line-height: 1.6;">
+                    Busca el nombre de tu proveedor para consultar tus órdenes y gestionar tu cuenta.
+                </p>
+
+                <!-- Buscador principal -->
+                <div class="mx-auto mt-10 max-w-xl">
+                    <app-tenant-search placeholder="Nombre de tu proveedor..." [showFrequentSearches]="false"
+                        (tenantSelected)="onTenantSelected($event)"></app-tenant-search>
+                </div>
+                <!-- fin buscador -->
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Bloque de ayuda -->
+    <section aria-labelledby="ayuda-heading" class="py-16" style="background-color: #fff;">
+        <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 text-center">
+
+            <h2 id="ayuda-heading" class="text-xl font-bold text-slate-900 mb-3" style="letter-spacing: -0.01em;">
+                ¿No sabes a qué empresa buscar?
+            </h2>
+            <p class="text-sm text-slate-500 mb-6" style="line-height: 1.6;">
+                Revisa el correo o mensaje que te envió tu proveedor — allí debería haber un enlace de acceso directo.
+                Si no lo tienes, contáctalo para que te reenvíe la invitación.
+            </p>
+
+            <a href="https://wa.me/573008578561"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border text-sm font-medium text-slate-600 hover:text-slate-900 hover:border-slate-400 transition-colors"
+                style="border-color: #e5ddd4;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                </svg>
+                Contactar soporte
+            </a>
+
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="w-full border-t py-10" style="background-color: #f8fafc; border-color: #e2e8f0;">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <div class="flex items-center gap-2">
+                <span class="text-base font-bold text-slate-900">ORDAMY</span>
+                <span class="text-slate-300">|</span>
+                <span class="text-xs text-slate-400 tracking-wider">by BIGSO</span>
+            </div>
+
+
+
+            <p class="text-sm text-slate-400">
+                © 2026 Bigso Labs S.A.S. Todos los derechos reservados.
+            </p>
+
+        </div>
+    </div>
+</footer>

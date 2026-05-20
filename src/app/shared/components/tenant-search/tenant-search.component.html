@@ -1,0 +1,119 @@
+<div class="tenant-search">
+  <!-- Search Input -->
+  <div class="relative">
+    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+      <svg class="h-5 w-5" style="color: #9a9a9a;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </div>
+    
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      (input)="onSearchInput()"
+      [placeholder]="placeholder"
+      class="w-full pl-12 pr-4 py-3 text-sm bg-white text-slate-900 rounded-lg border transition-all duration-150 focus:outline-none focus:ring-2"
+      style="border-color: #e5ddd4; height: 48px; line-height: 1.5;"
+      [style.border-color]="searchQuery ? '#e05a20' : '#e5ddd4'"
+      [style.box-shadow]="searchQuery ? '0 0 0 3px rgba(224, 90, 32, 0.1)' : 'none'"
+      autocomplete="off"
+    />
+    
+    <button
+      *ngIf="searchQuery"
+      (click)="clearSearch()"
+      class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+    >
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isSearching" class="mt-6 flex items-center justify-center py-8">
+    <svg class="animate-spin h-5 w-5 mr-2" style="color: #e05a20;" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span class="text-sm text-slate-500">Buscando negocios...</span>
+  </div>
+
+  <!-- Results -->
+  <div *ngIf="showResults && !isSearching" class="mt-4">
+    
+    <div *ngIf="searchResults.length > 0" class="space-y-2 max-h-64 overflow-y-auto">
+      
+      <button
+        *ngFor="let tenant of searchResults"
+        (click)="selectTenant(tenant)"
+        class="w-full flex items-center gap-4 p-4 rounded-lg border transition-all duration-150 text-left hover:shadow-sm bg-white border-slate-200 hover:border-orange-200"
+      >
+        <!-- Avatar -->
+        <div
+          class="flex-shrink-0 h-12 w-12 rounded-lg flex items-center justify-center text-white font-bold text-lg"
+          style="background-color: #e05a20;"
+        >
+          {{ getInitials(tenant.name) }}
+        </div>
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-slate-900 truncate">
+            {{ tenant.name }}
+          </p>
+          <p class="text-xs text-slate-500 truncate">
+            @{{ tenant.slug }}
+          </p>
+        </div>
+        
+        <!-- Arrow -->
+        <svg class="h-5 w-5 flex-shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Empty State -->
+    <div *ngIf="searchResults.length === 0 && searchQuery.length >= minSearchLength" class="text-center py-8">
+      
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full mb-3"
+           style="background-color: rgba(224, 90, 32, 0.1);">
+        <svg class="h-6 w-6" style="color: #e05a20;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      
+      <p class="text-sm font-medium text-slate-900 mb-1">No encontramos resultados</p>
+      
+      <p class="text-xs text-slate-500">Intenta con otro nombre o verifica la ortografía</p>
+    </div>
+  </div>
+
+  <!-- Frequent Searches -->
+  <div *ngIf="showFrequentSearches && !showResults && !isSearching && frequentSearches.length > 0" class="mt-6">
+    
+    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">Búsquedas populares</p>
+    
+    <div class="flex flex-wrap gap-2">
+      
+      <button
+        *ngFor="let tenant of frequentSearches; trackBy: trackBySlug"
+        (click)="selectTenant(tenant)"
+        class="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 hover:border-orange-300 hover:bg-orange-50 transition-all"
+      >
+        <span
+          class="w-5 h-5 rounded flex items-center justify-center text-white text-xs font-bold"
+          [style.background-color]="tenant.color || '#e05a20'"
+        >
+          {{ tenant.name.charAt(0).toUpperCase() }}
+        </span>
+        <span>{{ tenant.name }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Error -->
+  <p *ngIf="searchError" class="mt-4 text-sm text-rose-600 text-center">
+    {{ searchError }}
+  </p>
+</div>

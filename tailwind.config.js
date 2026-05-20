@@ -29,8 +29,16 @@ module.exports = {
       fontFamily: {
         inter: ['Inter', 'system-ui', 'sans-serif'],
       },
+      animation: {
+        fadeIn: 'fadeIn 0.2s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
     },
   },
   plugins: [],
 }
-

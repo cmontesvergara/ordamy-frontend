@@ -1,0 +1,10 @@
+@if (activeModal | async; as modal) {
+@switch (modal) {
+@case ("signup") {
+<div class="sdk-modal-overlay">
+  <app-sdk-sign-up></app-sdk-sign-up>
+</div>
+}
+
+}
+}

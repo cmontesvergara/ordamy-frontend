@@ -1,0 +1,18 @@
+<!-- SSO Sign-up Fullscreen Modal with Tailwind CSS -->
+<div class="fixed inset-0 z-[9999] bg-white animate-fadeIn" (click)="close()">
+  <button 
+    (click)="close()" 
+    class="fixed top-5 right-5 z-[10000] w-11 h-11 flex items-center justify-center bg-white/95 border border-black/5 rounded-full text-slate-500 cursor-pointer transition-all duration-200 shadow-sm hover:bg-white hover:text-slate-900 hover:shadow-md hover:rotate-90"
+    title="Cerrar"
+  >
+    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+  <iframe 
+    [src]="ssoSignUpUrl" 
+    class="w-full h-full border-none" 
+    title="Crear cuenta - Bigso"
+    allow="camera; microphone; fullscreen">
+  </iframe>
+</div>

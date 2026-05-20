@@ -1,0 +1,80 @@
+<footer class="w-full border-t py-8 mt-auto"
+         [class.bg-white]="variant !== 'auth'"
+         [class.bg-slate-50]="variant === 'auth'"
+         [class.border-slate-200]="variant !== 'auth'"
+         [class.border-slate-800]="variant === 'auth'">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    
+    <!-- Layout Tenant (Co-branding) -->
+    <ng-container *ngIf="variant === 'tenant'">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-sm text-slate-500 text-center sm:text-left">
+          © 2026 <span class="font-semibold text-slate-900">{{ tenantName }}</span>
+          <span *ngIf="showOrdamyCredit"> · Gestionado por <span class="font-semibold text-slate-900">ORDAMY</span></span>
+        </p>
+        <div class="flex items-center gap-6">
+          <a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Términos</a>
+          <a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Privacidad</a>
+          <a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Soporte</a>
+        </div>
+      </div>
+    </ng-container>
+    
+    <!-- Layout Auth (Minimal legal) -->
+    <ng-container *ngIf="variant === 'auth'">
+      <div class="flex flex-col items-center justify-center gap-3">
+        <p class="text-sm text-slate-500">
+          © 2026 <span class="font-semibold text-slate-900">Bigso S.A.S.</span>
+        </p>
+        <div class="flex items-center gap-4 text-sm">
+          <a href="#" class="text-slate-500 hover:text-slate-300 transition-colors">Términos</a>
+          <span class="text-slate-600">·</span>
+          <a href="#" class="text-slate-500 hover:text-slate-300 transition-colors">Privacidad</a>
+          <span class="text-slate-600">·</span>
+          <a href="#" class="text-slate-500 hover:text-slate-300 transition-colors">Ayuda</a>
+        </div>
+      </div>
+    </ng-container>
+    
+    <!-- Layout Corporate -->
+    <ng-container *ngIf="variant === 'corporate'">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="md:col-span-2">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"
+                 [style.background-color]="brandColor">O</div>
+            <span class="text-lg font-bold text-slate-900">ORDAMY</span>
+          </div>
+          <p class="text-sm text-slate-600 max-w-sm">
+            Ecosistema de soluciones digitales para gestión de órdenes de servicio.
+          </p>
+        </div>
+        <div>
+          <h4 class="text-sm font-semibold text-slate-900 mb-3">Producto</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Características</a></li>
+            <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Precios</a></li>
+            <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-sm font-semibold text-slate-900 mb-3">Legal</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Términos</a></li>
+            <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Privacidad</a></li>
+            <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-sm text-slate-500">
+          © 2026 ORDAMY · Un producto <span class="font-semibold text-slate-900">Bigso</span>
+        </p>
+        <div class="flex items-center gap-4">
+          <a href="mailto:soporte@ordamy.com" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">soporte@ordamy.com</a>
+        </div>
+      </div>
+    </ng-container>
+    
+  </div>
+</footer>

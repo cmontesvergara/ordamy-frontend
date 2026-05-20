@@ -1,15 +1,17 @@
-import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LoadingService } from './core/services/loading/loading.service';
-import { ToastService, Toast } from './core/services/toast/toast.service';
+import { SdkService } from './core/services/sdk/sdk.service';
+import { ToastService } from './core/services/toast/toast.service';
 import { LoaderOverlayComponent } from './shared/components/loader-overlay/loader-overlay.component';
+import { SdkWrapperComponent } from './shared/components/sdk-modal-wrapper/sdk-wrapper.component';
 
 @Component({
-    selector: 'app-root',
-    imports: [CommonModule, RouterOutlet, LoaderOverlayComponent],
-    templateUrl: './app.component.html',
-    styles: [`
+  selector: 'app-root',
+  imports: [CommonModule, RouterOutlet, LoaderOverlayComponent, SdkWrapperComponent],
+  templateUrl: './app.component.html',
+  styles: [`
     :host { display: block; min-height: 100vh; }
 
     /* Toasts */
@@ -76,7 +78,8 @@ import { LoaderOverlayComponent } from './shared/components/loader-overlay/loade
 export class AppComponent {
   constructor(
     public loadingService: LoadingService,
-    public toastService: ToastService
+    public toastService: ToastService,
+    public sdkService: SdkService
   ) { }
 
   // Prevent scroll from changing number input values globally

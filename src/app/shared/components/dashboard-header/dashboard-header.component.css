@@ -1,0 +1,4 @@
+/* Dashboard Header Styles */
+:host {
+  display: block;
+}

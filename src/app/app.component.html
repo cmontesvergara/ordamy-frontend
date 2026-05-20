@@ -2,22 +2,24 @@
 
 <!-- Global Loader -->
 @if (loadingService.is()) {
-  <app-loader-overlay mode="fixed"></app-loader-overlay>
+<app-loader-overlay mode="fixed"></app-loader-overlay>
 }
+
+<!-- SDK Modal Wrapper - Renders SDK modals as overlays -->
+<app-sdk-wrapper></app-sdk-wrapper>
 
 <!-- Global Toasts Container -->
 @if (toastService.toasts$ | async; as toasts) {
-  <div class="toast-container">
-    @for (toast of toasts; track toast) {
-      <div class="toast" [ngClass]="'toast-' + toast.type"
-        (click)="toastService.remove(toast.id)">
-        <div class="toast-indicator"></div>
-        <div class="toast-content">
-          <strong>{{ toast.title }}</strong>
-          <p>{{ toast.message }}</p>
-        </div>
-        <button class="toast-close">&times;</button>
-      </div>
-    }
+<div class="toast-container">
+  @for (toast of toasts; track toast) {
+  <div class="toast" [ngClass]="'toast-' + toast.type" (click)="toastService.remove(toast.id)">
+    <div class="toast-indicator"></div>
+    <div class="toast-content">
+      <strong>{{ toast.title }}</strong>
+      <p>{{ toast.message }}</p>
+    </div>
+    <button class="toast-close">&times;</button>
   </div>
+  }
+</div>
 }

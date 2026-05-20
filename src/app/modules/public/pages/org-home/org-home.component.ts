@@ -1,91 +1,80 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Tenant, TenantService } from '../../../../core/services/tenant/tenant.service';
-
-interface FrequentTenant {
-  id: string;
-  name: string;
-  slug: string;
-  color: string;
-}
+import { FooterComponent } from "../../components/footer";
+import { HeaderComponent, HeaderCta } from "../../components/header/header.component";
+import { TenantSearchComponent, FrequentTenant } from '../../../../shared/components/tenant-search';
 
 @Component({
   selector: 'app-org-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FooterComponent, TenantSearchComponent, HeaderComponent],
   templateUrl: './org-home.component.html',
   styleUrls: ['../../_tracker.scss']
 })
-export class OrgHomeComponent {
-  searchQuery = '';
-  tenants: Tenant[] = [];
-  isSearching = false;
-  showResults = false;
-  searchError = '';
-  private searchTimeout: any;
-
+export class OrgHomeComponent implements OnInit {
   // Mock data for frequent searches
-  frequentSearches: FrequentTenant[] = [
-    { id: '1', name: 'Centro Color', slug: 'centro-color', color: '#2563eb' },
+  private mockFrequentSearches: FrequentTenant[] = [
+    // { id: '1', name: 'Centro Color', slug: 'centro-color', color: '#2563eb' },
     { id: '2', name: 'Jaider Publicidad', slug: 'jaider-publicidad', color: '#d97706' },
     { id: '3', name: 'Big Print', slug: 'big-solutions', color: '#8c06d9' },
   ];
+
+  // Cached frequent searches to avoid recalculation on every change detection
+  frequentSearches: FrequentTenant[] = [];
+
+  ngOnInit(): void {
+    this.calculateFrequentSearches();
+  }
+
+  // Header CTAs configuration
+  headerCtas: HeaderCta[] = [
+    { id: 'business-label', type: 'label', label: '¿Aún no eres proveedor?' },
+    { id: 'register', type: 'button', variant: 'primary', label: 'Registrarse' }
+  ];
+
+  onHeaderCta(ctaId: string): void {
+    switch (ctaId) {
+      case 'business-label':
+        this.goToWelcome();
+        break;
+      case 'register':
+        this.goToWelcome();
+        break;
+    }
+  }
+
+  private calculateFrequentSearches(): void {
+    const stored = this.tenantService.getStoredTenantInfo();
+    if (stored) {
+      // Add stored tenant at the beginning if not already in the list
+      const storedAsFrequent: FrequentTenant = {
+        id: stored.id,
+        name: stored.name,
+        slug: stored.slug,
+        color: '#e05a20'
+      };
+      // Check if already exists to avoid duplicates
+      const exists = this.mockFrequentSearches.some(t => t.slug === stored.slug);
+      this.frequentSearches = exists ? [...this.mockFrequentSearches] : [storedAsFrequent, ...this.mockFrequentSearches];
+    } else {
+      this.frequentSearches = [...this.mockFrequentSearches];
+    }
+  }
 
   constructor(
     private router: Router,
     private tenantService: TenantService
   ) { }
 
-  onSearch(): void {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
+  onTenantSelected(tenant: FrequentTenant): void {
+    console.log('[OrgHome] Selecting tenant:', tenant);
+    if (tenant?.slug) {
+      this.router.navigate(['/org', tenant.slug]);
+    } else {
+      console.error('[OrgHome] Tenant slug is missing:', tenant);
     }
-
-    this.searchError = '';
-
-    if (this.searchQuery.length < 2) {
-      this.tenants = [];
-      this.showResults = false;
-      return;
-    }
-
-    this.showResults = true;
-    this.isSearching = true;
-
-    this.searchTimeout = setTimeout(() => {
-      this.performSearch();
-    }, 300);
-  }
-
-  private performSearch(): void {
-    this.tenantService.searchTenants(this.searchQuery).subscribe({
-      next: (results) => {
-        this.tenants = results;
-        this.isSearching = false;
-      },
-      error: () => {
-        this.searchError = 'Error al buscar. Intenta de nuevo.';
-        this.tenants = [];
-        this.isSearching = false;
-      }
-    });
-  }
-
-  selectTenant(tenant: Tenant | FrequentTenant): void {
-    this.router.navigate(['/org', tenant.slug]);
-  }
-
-  clearSearch(): void {
-    this.searchQuery = '';
-    this.tenants = [];
-    this.showResults = false;
-    this.searchError = '';
-  }
-
-  getInitials(name: string): string {
-    return name.split(' ').slice(0, 2).map((w: string) => w[0]?.toUpperCase() || '').join('');
   }
 
   goToWelcome(): void {

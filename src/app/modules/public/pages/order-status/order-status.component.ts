@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { DashboardHeaderComponent } from '../../../../shared/components/dashboard-header/dashboard-header.component';
 import {
   PublicOrderService,
   PublicOrderDetail,
-  PublicTenantInfo
+  PublicTenantInfo,
+  PublicTenantContact
 } from '../../../../core/services/public/public-order.service';
 
 const STEPS = ['PENDING', 'APPROVED', 'IN_PRODUCTION', 'PRODUCED', 'DELIVERED'];
@@ -46,12 +48,13 @@ const OP_META: Record<string, { label: string; bgClass: string; textClass: strin
 @Component({
   selector: 'app-order-status',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DashboardHeaderComponent],
   templateUrl: './order-status.component.html',
   styleUrls: ['../../_tracker.scss']
 })
 export class OrderStatusComponent implements OnInit {
   tenantSlug = '';
+  customerName = '';
   orderId = '';
   order: PublicOrderDetail | null = null;
   tenantInfo: PublicTenantInfo | null = null;
@@ -123,19 +126,30 @@ export class OrderStatusComponent implements OnInit {
   }
 
   goToList(): void {
-    this.router.navigate(['/org', this.tenantSlug, 'ordenes']);
+    this.router.navigate(['/org', 'portal-usuarios', this.tenantSlug, 'ordenes']);
   }
 
   goToValidate(): void {
-    this.router.navigate(['/org', this.tenantSlug, 'consultar']);
+    this.router.navigate(['/org', 'portal-usuarios', this.tenantSlug]);
   }
 
   get tenantWhatsapp(): string | null {
     if (this.tenantInfo?.whatsapp) return this.tenantInfo.whatsapp;
-    if (this.tenantInfo?.settings?.contact) {
-      const wa = this.tenantInfo.settings.contact.find(c => c.name.toLowerCase() === 'whatsapp');
+    if (this.tenantInfo?.contacts) {
+      const wa = this.tenantInfo.contacts.find((c: PublicTenantContact) => c.type === 'whatsapp');
       if (wa && wa.value) return wa.value;
     }
     return null;
+  }
+
+
+  logout(): void {
+    // Clear session for this tenant
+    sessionStorage.removeItem(`tracker_phone_${this.tenantSlug}`);
+    sessionStorage.removeItem(`tracker_document_${this.tenantSlug}`);
+    sessionStorage.removeItem(`tracker_customer_${this.tenantSlug}`);
+    sessionStorage.removeItem(`tracker_tenant_${this.tenantSlug}`);
+    // Redirect to portal usuarios tenant page
+    this.router.navigate(['portal-usuarios', this.tenantSlug]);
   }
 }
