@@ -93,7 +93,7 @@ import { Tenant, TenantService } from '../../../../core/services/tenant/tenant.s
                             </button>
 
                             <a 
-                                href="https://wa.me/573008578561"
+                                href="https://wa.me/573052215945"
                                 target="_blank"
                                 class="inline-flex items-center justify-center rounded-md px-8 py-4 text-base font-semibold transition-all duration-150 border-2 hover:bg-slate-50"
                                 style="border-color: #e5ddd4; color: #6b6b80; min-width: 200px;"
