@@ -3,14 +3,64 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PublicOrderService, PublicTenantInfo } from '../../../../core/services/public/public-order.service';
 import { environment } from '../../../../../environments/environment';
-import { HeaderComponent, HeaderCta } from '../../components/header/header.component';
+import { PublicOrderService, PublicTenantInfo } from '../../../../core/services/public/public-order.service';
 import { SdkService } from '../../../../core/services/sdk/sdk.service';
 import { Tenant, TenantService } from '../../../../core/services/tenant/tenant.service';
+import { HeaderComponent, HeaderCta } from '../../components/header/header.component';
 
 type CredentialType = 'document' | 'phone' | 'order';
 type ViewState = 'loading' | 'form' | 'validating' | 'no-results' | 'error';
+
+interface OrderPreview {
+  orderNumber: string;
+  operationalStatus: string;
+}
+
+const OP_META: Record<string, { label: string; bgClass: string; textClass: string; explanation: string; action: string }> = {
+  PENDING: {
+    label: 'Recibida',
+    bgClass: 'bg-slate-100',
+    textClass: 'text-slate-700',
+    explanation: 'Tu orden fue registrada exitosamente y esta en espera de que el equipo la revise y apruebe.',
+    action: 'No necesitas hacer nada ahora. Espera la confirmacion.'
+  },
+  APPROVED: {
+    label: 'Aprobada',
+    bgClass: 'bg-blue-100',
+    textClass: 'text-blue-700',
+    explanation: 'Tu orden fue revisada y aprobada. Esta lista para iniciar produccion.',
+    action: 'Si tienes saldo pendiente, este es el mejor momento para coordinarlo.'
+  },
+  IN_PRODUCTION: {
+    label: 'En produccion',
+    bgClass: 'bg-indigo-100',
+    textClass: 'text-indigo-700',
+    explanation: 'El equipo esta fabricando tu orden activamente en este momento.',
+    action: 'No necesitas hacer nada. Pronto recibiras aviso cuando este lista.'
+  },
+  PRODUCED: {
+    label: 'Lista para entrega',
+    bgClass: 'bg-emerald-100',
+    textClass: 'text-emerald-700',
+    explanation: 'Tu orden esta terminada! Solo falta coordinar la entrega o el recogido.',
+    action: 'Comunicate para coordinar cuando y como recibes tu orden.'
+  },
+  DELIVERED: {
+    label: 'Entregada',
+    bgClass: 'bg-emerald-100',
+    textClass: 'text-emerald-700',
+    explanation: 'Tu orden fue entregada exitosamente. Esperamos que estes muy satisfecho.',
+    action: 'Gracias por tu confianza! Esperamos verte pronto de nuevo.'
+  },
+  CANCELLED: {
+    label: 'Anulada',
+    bgClass: 'bg-rose-100',
+    textClass: 'text-rose-700',
+    explanation: 'Esta orden fue anulada y ya no esta activa.',
+    action: 'Comunicate con el negocio si tienes dudas sobre la anulacion.'
+  }
+};
 
 @Component({
   selector: 'app-portal-usuarios-tenant',
@@ -20,9 +70,8 @@ type ViewState = 'loading' | 'form' | 'validating' | 'no-results' | 'error';
   styleUrls: ['./portal-usuarios.component.scss']
 })
 export class PortalUsuariosTenantComponent implements OnInit {
-  // Header CTAs configuration
   headerCtas: HeaderCta[] = [
-    { id: 'business-label', type: 'label', label: '¿Eres un negocio?' },
+    { id: 'business-label', type: 'label', label: 'Eres un negocio?' },
     { id: 'create-account', type: 'button', variant: 'primary', label: 'Crear cuenta' }
   ];
 
@@ -33,10 +82,13 @@ export class PortalUsuariosTenantComponent implements OnInit {
   customerName = '';
 
   viewState: ViewState = 'loading';
+
+  previewOrder: OrderPreview | null = null;
+  showPreviewModal = false;
+
   apiError = '';
   imageError = false;
 
-  // Form state
   credentialType: CredentialType = 'document';
   credentialValue = '';
   submitted = false;
@@ -73,7 +125,6 @@ export class PortalUsuariosTenantComponent implements OnInit {
           this.tenant = tenant;
           this.tenantService.storeTenantInfo(tenant);
 
-          // Build tenant info for display
           this.tenantInfo = {
             name: tenant.name,
             slug: tenant.slug,
@@ -82,7 +133,6 @@ export class PortalUsuariosTenantComponent implements OnInit {
             whatsapp: null
           };
 
-          // Load full tenant data with branding
           this.loadTenantBranding(slug);
 
           this.viewState = 'form';
@@ -151,12 +201,25 @@ export class PortalUsuariosTenantComponent implements OnInit {
     }
 
     if (this.credentialType === 'order') {
-      // For order number, go directly to order detail
-      this.router.navigate(['portal-usuarios', this.tenantSlug, 'ordenes', this.credentialValue.trim()]);
+      const orderId = this.credentialValue.trim().replace(/^ORD-/i, '');
+
+      this.publicOrderService.getOrderPreview(this.tenantSlug, orderId)
+        .subscribe({
+          next: (res) => {
+            if (res.success && res.preview) {
+              this.previewOrder = res.preview;
+              this.showPreviewModal = true;
+            } else {
+              this.viewState = 'no-results';
+            }
+          },
+          error: () => {
+            this.viewState = 'no-results';
+          }
+        });
       return;
     }
 
-    // Validate phone or document and get orders
     this.viewState = 'validating';
 
     const phone = this.credentialType === 'phone' ? this.credentialValue.trim() : '';
@@ -165,7 +228,6 @@ export class PortalUsuariosTenantComponent implements OnInit {
     this.publicOrderService.getCustomerOrders(this.tenantSlug, phone, document).subscribe({
       next: (res) => {
         if (res.success && res.orders && res.orders.length > 0) {
-          // Store session data and go to dashboard
           sessionStorage.setItem(`tracker_phone_${this.tenantSlug}`, phone);
           sessionStorage.setItem(`tracker_document_${this.tenantSlug}`, document);
           sessionStorage.setItem(`tracker_customer_${this.tenantSlug}`, res.customer?.name || '');
@@ -180,6 +242,15 @@ export class PortalUsuariosTenantComponent implements OnInit {
         this.viewState = 'no-results';
       }
     });
+  }
+
+  closePreviewModal(): void {
+    this.showPreviewModal = false;
+    this.previewOrder = null;
+  }
+
+  goToFullDetail(): void {
+    this.router.navigate(['portal-usuarios', this.tenantSlug, 'ordenes', this.credentialValue.trim()]);
   }
 
   retry(): void {
@@ -206,5 +277,9 @@ export class PortalUsuariosTenantComponent implements OnInit {
 
   onImageError(): void {
     this.imageError = true;
+  }
+
+  getOperationalMeta(status: string): { label: string; bgClass: string; textClass: string; explanation: string; action: string } {
+    return OP_META[status] || OP_META['PENDING'];
   }
 }

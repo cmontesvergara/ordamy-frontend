@@ -69,15 +69,23 @@ export interface OrderDetailResponse {
   message?: string;
 }
 
+export interface OrderPreviewResponse {
+  success: boolean;
+  preview?: {
+    orderNumber: string;
+    operationalStatus: string;
+  };
+  tenant?: PublicTenantInfo;
+  error?: string;
+  message?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PublicOrderService {
   private base = `${environment.middlewareBaseUrl}/api/public`;
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Validate customer by phone or document and get all their active orders
-   */
   getCustomerOrders(tenantSlug: string, phone?: string, document?: string): Observable<CustomerOrdersResponse> {
     let params = new HttpParams();
     if (phone) { params = params.set('phone', phone); }
@@ -89,9 +97,12 @@ export class PublicOrderService {
     );
   }
 
-  /**
-   * Get full detail of a specific order — re-validates phone or document
-   */
+  getOrderPreview(tenantSlug: string, orderId: string): Observable<OrderPreviewResponse> {
+    return this.http.get<OrderPreviewResponse>(
+      `${this.base}/${tenantSlug}/orders/${orderId}/preview`
+    );
+  }
+
   getOrderDetail(tenantSlug: string, orderId: string, phone?: string, document?: string): Observable<OrderDetailResponse> {
     let params = new HttpParams();
     if (phone) { params = params.set('phone', phone); }
