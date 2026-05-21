@@ -249,9 +249,7 @@ export class PortalUsuariosTenantComponent implements OnInit {
     this.previewOrder = null;
   }
 
-  goToFullDetail(): void {
-    this.router.navigate(['portal-usuarios', this.tenantSlug, 'ordenes', this.credentialValue.trim()]);
-  }
+
 
   retry(): void {
     this.viewState = 'form';

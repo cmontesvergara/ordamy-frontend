@@ -233,13 +233,15 @@
     </section>
 
     <!-- Modal de Preview de Orden -->
-    <div *ngIf="showPreviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(0, 0, 0, 0.5);">
+    <div *ngIf="showPreviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style="background-color: rgba(0, 0, 0, 0.5);">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
             <!-- Header con boton cerrar -->
             <div class="flex items-center justify-between px-6 py-4 border-b" style="border-color: #e5ddd4;">
                 <h3 class="text-lg font-semibold text-slate-900">Estado de tu orden</h3>
                 <button (click)="closePreviewModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
@@ -256,7 +258,7 @@
                 <!-- Badge de estado -->
                 <div class="mb-6">
                     <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold"
-                          [ngClass]="[getOperationalMeta(previewOrder.operationalStatus).bgClass, getOperationalMeta(previewOrder.operationalStatus).textClass]">
+                        [ngClass]="[getOperationalMeta(previewOrder.operationalStatus).bgClass, getOperationalMeta(previewOrder.operationalStatus).textClass]">
                         {{ getOperationalMeta(previewOrder.operationalStatus).label }}
                     </span>
                 </div>
@@ -274,13 +276,16 @@
                 <!-- CTA -->
                 <div class="border-t pt-6" style="border-color: #e5ddd4;">
                     <p class="text-sm text-slate-500 mb-4">
-                        Para ver mas detalles <strong>(productos, pagos, historial completo)</strong>, ingresa con tu telefono o numero de documento.
+                        Para ver mas detalles <strong>(productos, pagos, historial completo)</strong>, ingresa con tu
+                        telefono o numero de documento.
                     </p>
-                    <button (click)="goToFullDetail()"
-                            class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-semibold text-white transition-all duration-150 hover:shadow-lg hover:-translate-y-0.5"
-                            style="background-color: #e05a20; box-shadow: 0 4px 14px rgba(224, 90, 32, 0.4);">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    <button (click)="closePreviewModal()"
+                        class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-semibold text-white transition-all duration-150 hover:shadow-lg hover:-translate-y-0.5"
+                        style="background-color: #e05a20; box-shadow: 0 4px 14px rgba(224, 90, 32, 0.4);">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                         </svg>
                         Ver detalles completos
                     </button>
