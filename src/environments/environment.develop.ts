@@ -5,7 +5,7 @@ export const environment = {
     appId: '077dcfcb-06f9-4997-9f82-c9bd8dce4c05',//preprod
     baseUrl: 'https://www.ordamy.com',
     callbackUrl: '/auth/callback',
-    middlewareBaseUrl: 'https://ordamy-middleware-prod.bigso.co',
+    middlewareBaseUrl: 'https://ordamy-middleware-dev.bigso.co',
     jwksUrl: 'https://sso-core-prod.bigso.co/.well-known/jwks.json',
 };
 
