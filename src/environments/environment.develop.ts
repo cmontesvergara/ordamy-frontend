@@ -1,10 +1,11 @@
 export const environment = {
     production: true,
-    ssoCoreUrl: 'https://sso-core-dev.bigso.co',
-    ssoPortalUrl: 'https://sso-dev.bigso.co',
-    appId: 'ad7b4e78-a856-486e-9f4c-9fe0a73eb780',//TODO: implementar in edpoint /api/config en el middleware pra que sirva este valor y solo configurrlo en el middleware
-    baseUrl: 'https://ordamy-dev.bigso.co',
+    ssoCoreUrl: 'https://sso-core-prod.bigso.co',
+    ssoPortalUrl: 'https://sso.bigso.co',
+    appId: '077dcfcb-06f9-4997-9f82-c9bd8dce4c05',//preprod
+    baseUrl: 'https://www.ordamy.com',
     callbackUrl: '/auth/callback',
-    middlewareBaseUrl: 'https://ordamy-middleware-dev.bigso.co',
-    jwksUrl: 'https://sso-core-dev.bigso.co/.well-known/jwks.json',
+    middlewareBaseUrl: 'https://ordamy-middleware-prod.bigso.co',
+    jwksUrl: 'https://sso-core-prod.bigso.co/.well-known/jwks.json',
 };
+
