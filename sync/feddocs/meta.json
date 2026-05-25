@@ -1,0 +1,11 @@
+{
+  "name": "Ordamy Frontend",
+  "description": "Aplicación Angular SPA para gestión de órdenes, clientes, egresos e inventario con diseño responsive y soporte PWA",
+  "project": "ordamy-frontend",
+  "ownerTeam": "bigso-core",
+  "techLead": "carlos@bigso.org",
+  "supportChannel": "#ordamy-team",
+  "lifecycle": "active",
+  "version": "0.0.0",
+  "lastReviewed": "2026-05-25"
+}

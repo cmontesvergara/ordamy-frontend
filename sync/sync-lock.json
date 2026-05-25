@@ -1,0 +1,10 @@
+{
+  "lastUpdate": "2026-05-25T12:00:00Z",
+  "commitRef": "feddocs-init-v1",
+  "updatedBy": "GenAI-Doc-Agent",
+  "changes": [
+    "Generación inicial de documentación federada v3.0 para Ordamy Frontend.",
+    "Creación de archivos: meta.json, onboarding.md, architecture.md, integration.md, operations.md, references.md.",
+    "Sincronización desde código fuente real del repositorio ordamy-frontend."
+  ]
+}
