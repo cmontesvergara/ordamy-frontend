@@ -1,462 +1,809 @@
 <app-public-header [ctas]="headerCtas" (ctaClick)="onHeaderCta($event)"></app-public-header>
 
-
 <main>
-
-    <!-- ─── 1. HERO — foco total en el prospecto B2B ─── -->
-    <section aria-labelledby="main-heading" class="flex flex-col justify-center"
-        style="background-color: #fdf6ef; min-height: calc(100vh - 64px); padding-top: 72px; padding-bottom: 72px;">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-
-                <img src="assets/ordamy_logo.png" alt="Ordamy Logo" class="h-16 mx-auto mb-8" />
-
-                <h1 id="main-heading" class="text-4xl font-bold text-slate-900 sm:text-5xl md:text-6xl tracking-tight"
-                    style="letter-spacing: -0.02em; line-height: 1.1;">
-                    Optimiza y controla
-                    <span class="mt-2 block" style="color: #e05a20;">tu negocio al máximo</span>
-                </h1>
-
-                <p class="mx-auto mt-5 max-w-2xl text-lg text-slate-600" style="line-height: 1.6;">
-                    Gestión integral de órdenes, clientes, finanzas y reportes en una sola plataforma intuitiva.
-                </p>
-
-                <!-- CTAs primarios -->
-                <div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-                    <button type="button" (click)="openSignUp()"
-                        class="inline-flex items-center justify-center rounded-md px-8 py-3 text-base font-semibold text-white transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 shadow-md"
-                        style="background-color: #e05a20; line-height: 1;">
-                        Crear cuenta gratis
-                    </button>
-                    <!-- Acceso rápido para clientes activos -->
-                    <button type="button" (click)="goToOrg()"
-                        class="inline-flex items-center justify-center rounded-md border-2 px-8 py-3 text-base font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                        style="border-color: #e05a20; color: #e05a20; line-height: 1;"
-                        onmouseover="this.style.backgroundColor='rgba(224, 90, 32, 0.05)';"
-                        onmouseout="this.style.backgroundColor='transparent';">
-                        Acceder a mi negocio
-                    </button>
-                </div>
-
-                <!-- Derivación discreta hacia el portal de usuarios finales -->
-                <p class="mt-6 text-sm" style="color: #9a9a9a;">
-                    ¿Eres cliente de una empresa en Ordamy?
-                    <a (click)="goToUserPortal()" class="font-medium hover:underline cursor-pointer"
-                        style="color: #e05a20;">
-                        Accede a tu portal de usuarios →
-                    </a>
-                </p>
-
-                <p class="mt-3 text-sm" style="color: #9a9a9a;">
-                    ¿Necesitas ayuda?
-                    <a href="https://wa.me/573052215945" class="font-medium hover:underline"
-                        style="color: #e05a20;">Habla con soporte</a>
-                </p>
-
-            </div>
+  <!-- ─── 1. HERO — foco total en el prospecto B2B ─── -->
+  <section
+    aria-labelledby="main-heading"
+    class="flex flex-col justify-center"
+    style="background-color: #fdf6ef; min-height: calc(100vh - 64px); padding-top: 72px; padding-bottom: 72px"
+  >
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <!-- Badge de problema -->
+        <div
+          class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium mb-6"
+          style="background-color: rgba(224, 90, 32, 0.1); color: #e05a20"
+        >
+          <span>¿Tu negocio creativo pierde control con cada orden?</span>
         </div>
-    </section>
 
-    <!-- ─── 2. PRUEBA SOCIAL ─── -->
-    <section aria-labelledby="social-proof-heading" class="py-12 border-b border-slate-100"
-        style="background-color: #fff;">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <p id="social-proof-heading" class="text-center text-sm font-medium text-slate-400 mb-8 tracking-wider"
-                style="letter-spacing: 0.08em;">
-                NEGOCIOS QUE YA OPERAN CON ORDAMY
+        <h1
+          id="main-heading"
+          class="text-4xl font-bold text-slate-900 sm:text-5xl md:text-6xl tracking-tight"
+          style="letter-spacing: -0.02em; line-height: 1.1"
+        >
+          Ordena tus órdenes, clientes
+          <span class="mt-2 block" style="color: #e05a20">y finanzas en un solo lugar</span>
+        </h1>
+
+        <p class="mx-auto mt-5 max-w-2xl text-lg text-slate-600" style="line-height: 1.6">
+          Diseñado para agencias y negocios creativos. Sin complejidad, sin excel.
+        </p>
+
+        <!-- CTAs primarios -->
+        <div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+          <button
+            type="button"
+            (click)="openSignUp()"
+            class="inline-flex items-center justify-center rounded-md px-8 py-3 text-base font-semibold text-white transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 shadow-md"
+            style="background-color: #e05a20; line-height: 1"
+          >
+            Crear cuenta gratis
+          </button>
+          <button
+            type="button"
+            (click)="scrollToPricing()"
+            class="inline-flex items-center justify-center rounded-md border-2 px-8 py-3 text-base font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style="border-color: #e05a20; color: #e05a20; line-height: 1"
+            onmouseover="this.style.backgroundColor = 'rgba(224, 90, 32, 0.05)'"
+            onmouseout="this.style.backgroundColor = 'transparent'"
+          >
+            Explorar planes
+          </button>
+        </div>
+
+        <!-- Micro-copy de confianza -->
+        <p class="mt-4 text-sm font-medium" style="color: #9a9a9a">
+          Sin tarjeta de crédito · 30 días gratis · Cancela cuando quieras
+        </p>
+
+        <!-- Derivación discreta hacia el portal de usuarios finales -->
+        <p class="mt-6 text-sm" style="color: #9a9a9a">
+          ¿Eres cliente de una empresa en Ordamy?
+          <a (click)="goToUserPortal()" class="font-medium hover:underline cursor-pointer" style="color: #e05a20">
+            Accede a tu portal de usuarios →
+          </a>
+        </p>
+
+        <!-- <p class="mt-3 text-sm" style="color: #9a9a9a">
+          ¿Necesitas ayuda?
+          <a href="https://wa.me/573052215945" class="font-medium hover:underline" style="color: #e05a20"
+            >Habla con soporte</a
+          >
+        </p> -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 2. PRUEBA SOCIAL ─── -->
+  <section
+    aria-labelledby="social-proof-heading"
+    class="py-16 border-b border-slate-100"
+    style="background-color: #fff"
+  >
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <p
+        id="social-proof-heading"
+        class="text-center text-sm font-medium text-slate-400 mb-10 tracking-wider"
+        style="letter-spacing: 0.08em"
+      >
+        NEGOCIOS CREATIVOS QUE YA ORDENARON SU OPERACIÓN
+      </p>
+
+      <!-- Testimonio real -->
+      <div class="mx-auto max-w-2xl text-center">
+        <blockquote class="text-xl text-slate-700 italic" style="line-height: 1.6">
+          "Antes usábamos 3 herramientas. Ahora todo está en Ordamy y cerramos caja en 5 minutos."
+        </blockquote>
+        <div class="mt-6 flex items-center justify-center gap-3">
+          <div
+            class="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+            style="background-color: #e05a20"
+          >
+            JP
+          </div>
+          <div class="text-left">
+            <p class="text-sm font-semibold text-slate-900">Darwin Correa</p>
+            <p class="text-xs text-slate-500">CentroColor Soluciones Impresas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 3. CARACTERÍSTICAS ─── -->
+  <section id="features" aria-labelledby="features-heading" style="background-color: #f4f2ee" class="py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mb-16 text-center">
+        <h2
+          id="features-heading"
+          class="text-3xl font-bold text-slate-900 sm:text-4xl tracking-tight"
+          style="letter-spacing: -0.02em"
+        >
+          Todo lo que necesitas para operar
+        </h2>
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600" style="line-height: 1.6">
+          Herramientas diseñadas para el flujo de agencias y negocios creativos
+        </p>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <!-- Gestión de Órdenes -->
+        <article
+          class="rounded-xl border bg-white p-8 transition-all duration-200 hover:-translate-y-1"
+          style="
+            border-color: #e5ddd4;
+            border-radius: 10px;
+            box-shadow:
+              0 1px 3px rgba(0, 0, 0, 0.07),
+              0 4px 12px rgba(0, 0, 0, 0.04);
+          "
+        >
+          <div
+            class="mb-6 flex h-16 w-16 items-center justify-center rounded-xl"
+            style="background-color: rgba(224, 90, 32, 0.1); color: #e05a20; border-radius: 8px"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+          <h3 class="mb-4 text-xl font-bold text-slate-900" style="letter-spacing: -0.01em">Gestión de Órdenes</h3>
+          <p class="text-slate-600" style="line-height: 1.6">
+            Crea órdenes de trabajo en segundos. Asigna equipos, define deadlines y da seguimiento sin perder nada en
+            WhatsApp.
+          </p>
+        </article>
+
+        <!-- Caja y Finanzas -->
+        <article
+          class="rounded-xl border bg-white p-8 transition-all duration-200 hover:-translate-y-1"
+          style="
+            border-color: #e5ddd4;
+            border-radius: 10px;
+            box-shadow:
+              0 1px 3px rgba(0, 0, 0, 0.07),
+              0 4px 12px rgba(0, 0, 0, 0.04);
+          "
+        >
+          <div
+            class="mb-6 flex h-16 w-16 items-center justify-center rounded-xl"
+            style="background-color: rgba(224, 90, 32, 0.1); color: #e05a20; border-radius: 8px"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h3 class="mb-4 text-xl font-bold text-slate-900" style="letter-spacing: -0.01em">Caja y Finanzas</h3>
+          <p class="text-slate-600" style="line-height: 1.6">
+            Controla ingresos y egresos por orden. Cierres de caja precisos sin estrés y sin spreadsheets.
+          </p>
+        </article>
+
+        <!-- Analítica -->
+        <article
+          class="rounded-xl border bg-white p-8 transition-all duration-200 hover:-translate-y-1"
+          style="
+            border-color: #e5ddd4;
+            border-radius: 10px;
+            box-shadow:
+              0 1px 3px rgba(0, 0, 0, 0.07),
+              0 4px 12px rgba(0, 0, 0, 0.04);
+          "
+        >
+          <div
+            class="mb-6 flex h-16 w-16 items-center justify-center rounded-xl"
+            style="background-color: rgba(224, 90, 32, 0.1); color: #e05a20; border-radius: 8px"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+          </div>
+          <h3 class="mb-4 text-xl font-bold text-slate-900" style="letter-spacing: -0.01em">Analítica y Reportes</h3>
+          <p class="text-slate-600" style="line-height: 1.6">
+            Descubre qué clientes y servicios son más rentables. Métricas claras para tomar mejores decisiones.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 4. DIFERENCIADORES / OBJECIONES ─── -->
+  <section aria-labelledby="diferenciadores-heading" class="py-20" style="background-color: #fff">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mb-12 text-center">
+        <h2
+          id="diferenciadores-heading"
+          class="text-3xl font-bold text-slate-900 sm:text-4xl tracking-tight"
+          style="letter-spacing: -0.02em"
+        >
+          Sin complicaciones
+        </h2>
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600" style="line-height: 1.6">
+          Resolvemos tus dudas antes de que las tengas
+        </p>
+      </div>
+
+      <!-- Strip de objeciones -->
+      <div class="mx-auto max-w-5xl grid gap-6 md:grid-cols-3">
+        <div
+          class="flex flex-col items-center text-center rounded-xl border p-6"
+          style="border-color: #e5ddd4; background-color: #fdf6ef"
+        >
+          <div
+            class="flex h-12 w-12 items-center justify-center rounded-full text-white mb-4"
+            style="background-color: #e05a20"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+              />
+            </svg>
+          </div>
+          <p class="font-semibold text-slate-900 text-lg">¿Es difícil de configurar?</p>
+          <p class="text-sm mt-2 text-slate-500">Listo en 10 minutos. Importa tus clientes y empieza a facturar hoy.</p>
+        </div>
+
+        <div
+          class="flex flex-col items-center text-center rounded-xl border p-6"
+          style="border-color: #e5ddd4; background-color: #fdf6ef"
+        >
+          <div
+            class="flex h-12 w-12 items-center justify-center rounded-full text-white mb-4"
+            style="background-color: #e05a20"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+              />
+            </svg>
+          </div>
+          <p class="font-semibold text-slate-900 text-lg">¿Y si no me convence?</p>
+          <p class="text-sm mt-2 text-slate-500">30 días de prueba gratis. Sin tarjeta, sin compromiso.</p>
+        </div>
+
+        <div
+          class="flex flex-col items-center text-center rounded-xl border p-6"
+          style="border-color: #e5ddd4; background-color: #fdf6ef"
+        >
+          <div
+            class="flex h-12 w-12 items-center justify-center rounded-full text-white mb-4"
+            style="background-color: #e05a20"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+              />
+            </svg>
+          </div>
+          <p class="font-semibold text-slate-900 text-lg">¿Y si ya tengo clientes en Excel?</p>
+          <p class="text-sm mt-2 text-slate-500">Importa tus contactos en un clic. Sin perder nada de información.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PRICING ═══ -->
+  <section id="pricing" aria-labelledby="pricing-heading" class="py-20" style="background-color: #fdf6ef">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mb-16 text-center">
+        <h2
+          id="pricing-heading"
+          class="text-3xl font-bold text-slate-900 sm:text-4xl tracking-tight"
+          style="letter-spacing: -0.02em"
+        >
+          Un plan para cada etapa
+        </h2>
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600" style="line-height: 1.6">
+          Arranca con 30 días gratis. Sin tarjeta, sin letra pequeña.
+        </p>
+      </div>
+
+      <div class="grid gap-8 lg:grid-cols-3 items-start">
+        <!-- STARTER -->
+        <article
+          class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1"
+          style="
+            border-color: #e5ddd4;
+            box-shadow:
+              0 1px 3px rgba(0, 0, 0, 0.07),
+              0 4px 12px rgba(0, 0, 0, 0.04);
+          "
+        >
+          <div class="mb-6">
+            <h3 class="text-xl font-bold text-slate-900">Starter</h3>
+            <p class="text-sm text-slate-500 mt-1">Para quien empieza a ordenar</p>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-bold text-slate-900">$99.000</span>
+              <span class="text-sm text-slate-500">COP/mes</span>
+            </div>
+          </div>
+          <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              1 usuario
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              1 sucursal
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Hasta 20 clientes
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Hasta 50 órdenes/mes
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Hasta 50 productos
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Reportes básicos
+            </li>
+          </ul>
+          <button
+            type="button"
+            (click)="openSignUp()"
+            class="w-full inline-flex items-center justify-center rounded-md border-2 px-6 py-3 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style="border-color: #e05a20; color: #e05a20"
+            onmouseover="this.style.backgroundColor = 'rgba(224, 90, 32, 0.05)'"
+            onmouseout="this.style.backgroundColor = 'transparent'"
+          >
+            Crear cuenta gratis
+          </button>
+        </article>
+
+        <!-- PRO - Recomendado -->
+        <article
+          class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1 relative"
+          style="
+            border-color: #e05a20;
+            box-shadow:
+              0 0 20px rgba(224, 90, 32, 0.15),
+              0 4px 16px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <div
+            class="absolute -top-3 left-1/2 -translate-x-1/2 inline-block rounded-full px-4 py-1 text-xs font-bold text-white"
+            style="background-color: #e05a20; box-shadow: 0 2px 8px rgba(224, 90, 32, 0.4)"
+          >
+            Más popular
+          </div>
+          <div class="mb-6 mt-2">
+            <h3 class="text-xl font-bold text-slate-900">Pro</h3>
+            <p class="text-sm text-slate-500 mt-1">Para la agencia en crecimiento</p>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-bold text-slate-900">$249.000</span>
+              <span class="text-sm text-slate-500">COP/mes</span>
+            </div>
+          </div>
+          <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Hasta 5 usuarios
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              1 sucursal
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Hasta 100 clientes
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Hasta 200 órdenes/mes
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Hasta 200 productos
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Reportes avanzados
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Portal de clientes
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Control de egresos
+            </li>
+          </ul>
+          <button
+            type="button"
+            (click)="openSignUp()"
+            class="w-full inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-bold text-white transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style="background-color: #e05a20; box-shadow: 0 4px 12px rgba(224, 90, 32, 0.4)"
+            onmouseover="this.style.backgroundColor = '#c94c18'"
+            onmouseout="this.style.backgroundColor = '#e05a20'"
+          >
+            Crear cuenta gratis
+          </button>
+        </article>
+
+        <!-- AGENCIA -->
+        <article
+          class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1"
+          style="
+            border-color: #e5ddd4;
+            box-shadow:
+              0 1px 3px rgba(0, 0, 0, 0.07),
+              0 4px 12px rgba(0, 0, 0, 0.04);
+          "
+        >
+          <div class="mb-6">
+            <h3 class="text-xl font-bold text-slate-900">Agencia</h3>
+            <p class="text-sm text-slate-500 mt-1">Operación sin límites</p>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-bold text-slate-900">$499.000</span>
+              <span class="text-sm text-slate-500">COP/mes</span>
+            </div>
+          </div>
+          <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Usuarios ilimitados
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Sucursales ilimitadas
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Clientes ilimitados
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Órdenes ilimitadas
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Productos ilimitados
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Exportación Excel / PDF
+            </li>
+            <li class="flex items-start gap-2">
+              <svg
+                class="w-5 h-5 text-emerald-500 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Soporte dedicado
+            </li>
+          </ul>
+          <button
+            type="button"
+            (click)="openSignUp()"
+            class="w-full inline-flex items-center justify-center rounded-md border-2 px-6 py-3 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style="border-color: #e05a20; color: #e05a20"
+            onmouseover="this.style.backgroundColor = 'rgba(224, 90, 32, 0.05)'"
+            onmouseout="this.style.backgroundColor = 'transparent'"
+          >
+            Crear cuenta gratis
+          </button>
+        </article>
+      </div>
+
+      <p class="text-center mt-10 text-sm text-slate-500">
+        🎁 <strong class="text-slate-700">Paga anual y ahorra 2 meses.</strong> Starter: $990.000 COP/año · Pro:
+        $2.490.000 COP/año · Agencia: $4.990.000 COP/año
+      </p>
+
+      <!-- FAQ Grid -->
+      <div class="mt-20">
+        <h3 class="text-2xl font-bold text-slate-900 text-center mb-10" style="letter-spacing: -0.02em">
+          Preguntas frecuentes
+        </h3>
+        <div class="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
+          <div class="rounded-xl border p-6" style="border-color: #e5ddd4; background-color: #fff">
+            <p class="font-semibold text-slate-900 mb-2">¿Qué pasa después de los 30 días?</p>
+            <p class="text-sm text-slate-600">
+              Eliges el plan que más se ajuste a tu negocio. Si no contratas, tu cuenta se pausa pero no pierdes tus
+              datos.
             </p>
-            <!-- Reemplazar con logos reales o métricas -->
-            <div class="flex flex-wrap justify-center items-center gap-10">
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-slate-800" style="letter-spacing: -0.02em;">+500</p>
-                    <p class="text-sm text-slate-400 mt-1">Negocios activos</p>
-                </div>
-                <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-slate-800" style="letter-spacing: -0.02em;">+120k</p>
-                    <p class="text-sm text-slate-400 mt-1">Órdenes procesadas</p>
-                </div>
-                <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
-                <div class="text-center">
-                    <p class="text-3xl font-bold text-slate-800" style="letter-spacing: -0.02em;">4.9★</p>
-                    <p class="text-sm text-slate-400 mt-1">Valoración promedio</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ─── 3. CARACTERÍSTICAS ─── -->
-    <section id="features" aria-labelledby="features-heading" style="background-color: #f4f2ee;" class="py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-            <div class="mb-16 text-center">
-                <h2 id="features-heading" class="text-3xl font-bold text-slate-900 sm:text-4xl tracking-tight"
-                    style="letter-spacing: -0.02em;">
-                    Todo lo que necesitas para operar
-                </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600" style="line-height: 1.6;">
-                    Herramientas diseñadas específicamente para el flujo dinámico de tu negocio
-                </p>
-            </div>
-
-            <div class="grid gap-6 md:grid-cols-3">
-
-                <!-- Gestión de Órdenes -->
-                <article class="rounded-xl border bg-white p-8 transition-all duration-200 hover:-translate-y-1"
-                    style="border-color: #e5ddd4; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);">
-                    <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-xl"
-                        style="background-color: rgba(224, 90, 32, 0.1); color: #e05a20; border-radius: 8px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                    </div>
-                    <h3 class="mb-4 text-xl font-bold text-slate-900" style="letter-spacing: -0.01em;">Gestión de
-                        Órdenes</h3>
-                    <p class="text-slate-600" style="line-height: 1.6;">
-                        Crea órdenes rápidas, añade múltiples ítems y controla los estados desde el inicio hasta la
-                        entrega.
-                    </p>
-                </article>
-
-                <!-- Caja y Finanzas -->
-                <article class="rounded-xl border bg-white p-8 transition-all duration-200 hover:-translate-y-1"
-                    style="border-color: #e5ddd4; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);">
-                    <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-xl"
-                        style="background-color: rgba(224, 90, 32, 0.1); color: #e05a20; border-radius: 8px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <h3 class="mb-4 text-xl font-bold text-slate-900" style="letter-spacing: -0.01em;">Caja y Finanzas
-                    </h3>
-                    <p class="text-slate-600" style="line-height: 1.6;">
-                        Control exacto de ingresos y egresos. Cierres de caja precisos y conciliaciones sin estrés.
-                    </p>
-                </article>
-
-                <!-- Analítica -->
-                <article class="rounded-xl border bg-white p-8 transition-all duration-200 hover:-translate-y-1"
-                    style="border-color: #e5ddd4; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);">
-                    <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-xl"
-                        style="background-color: rgba(224, 90, 32, 0.1); color: #e05a20; border-radius: 8px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                    </div>
-                    <h3 class="mb-4 text-xl font-bold text-slate-900" style="letter-spacing: -0.01em;">Analítica y
-                        Reportes</h3>
-                    <p class="text-slate-600" style="line-height: 1.6;">
-                        Métricas clave de ventas y rendimiento en tiempo real para tomar las mejores decisiones.
-                    </p>
-                </article>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- ─── 4. DIFERENCIADORES ─── -->
-    <section aria-labelledby="diferenciadores-heading" class="py-20" style="background-color: #fff;">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-            <div class="mb-16 text-center">
-                <h2 id="diferenciadores-heading" class="text-3xl font-bold text-slate-900 sm:text-4xl tracking-tight"
-                    style="letter-spacing: -0.02em;">
-                    Diseñado para la velocidad de tu negocio
-                </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600" style="line-height: 1.6;">
-                    Escalable para múltiples sucursales con control absoluto de permisos.
-                </p>
-            </div>
-
-            <div class="mx-auto max-w-4xl grid gap-8 md:grid-cols-3">
-
-                <div class="flex flex-col items-center text-center">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full text-white mb-4"
-                        style="background-color: #e05a20;">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <p class="font-semibold text-slate-900 text-lg">Rapidez en caja</p>
-                    <p class="text-sm mt-2 text-slate-500">Flujos de cobro en 3 clics o menos</p>
-                </div>
-
-                <div class="flex flex-col items-center text-center">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full text-white mb-4"
-                        style="background-color: #e05a20;">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <p class="font-semibold text-slate-900 text-lg">Multi-sucursal</p>
-                    <p class="text-sm mt-2 text-slate-500">Varios locales bajo tu misma cuenta</p>
-                </div>
-
-                <div class="flex flex-col items-center text-center">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full text-white mb-4"
-                        style="background-color: #e05a20;">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <p class="font-semibold text-slate-900 text-lg">Portal de clientes</p>
-                    <p class="text-sm mt-2 text-slate-500">Tus clientes se auto-gestionan, menos carga para ti</p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- ═══ PRICING ═══ -->
-    <section id="pricing" aria-labelledby="pricing-heading" class="py-20" style="background-color: #fdf6ef;">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-            <div class="mb-16 text-center">
-                <h2 id="pricing-heading" class="text-3xl font-bold text-slate-900 sm:text-4xl tracking-tight"
-                    style="letter-spacing: -0.02em;">
-                    Un plan para cada etapa
-                </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600" style="line-height: 1.6;">
-                    Arranca con 30 días gratis. Sin tarjeta, sin letra pequeña.
-                </p>
-            </div>
-
-            <div class="grid gap-8 lg:grid-cols-3 items-start">
-
-                <!-- STARTER -->
-                <article class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1"
-                    style="border-color: #e5ddd4; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);">
-                    <div class="mb-6">
-                        <h3 class="text-xl font-bold text-slate-900">Starter</h3>
-                        <p class="text-sm text-slate-500 mt-1">Para quien empieza a ordenar</p>
-                        <div class="mt-4 flex items-baseline gap-1">
-                            <span class="text-4xl font-bold text-slate-900">$99.000</span>
-                            <span class="text-sm text-slate-500">COP/mes</span>
-                        </div>
-                    </div>
-                    <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            1 usuario
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            1 sucursal
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Hasta 20 clientes
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Hasta 50 órdenes/mes
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Hasta 50 productos
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Reportes básicos
-                        </li>
-                    </ul>
-                    <button type="button" (click)="openSignUp()" class="w-full inline-flex items-center justify-center rounded-md border-2 px-6 py-3 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                        style="border-color: #e05a20; color: #e05a20;"
-                        onmouseover="this.style.backgroundColor='rgba(224, 90, 32, 0.05)';"
-                        onmouseout="this.style.backgroundColor='transparent';">
-                        Crear cuenta gratis
-                    </button>
-                </article>
-
-                <!-- PRO - Recomendado -->
-                <article class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1 relative"
-                    style="border-color: #e05a20; box-shadow: 0 0 20px rgba(224, 90, 32, 0.15), 0 4px 16px rgba(0,0,0,0.08);">
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 inline-block rounded-full px-4 py-1 text-xs font-bold text-white"
-                        style="background-color: #e05a20; box-shadow: 0 2px 8px rgba(224, 90, 32, 0.4);">
-                        Más popular
-                    </div>
-                    <div class="mb-6 mt-2">
-                        <h3 class="text-xl font-bold text-slate-900">Pro</h3>
-                        <p class="text-sm text-slate-500 mt-1">Para la agencia en crecimiento</p>
-                        <div class="mt-4 flex items-baseline gap-1">
-                            <span class="text-4xl font-bold text-slate-900">$249.000</span>
-                            <span class="text-sm text-slate-500">COP/mes</span>
-                        </div>
-                    </div>
-                    <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Hasta 5 usuarios
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            1 sucursal
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Hasta 100 clientes
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Hasta 200 órdenes/mes
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Hasta 200 productos
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Reportes avanzados
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Portal de clientes
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Control de egresos
-                        </li>
-                    </ul>
-                    <button type="button" (click)="openSignUp()"
-                        class="w-full inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-bold text-white transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                        style="background-color: #e05a20; box-shadow: 0 4px 12px rgba(224, 90, 32, 0.4);"
-                        onmouseover="this.style.backgroundColor='#c94c18';"
-                        onmouseout="this.style.backgroundColor='#e05a20';">
-                        Crear cuenta gratis
-                    </button>
-                </article>
-
-                <!-- AGENCIA -->
-                <article class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1"
-                    style="border-color: #e5ddd4; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);">
-                    <div class="mb-6">
-                        <h3 class="text-xl font-bold text-slate-900">Agencia</h3>
-                        <p class="text-sm text-slate-500 mt-1">Operación sin límites</p>
-                        <div class="mt-4 flex items-baseline gap-1">
-                            <span class="text-4xl font-bold text-slate-900">$499.000</span>
-                            <span class="text-sm text-slate-500">COP/mes</span>
-                        </div>
-                    </div>
-                    <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Usuarios ilimitados
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Sucursales ilimitadas
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Clientes ilimitados
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Órdenes ilimitadas
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Productos ilimitados
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Exportación Excel / PDF
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            Soporte dedicado
-                        </li>
-                    </ul>
-                    <button type="button" (click)="openSignUp()" class="w-full inline-flex items-center justify-center rounded-md border-2 px-6 py-3 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                        style="border-color: #e05a20; color: #e05a20;"
-                        onmouseover="this.style.backgroundColor='rgba(224, 90, 32, 0.05)';"
-                        onmouseout="this.style.backgroundColor='transparent';">
-                        Crear cuenta gratis
-                    </button>
-                </article>
-
-            </div>
-
-            <p class="text-center mt-10 text-sm text-slate-500">
-                🎁 <strong class="text-slate-700">Paga anual y ahorra 2 meses.</strong> Starter: $990.000 COP/año · Pro: $2.490.000 COP/año · Agencia: $4.990.000 COP/año
+          </div>
+          <div class="rounded-xl border p-6" style="border-color: #e5ddd4; background-color: #fff">
+            <p class="font-semibold text-slate-900 mb-2">¿Puedo cambiar de plan?</p>
+            <p class="text-sm text-slate-600">
+              Sí, puedes subir o bajar de plan en cualquier momento. El cambio se refleja inmediatamente.
             </p>
-
-        </div>
-    </section>
-
-    <!-- ─── 5. CTA FINAL DE CONVERSIÓN ─── -->
-    <section aria-labelledby="cta-final-heading" class="py-24 relative overflow-hidden"
-        style="background-color: #1a1a2e;">
-
-        <!-- Patrón de fondo decorativo -->
-        <div class="absolute inset-0 opacity-10"
-            style="background-image: url('data:image/svg+xml,%3Csvg width=\x2220\x22 height=\x2220\x22 xmlns=\x22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg\x22%3E%3Ccircle cx=\x222\x22 cy=\x222\x22 r=\x222\x22 fill=\x22white\x22%2F%3E%3C%2Fsvg%3E');">
-        </div>
-
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-
-            <h2 id="cta-final-heading" class="text-3xl font-bold text-white sm:text-4xl tracking-tight"
-                style="letter-spacing: -0.02em;">
-                Empieza hoy, sin complicaciones
-            </h2>
-            <p class="mx-auto mt-4 max-w-xl text-lg" style="color: #9a9a9a; line-height: 1.6;">
-                Crea tu cuenta en minutos y lleva el control de tu negocio desde el primer día.
+          </div>
+          <div class="rounded-xl border p-6" style="border-color: #e5ddd4; background-color: #fff">
+            <p class="font-semibold text-slate-900 mb-2">¿Cómo funciona el soporte?</p>
+            <p class="text-sm text-slate-600">
+              Soporte por WhatsApp y email. Respondemos en menos de 24 horas en días hábiles.
             </p>
-
-            <div class="mt-10">
-                <button type="button" (click)="openSignUp()"
-                    class="inline-flex items-center justify-center rounded-md px-10 py-4 text-base font-bold text-white transition-all duration-150 hover:scale-105"
-                    style="background-color: #e05a20; box-shadow: 0 0 20px rgba(224, 90, 32, 0.45); line-height: 1;">
-                    Crear cuenta gratis
-                </button>
-            </div>
-
-            <p class="mt-6 text-sm" style="color: #bdbdbd;">
-                ¿Dudas técnicas?
-                <a href="https://wa.me/573052215945" class="underline hover:text-white transition-colors">Habla con
-                    soporte</a>
+          </div>
+          <div class="rounded-xl border p-6" style="border-color: #e5ddd4; background-color: #fff">
+            <p class="font-semibold text-slate-900 mb-2">¿Hay límites de órdenes o clientes?</p>
+            <p class="text-sm text-slate-600">
+              Cada plan tiene límites claros. El plan Agencia no tiene límites de usuarios, clientes ni órdenes.
             </p>
-
-            <!-- Acceso discreto para clientes activos dentro del CTA -->
-            <p class="mt-4 text-sm" style="color: #6a6a7a;">
-                ¿Ya tienes cuenta?
-                <button (click)="goToOrg()"
-                    class="underline hover:text-white transition-colors cursor-pointer bg-transparent border-none"
-                    style="color: #6a6a7a; font-size: inherit;">
-                    Acceder a mi negocio
-                </button>
+          </div>
+          <div class="rounded-xl border p-6" style="border-color: #e5ddd4; background-color: #fff">
+            <p class="font-semibold text-slate-900 mb-2">¿Puedo exportar mis datos?</p>
+            <p class="text-sm text-slate-600">
+              Sí, exporta tus órdenes, clientes y reportes a Excel o PDF en cualquier momento.
             </p>
-
+          </div>
+          <div class="rounded-xl border p-6" style="border-color: #e5ddd4; background-color: #fff">
+            <p class="font-semibold text-slate-900 mb-2">¿Es seguro mi información?</p>
+            <p class="text-sm text-slate-600">
+              Tus datos se almacenan en servidores seguros con encriptación. Nunca compartimos tu información.
+            </p>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
+  <!-- ─── 5. CTA FINAL DE CONVERSIÓN ─── -->
+  <section aria-labelledby="cta-final-heading" class="py-24 relative overflow-hidden" style="background-color: #1c1c1c">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <h2
+        id="cta-final-heading"
+        class="text-3xl font-bold text-white sm:text-4xl tracking-tight"
+        style="letter-spacing: -0.02em"
+      >
+        Empieza gratis. Ordena tu negocio desde el primer día.
+      </h2>
+      <p class="mx-auto mt-4 max-w-xl text-lg" style="color: #c4b8b0; line-height: 1.6">
+        Crea tu cuenta en minutos y lleva el control de tu negocio creativo sin complicaciones.
+      </p>
+
+      <div class="mt-10">
+        <button
+          type="button"
+          (click)="openSignUp()"
+          class="inline-flex items-center justify-center rounded-md px-10 py-4 text-base font-bold text-white transition-all duration-150 hover:scale-105"
+          style="background-color: #e05a20; box-shadow: 0 0 20px rgba(224, 90, 32, 0.45); line-height: 1"
+        >
+          Crear cuenta gratis
+        </button>
+      </div>
+
+      <p class="mt-4 text-sm font-medium" style="color: #a89e98">
+        Sin tarjeta · Sin permanencia · Soporte por WhatsApp
+      </p>
+
+      <p class="mt-6 text-sm" style="color: #a89e98">
+        ¿Dudas técnicas?
+        <a href="https://wa.me/573052215945" class="underline hover:text-white transition-colors">Habla con soporte</a>
+      </p>
+
+      <!-- Acceso discreto para clientes activos dentro del CTA -->
+      <p class="mt-4 text-sm" style="color: #7a726d">
+        ¿Ya tienes cuenta?
+        <button
+          (click)="goToOrg()"
+          class="underline hover:text-white transition-colors cursor-pointer bg-transparent border-none"
+          style="color: #7a726d; font-size: inherit"
+        >
+          Acceder a mi negocio
+        </button>
+      </p>
+    </div>
+  </section>
 </main>
 
 <!-- Footer -->
-<footer class="w-full border-t py-10" style="background-color: #f8fafc; border-color: #e2e8f0;">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<footer class="w-full border-t py-10" style="background-color: #f8fafc; border-color: #e2e8f0">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+      <!-- Marca -->
+      <div class="flex items-center gap-2">
+        <span class="text-lg font-bold text-slate-900">ORDAMY</span>
+        <span class="text-slate-300">|</span>
+        <span class="text-xs text-slate-400 tracking-wider">by BIGSO</span>
+      </div>
 
-            <!-- Marca -->
-            <div class="flex items-center gap-2">
-                <span class="text-lg font-bold text-slate-900">ORDAMY</span>
-                <span class="text-slate-300">|</span>
-                <span class="text-xs text-slate-400 tracking-wider">by BIGSO</span>
-            </div>
-
-
-
-            <!-- Legal -->
-            <p class="text-sm text-slate-400">
-                © 2026 Bigso Labs S.A.S. Todos los derechos reservados.
-            </p>
-
-        </div>
+      <!-- Legal -->
+      <p class="text-sm text-slate-400">© 2026 Bigso Labs S.A.S. Todos los derechos reservados.</p>
     </div>
+  </div>
 </footer>
