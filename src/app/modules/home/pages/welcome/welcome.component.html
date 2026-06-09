@@ -213,6 +213,183 @@
         </div>
     </section>
 
+    <!-- ═══ PRICING ═══ -->
+    <section id="pricing" aria-labelledby="pricing-heading" class="py-20" style="background-color: #fdf6ef;">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+            <div class="mb-16 text-center">
+                <h2 id="pricing-heading" class="text-3xl font-bold text-slate-900 sm:text-4xl tracking-tight"
+                    style="letter-spacing: -0.02em;">
+                    Un plan para cada etapa
+                </h2>
+                <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600" style="line-height: 1.6;">
+                    Arranca con 30 días gratis. Sin tarjeta, sin letra pequeña.
+                </p>
+            </div>
+
+            <div class="grid gap-8 lg:grid-cols-3 items-start">
+
+                <!-- STARTER -->
+                <article class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1"
+                    style="border-color: #e5ddd4; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">Starter</h3>
+                        <p class="text-sm text-slate-500 mt-1">Para quien empieza a ordenar</p>
+                        <div class="mt-4 flex items-baseline gap-1">
+                            <span class="text-4xl font-bold text-slate-900">$99.000</span>
+                            <span class="text-sm text-slate-500">COP/mes</span>
+                        </div>
+                    </div>
+                    <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            1 usuario
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            1 sucursal
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Hasta 20 clientes
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Hasta 50 órdenes/mes
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Hasta 50 productos
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Reportes básicos
+                        </li>
+                    </ul>
+                    <button type="button" (click)="openSignUp()" class="w-full inline-flex items-center justify-center rounded-md border-2 px-6 py-3 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        style="border-color: #e05a20; color: #e05a20;"
+                        onmouseover="this.style.backgroundColor='rgba(224, 90, 32, 0.05)';"
+                        onmouseout="this.style.backgroundColor='transparent';">
+                        Crear cuenta gratis
+                    </button>
+                </article>
+
+                <!-- PRO - Recomendado -->
+                <article class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1 relative"
+                    style="border-color: #e05a20; box-shadow: 0 0 20px rgba(224, 90, 32, 0.15), 0 4px 16px rgba(0,0,0,0.08);">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 inline-block rounded-full px-4 py-1 text-xs font-bold text-white"
+                        style="background-color: #e05a20; box-shadow: 0 2px 8px rgba(224, 90, 32, 0.4);">
+                        Más popular
+                    </div>
+                    <div class="mb-6 mt-2">
+                        <h3 class="text-xl font-bold text-slate-900">Pro</h3>
+                        <p class="text-sm text-slate-500 mt-1">Para la agencia en crecimiento</p>
+                        <div class="mt-4 flex items-baseline gap-1">
+                            <span class="text-4xl font-bold text-slate-900">$249.000</span>
+                            <span class="text-sm text-slate-500">COP/mes</span>
+                        </div>
+                    </div>
+                    <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Hasta 5 usuarios
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            1 sucursal
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Hasta 100 clientes
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Hasta 200 órdenes/mes
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Hasta 200 productos
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Reportes avanzados
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Portal de clientes
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Control de egresos
+                        </li>
+                    </ul>
+                    <button type="button" (click)="openSignUp()"
+                        class="w-full inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-bold text-white transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        style="background-color: #e05a20; box-shadow: 0 4px 12px rgba(224, 90, 32, 0.4);"
+                        onmouseover="this.style.backgroundColor='#c94c18';"
+                        onmouseout="this.style.backgroundColor='#e05a20';">
+                        Crear cuenta gratis
+                    </button>
+                </article>
+
+                <!-- AGENCIA -->
+                <article class="rounded-xl border bg-white p-8 flex flex-col transition-all duration-200 hover:-translate-y-1"
+                    style="border-color: #e5ddd4; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">Agencia</h3>
+                        <p class="text-sm text-slate-500 mt-1">Operación sin límites</p>
+                        <div class="mt-4 flex items-baseline gap-1">
+                            <span class="text-4xl font-bold text-slate-900">$499.000</span>
+                            <span class="text-sm text-slate-500">COP/mes</span>
+                        </div>
+                    </div>
+                    <ul class="flex-1 space-y-3 text-slate-600 text-sm mb-8">
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Usuarios ilimitados
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Sucursales ilimitadas
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Clientes ilimitados
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Órdenes ilimitadas
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Productos ilimitados
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Exportación Excel / PDF
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Soporte dedicado
+                        </li>
+                    </ul>
+                    <button type="button" (click)="openSignUp()" class="w-full inline-flex items-center justify-center rounded-md border-2 px-6 py-3 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        style="border-color: #e05a20; color: #e05a20;"
+                        onmouseover="this.style.backgroundColor='rgba(224, 90, 32, 0.05)';"
+                        onmouseout="this.style.backgroundColor='transparent';">
+                        Crear cuenta gratis
+                    </button>
+                </article>
+
+            </div>
+
+            <p class="text-center mt-10 text-sm text-slate-500">
+                🎁 <strong class="text-slate-700">Paga anual y ahorra 2 meses.</strong> Starter: $990.000 COP/año · Pro: $2.490.000 COP/año · Agencia: $4.990.000 COP/año
+            </p>
+
+        </div>
+    </section>
+
     <!-- ─── 5. CTA FINAL DE CONVERSIÓN ─── -->
     <section aria-labelledby="cta-final-heading" class="py-24 relative overflow-hidden"
         style="background-color: #1a1a2e;">
