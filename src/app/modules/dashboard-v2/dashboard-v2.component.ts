@@ -79,13 +79,19 @@ export class DashboardV2Component implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.reportService.getDashboard().subscribe({
-            next: (res: any) => { this.data = res.data; },
+            next: (res: any) => {
+                this.data = res.data;
+                // Charts need DOM to be rendered; defer to next tick
+                setTimeout(() => {
+                    this.initSalesExpensesChart();
+                    this.initProfitChart();
+                }, 0);
+            },
         });
     }
 
     ngAfterViewInit() {
-        this.initSalesExpensesChart();
-        this.initProfitChart();
+        // Charts will be initialized after data arrives (see ngOnInit)
     }
 
     private initSalesExpensesChart() {
