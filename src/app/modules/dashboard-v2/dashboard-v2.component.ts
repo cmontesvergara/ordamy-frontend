@@ -34,7 +34,7 @@ export class DashboardV2Component implements OnInit {
     operationalSteps = [
         { key: 'PENDING', label: 'Pendiente', color: '#64748b', bg: '#f1f5f9' },
         { key: 'APPROVED', label: 'Aprobada', color: '#3b82f6', bg: '#eff6ff' },
-        { key: 'IN_PRODUCTION', label: 'En producción', color: '#f59e0b', bg: '#fffbeb' },
+        { key: 'IN_PRODUCTION', label: 'producción', color: '#f59e0b', bg: '#fffbeb' },
         { key: 'PRODUCED', label: 'Producida', color: '#8b5cf6', bg: '#f5f3ff' },
         { key: 'DELIVERED', label: 'Entregada', color: '#10b981', bg: '#ecfdf5' },
     ];
@@ -60,6 +60,10 @@ export class DashboardV2Component implements OnInit {
     // ApexCharts options
     salesExpensesChartOptions: any;
     profitChartOptions: any;
+    sparklineProfitOptions: any;
+    sparklineSalesOptions: any;
+    sparklineExpensesOptions: any;
+    sparklinePortfolioOptions: any;
 
     // Fake sparkline data for v1.5 (will be replaced by real historical data in v2.0)
     sparklines = {
@@ -152,6 +156,62 @@ export class DashboardV2Component implements OnInit {
                 },
             },
             grid: { borderColor: '#f1f5f9', strokeDashArray: 4, position: 'back' },
+        };
+
+        // Sparkline options for KPI cards
+        const sparklineBase = {
+            chart: { type: 'line', height: 50, sparkline: { enabled: true }, toolbar: { show: false }, animations: { enabled: true } },
+            stroke: { curve: 'smooth', width: 2 },
+            tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' } }, marker: { show: false } },
+        };
+
+        this.sparklineProfitOptions = {
+            ...sparklineBase,
+            series: [{ data: this.sparklines.profit }],
+            colors: ['#ef4444'],
+            tooltip: {
+                ...sparklineBase.tooltip,
+                y: {
+                    title: { formatter: () => 'Utilidad' },
+                    formatter: (val: number) => `${val}%`,
+                },
+            },
+        };
+        this.sparklineSalesOptions = {
+            ...sparklineBase,
+            series: [{ data: this.sparklines.sales }],
+            colors: ['#10b981'],
+            tooltip: {
+                ...sparklineBase.tooltip,
+                y: {
+                    title: { formatter: () => 'Ventas' },
+                    formatter: (val: number) => `${val}%`,
+                },
+            },
+        };
+        this.sparklineExpensesOptions = {
+            ...sparklineBase,
+            series: [{ data: this.sparklines.expenses }],
+            colors: ['#ef4444'],
+            tooltip: {
+                ...sparklineBase.tooltip,
+                y: {
+                    title: { formatter: () => 'Egresos' },
+                    formatter: (val: number) => `${val}%`,
+                },
+            },
+        };
+        this.sparklinePortfolioOptions = {
+            ...sparklineBase,
+            series: [{ data: this.sparklines.portfolio }],
+            colors: ['#d97706'],
+            tooltip: {
+                ...sparklineBase.tooltip,
+                y: {
+                    title: { formatter: () => 'Cartera' },
+                    formatter: (val: number) => `${val}%`,
+                },
+            },
         };
 
         this.reportService.getDashboard().subscribe({
@@ -266,24 +326,6 @@ export class DashboardV2Component implements OnInit {
 
     abs(value: number): number {
         return Math.abs(value);
-    }
-
-    // Sparkline SVG path generator
-    sparklinePath(values: number[]): string {
-        if (!values.length) return '';
-        const width = 120;
-        const height = 32;
-        const max = Math.max(...values, 1);
-        const min = Math.min(...values);
-        const range = max - min || 1;
-        const step = width / (values.length - 1);
-        return values
-            .map((v, i) => {
-                const x = i * step;
-                const y = height - ((v - min) / range) * height;
-                return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-            })
-            .join(' ');
     }
 
     // Donut chart accumulated percent for stroke-dashoffset
