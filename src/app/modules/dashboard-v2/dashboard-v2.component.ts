@@ -279,7 +279,7 @@ export class DashboardV2Component implements OnInit {
 
     get totalExpenses(): number {
         if (!this.data?.expensesByCategory) return 0;
-        return this.data.expensesByCategory.reduce((sum, e) => sum + e.total, 0);
+        return this.data.expensesByCategory.reduce((sum, e) => sum + Number(e.total || 0), 0);
     }
 
     get insights(): { icon: string; text: string; type: 'warning' | 'info' | 'danger' | 'success' }[] {
@@ -345,7 +345,8 @@ export class DashboardV2Component implements OnInit {
     }
 
     donutPercent(value: number): number {
-        if (!this.totalExpenses) return 0;
-        return Math.round((value / this.totalExpenses) * 100);
+        const total = this.totalExpenses;
+        if (!total) return 0;
+        return Math.round((Number(value || 0) / total) * 100);
     }
 }
