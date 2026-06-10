@@ -578,19 +578,7 @@
 .chart-wrap {
   width: 100%;
   height: 220px;
-}
-
-.chart-canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-// ─── Empty / Loading ───────────────────────────────────────
-.empty {
-  text-align: center;
-  color: #94a3b8;
-  padding: 1rem;
-  font-size: 0.85rem;
+  position: relative;
 }
 
 .loading {

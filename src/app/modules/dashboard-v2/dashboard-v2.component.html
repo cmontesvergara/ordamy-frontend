@@ -147,7 +147,12 @@
                 </div>
             </div>
             <div class="chart-wrap">
-                <canvas #salesExpensesChart class="chart-canvas"></canvas>
+                <apx-chart [series]="salesExpensesChartOptions.series" [chart]="salesExpensesChartOptions.chart"
+                    [colors]="salesExpensesChartOptions.colors" [fill]="salesExpensesChartOptions.fill"
+                    [stroke]="salesExpensesChartOptions.stroke" [dataLabels]="salesExpensesChartOptions.dataLabels"
+                    [legend]="salesExpensesChartOptions.legend" [tooltip]="salesExpensesChartOptions.tooltip"
+                    [xaxis]="salesExpensesChartOptions.xaxis" [yaxis]="salesExpensesChartOptions.yaxis"
+                    [grid]="salesExpensesChartOptions.grid"></apx-chart>
             </div>
         </div>
 
@@ -157,7 +162,11 @@
                 <h3 class="panel-title">Utilidad mensual</h3>
             </div>
             <div class="chart-wrap">
-                <canvas #profitChart class="chart-canvas"></canvas>
+                <apx-chart [series]="profitChartOptions.series" [chart]="profitChartOptions.chart"
+                    [colors]="profitChartOptions.colors" [plotOptions]="profitChartOptions.plotOptions"
+                    [dataLabels]="profitChartOptions.dataLabels" [legend]="profitChartOptions.legend"
+                    [tooltip]="profitChartOptions.tooltip" [xaxis]="profitChartOptions.xaxis"
+                    [yaxis]="profitChartOptions.yaxis" [grid]="profitChartOptions.grid"></apx-chart>
             </div>
         </div>
     </div>
