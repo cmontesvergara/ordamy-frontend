@@ -9,7 +9,7 @@
 // ─── KPI Row ───────────────────────────────────────────────
 .kpi-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -21,7 +21,7 @@
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
   transition:
     transform 0.2s,
     box-shadow 0.2s;
@@ -32,40 +32,46 @@
   }
 }
 
+.kpi-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.kpi-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .kpi-meta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 0.35rem;
+  flex: 1;
 }
 
 .kpi-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   color: var(--text-secondary, #64748b);
 }
 
-.kpi-badge {
+.kpi-help {
   font-size: 0.7rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border-radius: 20px;
-  white-space: nowrap;
-
-  &.up {
-    background: #dcfce7;
-    color: #16a34a;
-  }
-
-  &.down {
-    background: #fef2f2;
-    color: #ef4444;
-  }
+  color: #cbd5e1;
+  cursor: help;
 }
 
 .kpi-value {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-primary, #1e293b);
   letter-spacing: -0.5px;
@@ -87,23 +93,35 @@
   }
 }
 
-.kpi-footer {
-  font-size: 0.75rem;
-  color: var(--text-secondary, #94a3b8);
+.kpi-change {
+  font-size: 0.7rem;
+  color: #16a34a;
+  font-weight: 500;
+
+  &.down {
+    color: #ef4444;
+  }
 }
 
 // Sparkline SVG
 .sparkline {
   width: 100%;
-  height: 32px;
-  color: var(--text-secondary, #94a3b8);
-  opacity: 0.6;
+  height: 28px;
+  margin-top: 0.25rem;
+  opacity: 0.7;
 }
 
-// ─── Two-Column Grid ─────────────────────────────────────
+// ─── Grid Layouts ────────────────────────────────────────
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1rem;
 }
@@ -116,77 +134,104 @@
   padding: 1.25rem;
 }
 
+.panel-full {
+  max-width: 66%;
+}
+
 .panel-title {
   margin: 0 0 1rem;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-primary, #1e293b);
-}
-
-// ─── Pipeline ──────────────────────────────────────────────
-.pipeline-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.pipeline-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.35rem;
+
+  .help {
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    font-weight: 400;
+  }
 }
 
-.pipeline-left {
+// ─── Funnel Pipeline ─────────────────────────────────────
+.funnel {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 110px;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
 }
 
-.pipeline-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.pipeline-info {
+.funnel-step {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.25rem;
+  position: relative;
+  text-align: center;
+
+  &:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: inherit;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    z-index: 1;
+  }
+
+  &:not(:first-child) {
+    padding-left: 14px;
+  }
+}
+
+.funnel-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.35rem;
+}
+
+.funnel-count {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1e293b;
   line-height: 1.2;
 }
 
-.pipeline-name {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-primary, #1e293b);
-}
-
-.pipeline-pct {
+.funnel-pct {
   font-size: 0.7rem;
-  color: var(--text-secondary, #94a3b8);
+  color: #64748b;
+  font-weight: 500;
 }
 
-.pipeline-bar-wrap {
-  flex: 1;
+.funnel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.funnel-dots {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.funnel-dot {
+  width: 6px;
   height: 6px;
-  background: #f1f5f9;
-  border-radius: 3px;
-  overflow: hidden;
+  border-radius: 50%;
 }
 
-.pipeline-bar {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.6s ease;
-}
-
-.pipeline-count {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-primary, #1e293b);
-  min-width: 28px;
-  text-align: right;
+.funnel-total {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
 }
 
 // ─── Donut Chart ───────────────────────────────────────────
@@ -197,8 +242,8 @@
 }
 
 .donut {
-  width: 140px;
-  height: 140px;
+  width: 130px;
+  height: 130px;
   flex-shrink: 0;
   transform: rotate(-90deg);
 }
@@ -208,16 +253,23 @@
 }
 
 .donut-label {
-  font-size: 2.5px;
+  font-size: 2.2px;
   fill: #94a3b8;
   transform: rotate(90deg);
   transform-origin: center;
 }
 
 .donut-value {
-  font-size: 3.5px;
-  font-weight: 700;
+  font-size: 4px;
+  font-weight: 800;
   fill: #1e293b;
+  transform: rotate(90deg);
+  transform-origin: center;
+}
+
+.donut-sublabel {
+  font-size: 2.2px;
+  fill: #94a3b8;
   transform: rotate(90deg);
   transform-origin: center;
 }
@@ -225,7 +277,7 @@
 .donut-legend {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
   flex: 1;
 }
 
@@ -239,31 +291,42 @@
 .legend-dot {
   width: 8px;
   height: 8px;
-  border-radius: 2px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
 .legend-name {
   flex: 1;
   color: var(--text-primary, #1e293b);
+  font-size: 0.8rem;
 }
 
 .legend-pct {
   font-weight: 700;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-primary, #1e293b);
+  font-size: 0.8rem;
+  min-width: 28px;
+  text-align: right;
 }
 
-// ─── Bar Lists (Clients, Accounts) ─────────────────────────
+.legend-amount {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  min-width: 70px;
+  text-align: right;
+}
+
+// ─── Bar Lists (Clients) ─────────────────────────────────
 .bar-list {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.9rem;
 }
 
 .bar-row {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
 .bar-header {
@@ -276,23 +339,17 @@
 .bar-name {
   font-weight: 600;
   color: var(--text-primary, #1e293b);
+  font-size: 0.8rem;
 }
 
-.bar-amount {
+.bar-pct {
   font-weight: 700;
   color: var(--text-primary, #1e293b);
-
-  &.debt {
-    color: #ef4444;
-  }
-
-  &.negative {
-    color: #ef4444;
-  }
+  font-size: 0.8rem;
 }
 
 .bar-track {
-  height: 6px;
+  height: 5px;
   background: #f1f5f9;
   border-radius: 3px;
   overflow: hidden;
@@ -300,49 +357,34 @@
 
 .bar-fill {
   height: 100%;
-  background: #f97316;
+  background: #3b82f6;
   border-radius: 3px;
   transition: width 0.6s ease;
 
   &.debt {
     background: #ef4444;
   }
+}
 
-  &.negative {
-    background: #ef4444;
+.bar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.bar-amount {
+  color: #64748b;
+  font-weight: 500;
+
+  &.debt {
+    color: #ef4444;
   }
 }
 
 .bar-sub {
-  font-size: 0.7rem;
-  color: var(--text-secondary, #94a3b8);
-}
-
-// ─── Balance Total ─────────────────────────────────────────
-.balance-total {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  background: #f8fafc;
-  border-radius: 10px;
-  text-align: center;
-}
-
-.balance-total-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-secondary, #64748b);
-}
-
-.balance-total-value {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text-primary, #1e293b);
+  color: #94a3b8;
+  font-size: 0.75rem;
 }
 
 // ─── Insights ──────────────────────────────────────────────
@@ -356,18 +398,148 @@
 }
 
 .insight-item {
-  font-size: 0.85rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.8rem;
   color: var(--text-primary, #1e293b);
-  padding-left: 1.25rem;
-  position: relative;
   line-height: 1.4;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  border-left: 3px solid #cbd5e1;
 
-  &::before {
-    content: "•";
-    position: absolute;
-    left: 0;
-    color: #f97316;
-    font-weight: 700;
+  &.warning {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+  }
+
+  &.danger {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+  }
+
+  &.info {
+    border-left-color: #3b82f6;
+    background: #eff6ff;
+  }
+
+  &.success {
+    border-left-color: #10b981;
+    background: #ecfdf5;
+  }
+}
+
+.insight-icon {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.insight-text {
+  flex: 1;
+}
+
+// ─── Liquidity / Accounts ──────────────────────────────────
+.liquidity {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.liquidity-main {
+  text-align: center;
+  padding: 0.5rem 0 0.75rem;
+}
+
+.liquidity-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary, #64748b);
+}
+
+.liquidity-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.account-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f1f5f9;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.account-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #ecfdf5;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.negative {
+    background: #fef2f2;
+    color: #ef4444;
+  }
+}
+
+.account-name {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary, #1e293b);
+}
+
+.account-amount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+
+  &.negative {
+    color: #ef4444;
+  }
+}
+
+.account-trend {
+  font-size: 0.6rem;
+
+  &.up {
+    color: #16a34a;
+  }
+
+  &.down {
+    color: #ef4444;
+  }
+}
+
+.account-link {
+  font-size: 0.8rem;
+  color: #3b82f6;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  padding: 0.5rem 0;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 
@@ -403,13 +575,44 @@
 }
 
 // ─── Responsive ────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .kpi-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .panel-full {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .kpi-row {
     grid-template-columns: 1fr 1fr;
   }
 
-  .grid-2 {
+  .grid-2,
+  .grid-3 {
     grid-template-columns: 1fr;
+  }
+
+  .funnel {
+    flex-wrap: wrap;
+  }
+
+  .funnel-step {
+    min-width: 80px;
+
+    &:not(:last-child)::after {
+      display: none;
+    }
+
+    &:not(:first-child) {
+      padding-left: 0.25rem;
+    }
   }
 
   .donut-wrap {

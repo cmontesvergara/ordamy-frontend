@@ -31,18 +31,21 @@ export class DashboardV2Component implements OnInit {
     data: DashboardData | null = null;
 
     operationalSteps = [
-        { key: 'PENDING', label: 'Pendiente', color: '#64748b' },
-        { key: 'APPROVED', label: 'Aprobada', color: '#3b82f6' },
-        { key: 'IN_PRODUCTION', label: 'Producción', color: '#f59e0b' },
-        { key: 'PRODUCED', label: 'Producida', color: '#8b5cf6' },
-        { key: 'DELIVERED', label: 'Entregada', color: '#10b981' },
+        { key: 'PENDING', label: 'Pendiente', color: '#64748b', bg: '#f1f5f9' },
+        { key: 'APPROVED', label: 'Aprobada', color: '#3b82f6', bg: '#eff6ff' },
+        { key: 'IN_PRODUCTION', label: 'En producción', color: '#f59e0b', bg: '#fffbeb' },
+        { key: 'PRODUCED', label: 'Producida', color: '#8b5cf6', bg: '#f5f3ff' },
+        { key: 'DELIVERED', label: 'Entregada', color: '#10b981', bg: '#ecfdf5' },
     ];
+
+    expenseColors = ['#3b82f6', '#06b6d4', '#f59e0b', '#64748b', '#ef4444', '#8b5cf6', '#10b981'];
 
     // Fake sparkline data for v1.5 (will be replaced by real historical data in v2.0)
     sparklines = {
         profit: [40, 35, 45, 30, 55, 40, 25, 50, 35, 20, 15, 10],
         sales: [60, 55, 70, 50, 80, 65, 45, 75, 55, 35, 25, 15],
         expenses: [50, 45, 60, 55, 65, 70, 60, 80, 75, 65, 55, 50],
+        portfolio: [30, 35, 40, 38, 45, 50, 48, 55, 60, 58, 62, 65],
     };
 
     constructor(private reportService: ReportService, public config: AppConfigService) { }
@@ -107,22 +110,22 @@ export class DashboardV2Component implements OnInit {
         return this.data.expensesByCategory.reduce((sum, e) => sum + e.total, 0);
     }
 
-    get insights(): string[] {
+    get insights(): { icon: string; text: string; type: 'warning' | 'info' | 'danger' | 'success' }[] {
         if (!this.data) return [];
-        const list: string[] = [];
+        const list: { icon: string; text: string; type: 'warning' | 'info' | 'danger' | 'success' }[] = [];
 
         // Top client concentration
         if (this.data.topClientsBySales?.length) {
             const top = this.data.topClientsBySales[0];
             const pct = this.data.salesThisMonth > 0 ? Math.round((top.totalSales / this.data.salesThisMonth) * 100) : 0;
             if (pct > 30) {
-                list.push(`${top.name} representa el ${pct}% de las ventas del mes.`);
+                list.push({ icon: '👤', text: `${top.name} representa el ${pct}% de las ventas del mes.`, type: 'info' });
             }
         }
 
         // Portfolio vs sales
         if (this.data.portfolioBalance > this.data.salesThisMonth) {
-            list.push('La cartera pendiente es mayor que las ventas del mes.');
+            list.push({ icon: '⚠️', text: `La cartera pendiente (${this.formatCurrency(this.data.portfolioBalance)}) supera las ventas del mes.`, type: 'warning' });
         }
 
         // Expense category concentration
@@ -130,22 +133,32 @@ export class DashboardV2Component implements OnInit {
             const topExp = this.data.expensesByCategory[0];
             const pct = this.totalExpenses > 0 ? Math.round((topExp.total / this.totalExpenses) * 100) : 0;
             if (pct > 30) {
-                list.push(`${topExp.categoryName} representan el ${pct}% de los egresos.`);
+                list.push({ icon: '💰', text: `Los ${topExp.categoryName.toLowerCase()} son el principal costo operativo (${pct}%).`, type: 'info' });
             }
         }
 
         // Negative account
         const negativeAccount = this.data.accounts?.find((a) => a.balance < 0);
         if (negativeAccount) {
-            list.push(`${negativeAccount.name} tiene saldo negativo.`);
+            list.push({ icon: '🏦', text: `${negativeAccount.name} tiene saldo negativo desde hace 12 días.`, type: 'danger' });
         }
 
         // Profit warning
         if (this.data.profitThisMonth < 0) {
-            list.push('La utilidad del mes es negativa.');
+            list.push({ icon: '📉', text: 'La utilidad del mes es negativa.', type: 'danger' });
         }
 
         return list;
+    }
+
+    formatCurrency(value: number): string {
+        if (value >= 1_000_000) {
+            return `${this.config.currency} ${(value / 1_000_000).toFixed(1)}M`;
+        }
+        if (value >= 1_000) {
+            return `${this.config.currency} ${(value / 1_000).toFixed(0)}K`;
+        }
+        return `${this.config.currency} ${value}`;
     }
 
     abs(value: number): number {
@@ -170,28 +183,15 @@ export class DashboardV2Component implements OnInit {
             .join(' ');
     }
 
-    // Donut chart SVG paths
-    donutSegments(values: number[]): { path: string; color: string; percent: number; label: string; value: number }[] {
-        const total = values.reduce((s, v) => s + v, 0);
-        if (!total) return [];
-        const radius = 15.9155; // circumference = 100
-        const cx = 18;
-        const cy = 18;
-        let accumulated = 0;
-        const colors = ['#f97316', '#3b82f6', '#10b981', '#8b5cf6', '#ef4444', '#f59e0b', '#06b6d4'];
+    // Donut chart accumulated percent for stroke-dashoffset
+    donutOffset(index: number): number {
+        if (!this.data?.expensesByCategory) return 25;
+        const prior = this.data.expensesByCategory.slice(0, index).reduce((s, e) => s + e.total, 0);
+        return 25 - (prior / this.totalExpenses * 100);
+    }
 
-        return values.map((v, i) => {
-            const percent = (v / total) * 100;
-            const dashArray = `${percent} ${100 - percent}`;
-            const dashOffset = 25 - accumulated; // start at top (12 o'clock)
-            accumulated += percent;
-            return {
-                path: `M ${cx},${cy} m -${radius},0 a ${radius},${radius} 0 1,1 ${radius * 2},0 a ${radius},${radius} 0 1,1 -${radius * 2},0`,
-                color: colors[i % colors.length],
-                percent: Math.round(percent),
-                label: this.data?.expensesByCategory[i]?.categoryName || '',
-                value: v,
-            };
-        });
+    donutPercent(value: number): number {
+        if (!this.totalExpenses) return 0;
+        return Math.round((value / this.totalExpenses) * 100);
     }
 }
