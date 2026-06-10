@@ -45,6 +45,12 @@ export class ReportService {
         return this.http.get<any>(`${this.url}/monthly`, { params, withCredentials: true });
     }
 
+    getHistorical(months?: number) {
+        let params = new HttpParams();
+        if (months) params = params.set('months', months.toString());
+        return this.http.get<any>(`${this.url}/historical`, { params, withCredentials: true });
+    }
+
     downloadDailyPdf(date?: string) {
         let params = new HttpParams();
         if (date) params = params.set('date', date);

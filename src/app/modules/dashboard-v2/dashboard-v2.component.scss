@@ -248,11 +248,12 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .donut {
-  width: 130px;
-  height: 130px;
+  width: 140px;
+  height: 140px;
   flex-shrink: 0;
   transform: rotate(-90deg);
 }
@@ -288,6 +289,7 @@
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
+  min-width: 160px;
 }
 
 .legend-row {

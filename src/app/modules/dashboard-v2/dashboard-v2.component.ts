@@ -41,42 +41,50 @@ export class DashboardV2Component implements OnInit {
 
     expenseColors = ['#3b82f6', '#06b6d4', '#f59e0b', '#64748b', '#ef4444', '#8b5cf6', '#10b981'];
 
-    // Fake 12-month historical data for v1.5 charts (will be replaced by real API data in v2.0)
-    monthlyHistory = [
-        { month: 'Jul', sales: 25_000_000, expenses: 18_000_000 },
-        { month: 'Ago', sales: 32_000_000, expenses: 22_000_000 },
-        { month: 'Sep', sales: 45_000_000, expenses: 28_000_000 },
-        { month: 'Oct', sales: 48_000_000, expenses: 35_000_000 },
-        { month: 'Nov', sales: 55_000_000, expenses: 38_000_000 },
-        { month: 'Dic', sales: 62_000_000, expenses: 42_000_000 },
-        { month: 'Ene', sales: 40_000_000, expenses: 30_000_000 },
-        { month: 'Feb', sales: 38_000_000, expenses: 28_000_000 },
-        { month: 'Mar', sales: 35_000_000, expenses: 25_000_000 },
-        { month: 'Abr', sales: 30_000_000, expenses: 22_000_000 },
-        { month: 'May', sales: 25_000_000, expenses: 18_000_000 },
-        { month: 'Jun', sales: 20_000_000, expenses: 15_000_000 },
-    ];
+    // Real historical data from API (populated in ngOnInit)
+    monthlyHistory: { month: string; year: number; sales: number; expenses: number; profit: number }[] = [];
 
     // ApexCharts options
     salesExpensesChartOptions: any;
     profitChartOptions: any;
-    expensesDonutOptions: any;
     sparklineProfitOptions: any;
     sparklineSalesOptions: any;
     sparklineExpensesOptions: any;
     sparklinePortfolioOptions: any;
 
-    // Fake sparkline data for v1.5 (will be replaced by real historical data in v2.0)
+    // Sparkline data derived from monthlyHistory (real data)
     sparklines = {
-        profit: [40, 35, 45, 30, 55, 40, 25, 50, 35, 20, 15, 10],
-        sales: [60, 55, 70, 50, 80, 65, 45, 75, 55, 35, 25, 15],
-        expenses: [50, 45, 60, 55, 65, 70, 60, 80, 75, 65, 55, 50],
-        portfolio: [30, 35, 40, 38, 45, 50, 48, 55, 60, 58, 62, 65],
+        profit: [] as number[],
+        sales: [] as number[],
+        expenses: [] as number[],
+        portfolio: [] as number[],
     };
 
     constructor(private reportService: ReportService, public config: AppConfigService) { }
 
     ngOnInit() {
+        // Load historical data for charts
+        this.reportService.getHistorical(12).subscribe({
+            next: (res: any) => {
+                if (res.data?.length) {
+                    this.monthlyHistory = res.data;
+                    this.sparklines.sales = res.data.map((m: any) => m.sales);
+                    this.sparklines.expenses = res.data.map((m: any) => m.expenses);
+                    this.sparklines.profit = res.data.map((m: any) => m.profit);
+                    // Portfolio sparkline: use profit as proxy until we have real portfolio history
+                    this.sparklines.portfolio = res.data.map((m: any) => m.profit);
+                    this.initCharts();
+                }
+            },
+        });
+
+        // Load dashboard KPIs
+        this.reportService.getDashboard().subscribe({
+            next: (res: any) => { this.data = res.data; },
+        });
+    }
+
+    private initCharts() {
         const months = this.monthlyHistory.map((m) => m.month);
 
         this.salesExpensesChartOptions = {
@@ -118,7 +126,7 @@ export class DashboardV2Component implements OnInit {
             grid: { borderColor: '#f1f5f9', strokeDashArray: 0 },
         };
 
-        const profits = this.monthlyHistory.map((m) => m.sales - m.expenses);
+        const profits = this.monthlyHistory.map((m) => m.profit);
         const profitMax = Math.max(...profits.map((p) => Math.abs(p)), 1);
 
         this.profitChartOptions = {
@@ -178,7 +186,7 @@ export class DashboardV2Component implements OnInit {
                 ...sparklineBase.tooltip,
                 y: {
                     title: { formatter: () => 'Utilidad' },
-                    formatter: (val: number) => `${val}%`,
+                    formatter: (val: number) => `${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`,
                 },
             },
         };
@@ -190,7 +198,7 @@ export class DashboardV2Component implements OnInit {
                 ...sparklineBase.tooltip,
                 y: {
                     title: { formatter: () => 'Ventas' },
-                    formatter: (val: number) => `${val}%`,
+                    formatter: (val: number) => `${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`,
                 },
             },
         };
@@ -202,7 +210,7 @@ export class DashboardV2Component implements OnInit {
                 ...sparklineBase.tooltip,
                 y: {
                     title: { formatter: () => 'Egresos' },
-                    formatter: (val: number) => `${val}%`,
+                    formatter: (val: number) => `${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`,
                 },
             },
         };
@@ -214,77 +222,10 @@ export class DashboardV2Component implements OnInit {
                 ...sparklineBase.tooltip,
                 y: {
                     title: { formatter: () => 'Cartera' },
-                    formatter: (val: number) => `${val}%`,
-                },
-            },
-        };
-
-        this.expensesDonutOptions = {
-            series: [],
-            chart: { type: 'donut', height: 260, toolbar: { show: false }, fontFamily: 'Inter, sans-serif' },
-            labels: [],
-            colors: this.expenseColors,
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '65%',
-                        labels: {
-                            show: true,
-                            name: { show: true, fontSize: '12px', color: '#64748b', fontFamily: 'Inter, sans-serif' },
-                            value: {
-                                show: true,
-                                fontSize: '18px',
-                                fontWeight: 700,
-                                color: '#1e293b',
-                                fontFamily: 'Inter, sans-serif',
-                                formatter: (val: number) => `${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`,
-                            },
-                            total: {
-                                show: true,
-                                showAlways: true,
-                                label: 'Total',
-                                fontSize: '12px',
-                                color: '#94a3b8',
-                                fontFamily: 'Inter, sans-serif',
-                                formatter: (w: any) => {
-                                    const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
-                                    return `${this.config.currency} ${(total / 1_000_000).toFixed(1)}M`;
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            dataLabels: { enabled: false },
-            legend: {
-                show: true,
-                position: 'right',
-                fontSize: '12px',
-                fontFamily: 'Inter, sans-serif',
-                markers: { width: 8, height: 8, radius: 4 },
-                itemMargin: { horizontal: 0, vertical: 4 },
-            },
-            tooltip: {
-                theme: 'light',
-                y: {
                     formatter: (val: number) => `${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`,
                 },
             },
-            stroke: { show: true, colors: ['#fff'], width: 2 },
         };
-
-        this.reportService.getDashboard().subscribe({
-            next: (res: any) => {
-                this.data = res.data;
-                if (this.data?.expensesByCategory?.length) {
-                    this.expensesDonutOptions = {
-                        ...this.expensesDonutOptions,
-                        series: this.data.expensesByCategory.map((e) => e.total),
-                        labels: this.data.expensesByCategory.map((e) => e.categoryName),
-                    };
-                }
-            },
-        });
     }
 
     get activeOrdersTotal(): number {
