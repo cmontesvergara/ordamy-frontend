@@ -60,6 +60,7 @@ export class DashboardV2Component implements OnInit {
     // ApexCharts options
     salesExpensesChartOptions: any;
     profitChartOptions: any;
+    expensesDonutOptions: any;
     sparklineProfitOptions: any;
     sparklineSalesOptions: any;
     sparklineExpensesOptions: any;
@@ -160,8 +161,12 @@ export class DashboardV2Component implements OnInit {
 
         // Sparkline options for KPI cards
         const sparklineBase = {
-            chart: { type: 'line', height: 50, sparkline: { enabled: true }, toolbar: { show: false }, animations: { enabled: true } },
+            chart: { type: 'area', height: 50, sparkline: { enabled: true }, toolbar: { show: false }, animations: { enabled: true } },
             stroke: { curve: 'smooth', width: 2 },
+            fill: {
+                type: 'gradient',
+                gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.05, stops: [0, 100] },
+            },
             tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' } }, marker: { show: false } },
         };
 
@@ -214,8 +219,71 @@ export class DashboardV2Component implements OnInit {
             },
         };
 
+        this.expensesDonutOptions = {
+            series: [],
+            chart: { type: 'donut', height: 260, toolbar: { show: false }, fontFamily: 'Inter, sans-serif' },
+            labels: [],
+            colors: this.expenseColors,
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%',
+                        labels: {
+                            show: true,
+                            name: { show: true, fontSize: '12px', color: '#64748b', fontFamily: 'Inter, sans-serif' },
+                            value: {
+                                show: true,
+                                fontSize: '18px',
+                                fontWeight: 700,
+                                color: '#1e293b',
+                                fontFamily: 'Inter, sans-serif',
+                                formatter: (val: number) => `${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`,
+                            },
+                            total: {
+                                show: true,
+                                showAlways: true,
+                                label: 'Total',
+                                fontSize: '12px',
+                                color: '#94a3b8',
+                                fontFamily: 'Inter, sans-serif',
+                                formatter: (w: any) => {
+                                    const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
+                                    return `${this.config.currency} ${(total / 1_000_000).toFixed(1)}M`;
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            dataLabels: { enabled: false },
+            legend: {
+                show: true,
+                position: 'right',
+                fontSize: '12px',
+                fontFamily: 'Inter, sans-serif',
+                markers: { width: 8, height: 8, radius: 4 },
+                itemMargin: { horizontal: 0, vertical: 4 },
+            },
+            tooltip: {
+                theme: 'light',
+                y: {
+                    formatter: (val: number) => `${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`,
+                },
+            },
+            stroke: { show: true, colors: ['#fff'], width: 2 },
+        };
+
         this.reportService.getDashboard().subscribe({
-            next: (res: any) => { this.data = res.data; },
+            next: (res: any) => {
+                this.data = res.data;
+                if (this.data?.expensesByCategory?.length) {
+                    this.expensesDonutOptions = {
+                        ...this.expensesDonutOptions,
+                        series: this.data.expensesByCategory.map((e) => e.total),
+                        labels: this.data.expensesByCategory.map((e) => e.categoryName),
+                    };
+                }
+            },
         });
     }
 
