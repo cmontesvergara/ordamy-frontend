@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { ReportService } from '../../core/services/report/report.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
