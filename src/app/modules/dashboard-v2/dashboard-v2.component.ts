@@ -40,6 +40,31 @@ export class DashboardV2Component implements OnInit {
 
     expenseColors = ['#3b82f6', '#06b6d4', '#f59e0b', '#64748b', '#ef4444', '#8b5cf6', '#10b981'];
 
+    // Fake 12-month historical data for v1.5 charts (will be replaced by real API data in v2.0)
+    monthlyHistory = [
+        { month: 'Jul', sales: 25_000_000, expenses: 18_000_000 },
+        { month: 'Ago', sales: 32_000_000, expenses: 22_000_000 },
+        { month: 'Sep', sales: 45_000_000, expenses: 28_000_000 },
+        { month: 'Oct', sales: 48_000_000, expenses: 35_000_000 },
+        { month: 'Nov', sales: 55_000_000, expenses: 38_000_000 },
+        { month: 'Dic', sales: 62_000_000, expenses: 42_000_000 },
+        { month: 'Ene', sales: 40_000_000, expenses: 30_000_000 },
+        { month: 'Feb', sales: 38_000_000, expenses: 28_000_000 },
+        { month: 'Mar', sales: 35_000_000, expenses: 25_000_000 },
+        { month: 'Abr', sales: 30_000_000, expenses: 22_000_000 },
+        { month: 'May', sales: 25_000_000, expenses: 18_000_000 },
+        { month: 'Jun', sales: 20_000_000, expenses: 15_000_000 },
+    ];
+
+    get monthlyProfit(): number[] {
+        return this.monthlyHistory.map((m) => m.sales - m.expenses);
+    }
+
+    get profitChartMax(): number {
+        const profits = this.monthlyProfit;
+        return Math.max(...profits.map((p) => Math.abs(p)), 1);
+    }
+
     // Fake sparkline data for v1.5 (will be replaced by real historical data in v2.0)
     sparklines = {
         profit: [40, 35, 45, 30, 55, 40, 25, 50, 35, 20, 15, 10],
@@ -193,5 +218,80 @@ export class DashboardV2Component implements OnInit {
     donutPercent(value: number): number {
         if (!this.totalExpenses) return 0;
         return Math.round((value / this.totalExpenses) * 100);
+    }
+
+    // ─── Line Chart Helpers ──────────────────────────────────
+    get chartMax(): number {
+        const maxSales = Math.max(...this.monthlyHistory.map((m) => m.sales));
+        const maxExpenses = Math.max(...this.monthlyHistory.map((m) => m.expenses));
+        return Math.max(maxSales, maxExpenses, 1);
+    }
+
+    get chartYTicks(): number[] {
+        const max = this.chartMax;
+        const step = Math.ceil(max / 5 / 10_000_000) * 10_000_000;
+        return [0, step, step * 2, step * 3, step * 4, step * 5].filter((v) => v <= max * 1.1);
+    }
+
+    linePath(values: number[]): string {
+        const width = 500;
+        const height = 180;
+        const max = this.chartMax * 1.1;
+        const len = values.length;
+        const stepX = width / (len - 1);
+        return values
+            .map((v, i) => {
+                const x = i * stepX;
+                const y = height - (v / max) * height;
+                return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+            })
+            .join(' ');
+    }
+
+    areaPath(values: number[]): string {
+        const width = 500;
+        const height = 180;
+        const max = this.chartMax * 1.1;
+        const len = values.length;
+        const stepX = width / (len - 1);
+        let path = values
+            .map((v, i) => {
+                const x = i * stepX;
+                const y = height - (v / max) * height;
+                return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+            })
+            .join(' ');
+        path += ` L${width},${height} L0,${height} Z`;
+        return path;
+    }
+
+    profitBarY(value: number): number {
+        const max = this.profitChartMax * 1.2;
+        const height = 160;
+        const zeroY = height / 2;
+        if (value >= 0) {
+            return zeroY - (value / max) * (height / 2);
+        }
+        return zeroY;
+    }
+
+    profitBarHeight(value: number): number {
+        const max = this.profitChartMax * 1.2;
+        const height = 160;
+        return (Math.abs(value) / max) * (height / 2);
+    }
+
+    formatAxis(value: number): string {
+        if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(0)}M`;
+        if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`;
+        return `${value}`;
+    }
+
+    formatProfit(value: number): string {
+        if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(0)}M`;
+        if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`;
+        if (value <= -1_000_000) return `${(value / 1_000_000).toFixed(0)}M`;
+        if (value <= -1_000) return `${(value / 1_000).toFixed(0)}K`;
+        return `${value}`;
     }
 }
