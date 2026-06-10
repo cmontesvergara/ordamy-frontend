@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { LoggedLayoutComponent } from './logged-layout.component';
 import { hasPermissionGuard } from '../../core/guards/has-permission/has-permission.guard';
+import { LoggedLayoutComponent } from './logged-layout.component';
 
 export const LOGGED_ROUTES: Routes = [
     {
@@ -17,6 +17,11 @@ export const LOGGED_ROUTES: Routes = [
                 path: 'dashboard',
                 loadComponent: () =>
                     import('../dashboard/dashboard.component').then((m) => m.DashboardComponent),
+            },
+            {
+                path: 'v2/dashboard',
+                loadComponent: () =>
+                    import('../dashboard-v2/dashboard-v2.component').then((m) => m.DashboardV2Component),
             },
             {
                 path: 'orders',
