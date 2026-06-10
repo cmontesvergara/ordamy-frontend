@@ -147,52 +147,7 @@
                 </div>
             </div>
             <div class="chart-wrap">
-                <svg viewBox="0 0 560 220" class="line-chart" preserveAspectRatio="xMidYMid meet">
-                    <defs>
-                        <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#10b981" stop-opacity="0.25" />
-                            <stop offset="100%" stop-color="#10b981" stop-opacity="0.02" />
-                        </linearGradient>
-                        <linearGradient id="expGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#ef4444" stop-opacity="0.2" />
-                            <stop offset="100%" stop-color="#ef4444" stop-opacity="0.02" />
-                        </linearGradient>
-                    </defs>
-
-                    <!-- Grid lines -->
-                    @for (tick of chartYTicks; track tick) {
-                    <line [attr.x1]="40" [attr.x2]="540" [attr.y1]="180 - (tick / (chartMax * 1.1)) * 180"
-                        [attr.y2]="180 - (tick / (chartMax * 1.1)) * 180" stroke="#f1f5f9" stroke-width="1" />
-                    <text [attr.x]="35" [attr.y]="180 - (tick / (chartMax * 1.1)) * 180 + 4" text-anchor="end"
-                        class="chart-tick">{{ formatAxis(tick) }}</text>
-                    }
-
-                    <!-- Area fills with gradients -->
-                    <path [attr.d]="areaPath(monthlyHistory.map(m => m.sales))" fill="url(#salesGrad)" />
-                    <path [attr.d]="areaPath(monthlyHistory.map(m => m.expenses))" fill="url(#expGrad)" />
-
-                    <!-- Lines -->
-                    <path [attr.d]="linePath(monthlyHistory.map(m => m.sales))" fill="none" stroke="#10b981"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-                    <path [attr.d]="linePath(monthlyHistory.map(m => m.expenses))" fill="none" stroke="#ef4444"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-
-                    <!-- Dots -->
-                    @for (m of monthlyHistory; track m.month; let i = $index) {
-                    <circle [attr.cx]="i * (500 / (monthlyHistory.length - 1))"
-                        [attr.cy]="180 - (m.sales / (chartMax * 1.1)) * 180" r="3.5" fill="#fff" stroke="#10b981"
-                        stroke-width="2" />
-                    <circle [attr.cx]="i * (500 / (monthlyHistory.length - 1))"
-                        [attr.cy]="180 - (m.expenses / (chartMax * 1.1)) * 180" r="3.5" fill="#fff" stroke="#ef4444"
-                        stroke-width="2" />
-                    }
-
-                    <!-- X axis labels -->
-                    @for (m of monthlyHistory; track m.month; let i = $index) {
-                    <text [attr.x]="40 + i * (500 / (monthlyHistory.length - 1))" y="205" text-anchor="middle"
-                        class="chart-label">{{ m.month }}</text>
-                    }
-                </svg>
+                <canvas #salesExpensesChart class="chart-canvas"></canvas>
             </div>
         </div>
 
@@ -202,29 +157,7 @@
                 <h3 class="panel-title">Utilidad mensual</h3>
             </div>
             <div class="chart-wrap">
-                <svg viewBox="0 0 560 220" class="line-chart" preserveAspectRatio="xMidYMid meet">
-                    <!-- Zero line -->
-                    <line x1="40" x2="540" y1="80" y2="80" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4" />
-
-                    <!-- Y axis labels -->
-                    <text x="35" y="20" text-anchor="end" class="chart-tick">{{ formatProfit(profitChartMax) }}</text>
-                    <text x="35" y="84" text-anchor="end" class="chart-tick">0</text>
-                    <text x="35" y="155" text-anchor="end" class="chart-tick">{{ formatProfit(-profitChartMax) }}</text>
-
-                    <!-- Bars -->
-                    @for (m of monthlyHistory; track m.month; let i = $index) {
-                    <rect [attr.x]="40 + i * (500 / monthlyHistory.length) + 8"
-                        [attr.y]="profitBarY(m.sales - m.expenses)" [attr.width]="(500 / monthlyHistory.length) - 12"
-                        [attr.height]="profitBarHeight(m.sales - m.expenses)"
-                        [attr.fill]="(m.sales - m.expenses) >= 0 ? '#10b981' : '#ef4444'" rx="3" class="profit-bar" />
-                    }
-
-                    <!-- X axis labels -->
-                    @for (m of monthlyHistory; track m.month; let i = $index) {
-                    <text [attr.x]="40 + i * (500 / monthlyHistory.length) + (500 / monthlyHistory.length) / 2" y="205"
-                        text-anchor="middle" class="chart-label">{{ m.month }}</text>
-                    }
-                </svg>
+                <canvas #profitChart class="chart-canvas"></canvas>
             </div>
         </div>
     </div>

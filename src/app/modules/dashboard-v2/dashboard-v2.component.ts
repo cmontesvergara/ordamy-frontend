@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import Chart from 'chart.js/auto';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { ReportService } from '../../core/services/report/report.service';
 
@@ -27,8 +28,14 @@ interface DashboardData {
     templateUrl: './dashboard-v2.component.html',
     styleUrl: './dashboard-v2.component.scss'
 })
-export class DashboardV2Component implements OnInit {
+export class DashboardV2Component implements OnInit, AfterViewInit {
     data: DashboardData | null = null;
+
+    @ViewChild('salesExpensesChart') salesExpensesChartRef!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('profitChart') profitChartRef!: ElementRef<HTMLCanvasElement>;
+
+    private salesExpensesChart?: Chart;
+    private profitChart?: Chart;
 
     operationalSteps = [
         { key: 'PENDING', label: 'Pendiente', color: '#64748b', bg: '#f1f5f9' },
@@ -60,11 +67,6 @@ export class DashboardV2Component implements OnInit {
         return this.monthlyHistory.map((m) => m.sales - m.expenses);
     }
 
-    get profitChartMax(): number {
-        const profits = this.monthlyProfit;
-        return Math.max(...profits.map((p) => Math.abs(p)), 1);
-    }
-
     // Fake sparkline data for v1.5 (will be replaced by real historical data in v2.0)
     sparklines = {
         profit: [40, 35, 45, 30, 55, 40, 25, 50, 35, 20, 15, 10],
@@ -78,6 +80,155 @@ export class DashboardV2Component implements OnInit {
     ngOnInit() {
         this.reportService.getDashboard().subscribe({
             next: (res: any) => { this.data = res.data; },
+        });
+    }
+
+    ngAfterViewInit() {
+        this.initSalesExpensesChart();
+        this.initProfitChart();
+    }
+
+    private initSalesExpensesChart() {
+        const ctx = this.salesExpensesChartRef?.nativeElement?.getContext('2d');
+        if (!ctx) return;
+
+        const labels = this.monthlyHistory.map((m) => m.month);
+        const salesData = this.monthlyHistory.map((m) => m.sales);
+        const expensesData = this.monthlyHistory.map((m) => m.expenses);
+
+        this.salesExpensesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Ventas',
+                        data: salesData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16,185,129,0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                    },
+                    {
+                        label: 'Egresos',
+                        data: expensesData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239,68,68,0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#ef4444',
+                        pointBorderWidth: 2,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const val = ctx.parsed.y as number;
+                                return `${ctx.dataset.label}: ${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`;
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11 }, color: '#64748b' },
+                        border: { display: false },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f1f5f9' },
+                        ticks: {
+                            font: { size: 10 },
+                            color: '#94a3b8',
+                            callback: (val) => {
+                                const v = val as number;
+                                if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(0)}M`;
+                                if (v >= 1_000) return `${(v / 1_000).toFixed(0)}K`;
+                                return `${v}`;
+                            },
+                        },
+                        border: { display: false },
+                    },
+                },
+                interaction: { mode: 'index', intersect: false },
+            },
+        });
+    }
+
+    private initProfitChart() {
+        const ctx = this.profitChartRef?.nativeElement?.getContext('2d');
+        if (!ctx) return;
+
+        const labels = this.monthlyHistory.map((m) => m.month);
+        const profitData = this.monthlyProfit;
+        const barColors = profitData.map((p) => (p >= 0 ? '#10b981' : '#ef4444'));
+
+        this.profitChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Utilidad',
+                        data: profitData,
+                        backgroundColor: barColors,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                        barPercentage: 0.6,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const val = ctx.parsed.y as number;
+                                return `Utilidad: ${this.config.currency} ${(val / 1_000_000).toFixed(1)}M`;
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11 }, color: '#64748b' },
+                        border: { display: false },
+                    },
+                    y: {
+                        grid: { color: '#f1f5f9' },
+                        ticks: {
+                            font: { size: 10 },
+                            color: '#94a3b8',
+                            callback: (val) => {
+                                const v = val as number;
+                                if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(0)}M`;
+                                if (v >= 1_000) return `${(v / 1_000).toFixed(0)}K`;
+                                if (v <= -1_000_000) return `${(v / 1_000_000).toFixed(0)}M`;
+                                if (v <= -1_000) return `${(v / 1_000).toFixed(0)}K`;
+                                return `${v}`;
+                            },
+                        },
+                        border: { display: false },
+                    },
+                },
+            },
         });
     }
 
@@ -218,80 +369,5 @@ export class DashboardV2Component implements OnInit {
     donutPercent(value: number): number {
         if (!this.totalExpenses) return 0;
         return Math.round((value / this.totalExpenses) * 100);
-    }
-
-    // ─── Line Chart Helpers ──────────────────────────────────
-    get chartMax(): number {
-        const maxSales = Math.max(...this.monthlyHistory.map((m) => m.sales));
-        const maxExpenses = Math.max(...this.monthlyHistory.map((m) => m.expenses));
-        return Math.max(maxSales, maxExpenses, 1);
-    }
-
-    get chartYTicks(): number[] {
-        const max = this.chartMax;
-        const step = Math.ceil(max / 5 / 10_000_000) * 10_000_000;
-        return [0, step, step * 2, step * 3, step * 4, step * 5].filter((v) => v <= max * 1.1);
-    }
-
-    linePath(values: number[]): string {
-        const width = 500;
-        const height = 180;
-        const max = this.chartMax * 1.1;
-        const len = values.length;
-        const stepX = width / (len - 1);
-        return values
-            .map((v, i) => {
-                const x = i * stepX;
-                const y = height - (v / max) * height;
-                return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-            })
-            .join(' ');
-    }
-
-    areaPath(values: number[]): string {
-        const width = 500;
-        const height = 180;
-        const max = this.chartMax * 1.1;
-        const len = values.length;
-        const stepX = width / (len - 1);
-        let path = values
-            .map((v, i) => {
-                const x = i * stepX;
-                const y = height - (v / max) * height;
-                return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-            })
-            .join(' ');
-        path += ` L${width},${height} L0,${height} Z`;
-        return path;
-    }
-
-    profitBarY(value: number): number {
-        const max = this.profitChartMax * 1.2;
-        const height = 160;
-        const zeroY = height / 2;
-        if (value >= 0) {
-            return zeroY - (value / max) * (height / 2);
-        }
-        return zeroY;
-    }
-
-    profitBarHeight(value: number): number {
-        const max = this.profitChartMax * 1.2;
-        const height = 160;
-        return (Math.abs(value) / max) * (height / 2);
-    }
-
-    formatAxis(value: number): string {
-        if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(0)}M`;
-        if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`;
-        return `${value}`;
-    }
-
-    formatProfit(value: number): string {
-        if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(0)}M`;
-        if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`;
-        if (value <= -1_000_000) return `${(value / 1_000_000).toFixed(0)}M`;
-        if (value <= -1_000) return `${(value / 1_000).toFixed(0)}K`;
-        return `${value}`;
     }
 }
