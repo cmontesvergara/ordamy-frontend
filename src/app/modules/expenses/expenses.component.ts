@@ -188,6 +188,23 @@ export class ExpensesComponent implements OnInit {
     this.editSelectedFile = null;
   }
 
+  deleteEditAttachment(attachmentId: string) {
+    if (!this.editingExpense) return;
+    if (!confirm('¿Eliminar el soporte adjunto? Esta acción no se puede deshacer.')) return;
+
+    this.expenseService.deleteAttachment(this.editingExpense.id, attachmentId).subscribe({
+      next: () => {
+        this.editingExpense.attachments = (this.editingExpense.attachments || []).filter(
+          (a: any) => a.id !== attachmentId
+        );
+        this.toastService.success('Soporte eliminado', 'El archivo adjunto fue eliminado.');
+      },
+      error: () => {
+        this.toastService.error('Error', 'No se pudo eliminar el soporte.');
+      },
+    });
+  }
+
   // View attachment
   viewAttachment(attachment: any) {
     // Use presigned downloadUrl if available, otherwise fall back to fileUrl
@@ -287,27 +304,52 @@ export class ExpensesComponent implements OnInit {
     this.savingEdit = true;
     const expenseId = this.editingExpense.id;
     const fileToUpload = this.editSelectedFile;
+    const existingAttachments = this.editingExpense.attachments || [];
 
     this.expenseService.update(expenseId, this.editData).subscribe({
       next: () => {
-        // If a new support file was selected during edit, upload it after saving the expense
+        // If a new support file was selected during edit, replace existing attachments
         if (fileToUpload) {
-          this.expenseService.uploadAttachment(expenseId, fileToUpload).subscribe({
-            next: () => {
-              this.savingEdit = false;
-              this.editingExpense = null;
-              this.editSelectedFile = null;
-              this.toastService.success('Éxito', 'Egreso y soporte actualizados exitosamente');
-              this.loadExpenses();
-            },
-            error: (err: any) => {
-              this.savingEdit = false;
-              this.editingExpense = null;
-              this.editSelectedFile = null;
-              this.toastService.warning('Egreso guardado', 'El egreso se guardó, pero el soporte no pudo subirse.');
-              this.loadExpenses();
-            },
-          });
+          const deleteOldAttachments$ = existingAttachments.length > 0
+            ? this.expenseService.deleteAttachment(expenseId, existingAttachments[0].id)
+            : null;
+
+          const uploadNew$ = () => this.expenseService.uploadAttachment(expenseId, fileToUpload);
+
+          const finalize = (message: string, isError = false) => {
+            this.savingEdit = false;
+            this.editingExpense = null;
+            this.editSelectedFile = null;
+            if (isError) {
+              this.toastService.warning('Egreso guardado', message);
+            } else {
+              this.toastService.success('Éxito', message);
+            }
+            this.loadExpenses();
+          };
+
+          if (deleteOldAttachments$) {
+            deleteOldAttachments$.subscribe({
+              next: () => {
+                uploadNew$().subscribe({
+                  next: () => finalize('Egreso y soporte actualizados exitosamente'),
+                  error: () => finalize('El egreso se guardó, pero el nuevo soporte no pudo subirse.', true),
+                });
+              },
+              error: () => {
+                // If we can't delete the old one, still try to upload the new one
+                uploadNew$().subscribe({
+                  next: () => finalize('Egreso y soporte actualizados exitosamente'),
+                  error: () => finalize('El egreso se guardó, pero el soporte no pudo actualizarse.', true),
+                });
+              },
+            });
+          } else {
+            uploadNew$().subscribe({
+              next: () => finalize('Egreso y soporte actualizados exitosamente'),
+              error: () => finalize('El egreso se guardó, pero el soporte no pudo subirse.', true),
+            });
+          }
         } else {
           this.savingEdit = false;
           this.editingExpense = null;
