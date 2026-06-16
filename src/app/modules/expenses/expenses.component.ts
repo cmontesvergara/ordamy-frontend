@@ -285,11 +285,34 @@ export class ExpensesComponent implements OnInit {
   saveExpenseEdit() {
     if (!this.editingExpense) return;
     this.savingEdit = true;
-    this.expenseService.update(this.editingExpense.id, this.editData).subscribe({
+    const expenseId = this.editingExpense.id;
+    const fileToUpload = this.editSelectedFile;
+
+    this.expenseService.update(expenseId, this.editData).subscribe({
       next: () => {
-        this.savingEdit = false;
-        this.editingExpense = null;
-        this.loadExpenses();
+        // If a new support file was selected during edit, upload it after saving the expense
+        if (fileToUpload) {
+          this.expenseService.uploadAttachment(expenseId, fileToUpload).subscribe({
+            next: () => {
+              this.savingEdit = false;
+              this.editingExpense = null;
+              this.editSelectedFile = null;
+              this.toastService.success('Éxito', 'Egreso y soporte actualizados exitosamente');
+              this.loadExpenses();
+            },
+            error: (err: any) => {
+              this.savingEdit = false;
+              this.editingExpense = null;
+              this.editSelectedFile = null;
+              this.toastService.warning('Egreso guardado', 'El egreso se guardó, pero el soporte no pudo subirse.');
+              this.loadExpenses();
+            },
+          });
+        } else {
+          this.savingEdit = false;
+          this.editingExpense = null;
+          this.loadExpenses();
+        }
       },
       error: () => { this.savingEdit = false; },
     });
