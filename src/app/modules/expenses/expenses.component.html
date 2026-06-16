@@ -231,45 +231,66 @@
           </div>
 
           <!-- Edit File Attachment -->
-          <div class="form-group">
+          <div class="form-group full-width">
             <label>Soporte</label>
-            <div class="file-input-wrapper">
+            <div class="support-section">
               <input type="file" #editFileInput (change)="onEditFileSelected($event)"
                 accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.txt,.csv" style="display: none;" />
 
               @if (editSelectedFile) {
-              <div class="file-preview">
-                <span class="file-indicator">Nuevo soporte:</span>
-                <span class="file-name">{{ editSelectedFile.name }}</span>
-                <button type="button" class="btn-remove" (click)="removeEditFile()" title="Cancelar nuevo archivo">
-                  <span class="icon icon-close"></span>
-                </button>
-              </div>
-              @if (editingExpense?.attachments?.length > 0) {
-              <div class="file-help-text warning-text">
-                ⚠️ Al guardar, el nuevo archivo reemplazará el soporte actual.
-              </div>
-              }
-              } @else if (editingExpense?.attachments?.length > 0) {
-              <div class="file-preview existing-file">
-                <span class="file-indicator">Soporte actual:</span>
-                <span class="file-name">{{ editingExpense.attachments[0].fileName }}</span>
-                <button type="button" class="btn-icon-small" (click)="viewAttachment(editingExpense.attachments[0])"
-                  title="Ver archivo">
-                  <span class="icon icon-view"></span>
-                </button>
-                <button type="button" class="btn-icon-small danger"
-                  (click)="deleteEditAttachment(editingExpense.attachments[0].id)" title="Eliminar soporte">
+              <!-- New file preview -->
+              <div class="support-file-card new-file">
+                <div class="file-icon" [class]="'file-icon-' + getFileIconClassForFile(editSelectedFile.name)">
+                  <span class="file-extension">{{ getFileExtension(editSelectedFile.name) }}</span>
+                </div>
+                <div class="file-info">
+                  <div class="file-name">{{ editSelectedFile.name }}</div>
+                  <div class="file-meta">{{ formatFileSize(editSelectedFile.size) }} • Listo para subir</div>
+                </div>
+                <button type="button" class="btn-icon danger" (click)="removeEditFile()" title="Cancelar">
                   <span class="icon icon-delete"></span>
                 </button>
               </div>
-              <button type="button" class="btn btn-outline btn-file btn-sm" (click)="editFileInput.click()">
-                📎 Reemplazar soporte
+              @if (editingExpense?.attachments?.length > 0) {
+              <div class="replace-warning">
+                ⚠️ Al guardar, este archivo reemplazará el soporte actual.
+              </div>
+              }
+              } @else if (editingExpense?.attachments?.length > 0) {
+              <!-- Existing file card -->
+              <div class="support-file-card">
+                <div class="file-icon"
+                  [class]="'file-icon-' + getFileIconClass(editingExpense.attachments[0].mimeType)">
+                  <span class="file-extension">{{ getFileExtension(editingExpense.attachments[0].fileName) }}</span>
+                </div>
+                <div class="file-info">
+                  <div class="file-name">{{ editingExpense.attachments[0].fileName }}</div>
+                  <div class="file-meta">{{ getFileTypeLabel(editingExpense.attachments[0].mimeType) }} • {{
+                    formatFileSize(editingExpense.attachments[0].fileSize) }} • Subido el {{
+                    editingExpense.attachments[0].createdAt | date:'dd/MM/yyyy':config.timezone }}</div>
+                </div>
+              </div>
+              <div class="support-actions">
+                <button type="button" class="btn-support-action"
+                  (click)="viewAttachment(editingExpense.attachments[0])">
+                  <span class="icon icon-view"></span>
+                  Ver
+                </button>
+                <button type="button" class="btn-support-action danger"
+                  (click)="deleteEditAttachment(editingExpense.attachments[0].id)">
+                  <span class="icon icon-delete"></span>
+                  Eliminar
+                </button>
+              </div>
+              <button type="button" class="btn-replace-file" (click)="editFileInput.click()">
+                <span class="icon icon-attachment"></span>
+                Reemplazar archivo
               </button>
               } @else {
               <div class="file-help-text">No hay soporte adjunto</div>
-              <button type="button" class="btn btn-outline btn-file btn-sm" (click)="editFileInput.click()">
-                📎 Adjuntar soporte
+              <button type="button" class="btn-replace-file" (click)="editFileInput.click()">
+                <span class="icon icon-attachment"></span>
+                Adjuntar soporte
               </button>
               }
             </div>

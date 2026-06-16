@@ -192,12 +192,23 @@ export class ExpensesComponent implements OnInit {
     if (!this.editingExpense) return;
     if (!confirm('¿Eliminar el soporte adjunto? Esta acción no se puede deshacer.')) return;
 
-    this.expenseService.deleteAttachment(this.editingExpense.id, attachmentId).subscribe({
+    const expenseId = this.editingExpense.id;
+
+    this.expenseService.deleteAttachment(expenseId, attachmentId).subscribe({
       next: () => {
         this.editingExpense.attachments = (this.editingExpense.attachments || []).filter(
           (a: any) => a.id !== attachmentId
         );
-        this.toastService.success('Soporte eliminado', 'El archivo adjunto fue eliminado.');
+
+        // Silently save the expense so the change is reflected server-side
+        this.expenseService.update(expenseId, this.editData).subscribe({
+          next: () => {
+            this.toastService.success('Soporte eliminado', 'El archivo adjunto fue eliminado.');
+          },
+          error: () => {
+            this.toastService.warning('Soporte eliminado', 'El soporte se eliminó, pero no se pudo sincronizar el egreso.');
+          },
+        });
       },
       error: () => {
         this.toastService.error('Error', 'No se pudo eliminar el soporte.');
@@ -219,6 +230,41 @@ export class ExpensesComponent implements OnInit {
 
   formatFileSize(bytes: number): string {
     return this.expenseService.formatFileSize(bytes);
+  }
+
+  getFileIconClass(mimeType: string): string {
+    return this.expenseService.getFileIconClass(mimeType);
+  }
+
+  getFileIconClassForFile(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+    const mimeMap: Record<string, string> = {
+      pdf: 'application/pdf',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      webp: 'image/webp',
+      doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      txt: 'text/plain',
+      csv: 'text/csv',
+    };
+    return this.expenseService.getFileIconClass(mimeMap[ext] || 'application/octet-stream');
+  }
+
+  getFileExtension(fileName: string): string {
+    return (fileName.split('.').pop() || '').toUpperCase();
+  }
+
+  getFileTypeLabel(mimeType: string): string {
+    if (mimeType.startsWith('image/')) return 'Imagen';
+    if (mimeType === 'application/pdf') return 'PDF';
+    if (mimeType.includes('word') || mimeType.includes('document')) return 'Documento';
+    if (mimeType.includes('excel') || mimeType.includes('sheet') || mimeType.includes('csv')) return 'Hoja de cálculo';
+    return 'Archivo';
   }
 
   createExpense() {
