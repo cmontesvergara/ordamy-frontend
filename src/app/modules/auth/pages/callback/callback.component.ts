@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
+import { AnalyticsEventName, AnalyticsService } from '../../../../core/services/analytics/analytics.service';
 import { Permission, SessionService, User } from '../../../../core/services/session/session.service';
 import { Tenant } from '../../../../shared/components/tenant-selector.component';
 export interface ExchangeResponse {
@@ -47,6 +48,7 @@ export class CallbackComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         private sessionService: SessionService,
+        private analytics: AnalyticsService,
     ) { }
 
     ngOnInit() {
@@ -71,14 +73,17 @@ export class CallbackComponent implements OnInit {
                 .then((response: ExchangeResponse) => {
                     if (response.success) {
                         this.sessionService.setupSession(response);
+                        this.analytics.trackEvent({ name: AnalyticsEventName.LoginSuccess });
                         this.router.navigate(['/home']);
                     } else {
                         console.error('Exchange payload failed:', response);
+                        this.analytics.trackEvent({ name: AnalyticsEventName.LoginFailed, data: { reason: 'exchange_error' } });
                         this.router.navigate(['/']);
                     }
                 })
                 .catch((error: any) => {
                     console.error('Exchange payload error:', error);
+                    this.analytics.trackEvent({ name: AnalyticsEventName.LoginFailed, data: { reason: 'network_error' } });
                     this.router.navigate(['/']);
                 });
             return;

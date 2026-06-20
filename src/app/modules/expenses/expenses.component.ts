@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { ExpenseService } from '../../core/services/expense/expense.service';
 import { SettingsService } from '../../core/services/settings/settings.service';
@@ -44,6 +45,7 @@ export class ExpensesComponent implements OnInit {
     private settingsService: SettingsService,
     public config: AppConfigService,
     private toastService: ToastService,
+    private analytics: AnalyticsService,
   ) { }
 
   ngOnInit() {
@@ -281,6 +283,14 @@ export class ExpensesComponent implements OnInit {
       next: (res: any) => {
         this.saving = false;
         this.showForm = false;
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.ExpenseCreated,
+          data: {
+            expense_id: res.data.id,
+            amount: payload.amount,
+            has_attachment: !!this.selectedFile,
+          },
+        });
         this.newExpense = {
           description: '', amount: 0, categoryId: '', supplierId: '',
           paymentMethodId: '', invoiceNumber: '', expenseDate: '', notes: ''
@@ -307,7 +317,12 @@ export class ExpensesComponent implements OnInit {
 
   deleteExpense(id: string) {
     if (!confirm('¿Eliminar este egreso?')) return;
-    this.expenseService.delete(id).subscribe({ next: () => this.loadExpenses() });
+    this.expenseService.delete(id).subscribe({
+      next: () => {
+        this.analytics.trackEvent({ name: AnalyticsEventName.ExpenseDeleted, data: { expense_id: id } });
+        this.loadExpenses();
+      },
+    });
   }
 
   // Edit expense
@@ -354,6 +369,7 @@ export class ExpensesComponent implements OnInit {
 
     this.expenseService.update(expenseId, this.editData).subscribe({
       next: () => {
+        this.analytics.trackEvent({ name: AnalyticsEventName.ExpenseUpdated, data: { expense_id: expenseId } });
         // If a new support file was selected during edit, replace existing attachments
         if (fileToUpload) {
           const deleteOldAttachments$ = existingAttachments.length > 0

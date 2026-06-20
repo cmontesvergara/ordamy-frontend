@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings/settings.service';
 
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 
@@ -28,7 +29,12 @@ export class SettingsComponent implements OnInit {
     // Generic inline edit state
     editing: any = null;
 
-    constructor(private settingsService: SettingsService, private appConfig: AppConfigService, private toast: ToastService) { }
+    constructor(
+        private settingsService: SettingsService,
+        private appConfig: AppConfigService,
+        private toast: ToastService,
+        private analytics: AnalyticsService,
+    ) { }
 
     ngOnInit() {
         this.loadAll();
@@ -45,31 +51,46 @@ export class SettingsComponent implements OnInit {
     // ─── Create ───
     addPaymentMethod() {
         this.settingsService.createPaymentMethod({ name: this.newPaymentMethod }).subscribe({
-            next: () => { this.newPaymentMethod = ''; this.loadAll(); },
+            next: (res: any) => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.PaymentMethodCreated, data: { payment_method_id: res.data.id } });
+                this.newPaymentMethod = ''; this.loadAll();
+            },
         });
     }
 
     addCategory() {
         this.settingsService.createCategory(this.newCategory).subscribe({
-            next: () => { this.newCategory = { name: '', type: 'EXPENSE' }; this.loadAll(); },
+            next: (res: any) => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.CategoryCreated, data: { category_id: res.data.id, type: this.newCategory.type } });
+                this.newCategory = { name: '', type: 'EXPENSE' }; this.loadAll();
+            },
         });
     }
 
     addSupplier() {
         this.settingsService.createSupplier(this.newSupplier).subscribe({
-            next: () => { this.newSupplier = { name: '', identification: '', phone: '', email: '' }; this.loadAll(); },
+            next: (res: any) => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.SupplierCreated, data: { supplier_id: res.data.id } });
+                this.newSupplier = { name: '', identification: '', phone: '', email: '' }; this.loadAll();
+            },
         });
     }
 
     addTax() {
         this.settingsService.createTaxConfig(this.newTax).subscribe({
-            next: () => { this.newTax = { name: '', rate: 0 }; this.loadAll(); },
+            next: (res: any) => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.TaxConfigCreated, data: { tax_config_id: res.data.id } });
+                this.newTax = { name: '', rate: 0 }; this.loadAll();
+            },
         });
     }
 
     saveFinancial() {
         this.settingsService.updateFinancialConfig(this.financialConfig).subscribe({
-            next: () => { this.appConfig.refresh(); this.toast.success('Guardado', 'Configuración guardada'); },
+            next: () => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.FinancialConfigUpdated });
+                this.appConfig.refresh(); this.toast.success('Guardado', 'Configuración guardada');
+            },
         });
     }
 
@@ -82,13 +103,23 @@ export class SettingsComponent implements OnInit {
         if (!this.editing) return;
         const { id, data } = this.editing;
 
+        const eventByType: Record<string, AnalyticsEventName> = {
+            payment: AnalyticsEventName.PaymentMethodUpdated,
+            category: AnalyticsEventName.CategoryUpdated,
+            supplier: AnalyticsEventName.SupplierUpdated,
+            tax: AnalyticsEventName.TaxConfigUpdated,
+        };
+
         const obs = type === 'payment' ? this.settingsService.updatePaymentMethod(id, data)
             : type === 'category' ? this.settingsService.updateCategory(id, data)
                 : type === 'supplier' ? this.settingsService.updateSupplier(id, data)
                     : this.settingsService.updateTaxConfig(id, data);
 
         obs.subscribe({
-            next: () => { this.editing = null; this.loadAll(); },
+            next: () => {
+                this.analytics.trackEvent({ name: eventByType[type], data: { [`${type}_id`]: id } });
+                this.editing = null; this.loadAll();
+            },
             error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al actualizar'); },
         });
     }
@@ -98,13 +129,23 @@ export class SettingsComponent implements OnInit {
         const labels: any = { payment: 'medio de pago', category: 'categoría', supplier: 'proveedor', tax: 'configuración de impuesto' };
         if (!confirm(`¿Eliminar ${labels[type]} "${item.name}"?`)) return;
 
+        const eventByType: Record<string, AnalyticsEventName> = {
+            payment: AnalyticsEventName.PaymentMethodDeleted,
+            category: AnalyticsEventName.CategoryDeleted,
+            supplier: AnalyticsEventName.SupplierDeleted,
+            tax: AnalyticsEventName.TaxConfigDeleted,
+        };
+
         const obs = type === 'payment' ? this.settingsService.deletePaymentMethod(item.id)
             : type === 'category' ? this.settingsService.deleteCategory(item.id)
                 : type === 'supplier' ? this.settingsService.deleteSupplier(item.id)
                     : this.settingsService.deleteTaxConfig(item.id);
 
         obs.subscribe({
-            next: () => { this.loadAll(); },
+            next: () => {
+                this.analytics.trackEvent({ name: eventByType[type], data: { [`${type}_id`]: item.id } });
+                this.loadAll();
+            },
             error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al eliminar'); },
         });
     }

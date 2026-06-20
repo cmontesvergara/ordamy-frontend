@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ReportService } from '../../core/services/report/report.service';
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { ReportService } from '../../core/services/report/report.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
-    selector: 'app-reports',
-    imports: [CommonModule, FormsModule],
-    templateUrl: './reports.component.html',
-    styleUrl: './reports.component.scss'
+  selector: 'app-reports',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './reports.component.html',
+  styleUrl: './reports.component.scss'
 })
 export class ReportsComponent implements OnInit {
   activeTab = 'daily';
@@ -32,7 +33,8 @@ export class ReportsComponent implements OnInit {
   constructor(
     private reportService: ReportService,
     public config: AppConfigService,
-    private toast: ToastService
+    private toast: ToastService,
+    private analytics: AnalyticsService,
   ) { }
 
   ngOnInit() {
@@ -67,6 +69,10 @@ export class ReportsComponent implements OnInit {
       next: (blob: Blob) => {
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
         const fileURL = URL.createObjectURL(pdfBlob);
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.ReportPrinted,
+          data: { type: this.activeTab, date: this.dailyDate, month: this.selectedMonth, year: this.selectedYear },
+        });
         window.open(fileURL, '_blank');
         setTimeout(() => URL.revokeObjectURL(fileURL), 10000);
       },

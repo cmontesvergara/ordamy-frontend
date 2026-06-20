@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import packageJson from '../../../../package.json';
 import { environment } from '../../../environments/environment';
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { SessionService } from '../../core/services/session/session.service';
 import { Tenant, TenantSelectorComponent } from '../../shared/components/tenant-selector.component';
@@ -58,6 +59,7 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
     private router: Router,
     private appConfig: AppConfigService,
     private sessionService: SessionService,
+    private analytics: AnalyticsService,
   ) { }
 
 
@@ -113,6 +115,7 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
   }
 
   logout() {
+    this.analytics.trackEvent({ name: AnalyticsEventName.Logout });
     this.sessionService.logout().subscribe({
       next: () => {
         this.sessionService.clearSession();
@@ -170,6 +173,10 @@ export class LoggedLayoutComponent implements OnInit, OnDestroy {
   // Handler for tenant selection from TenantSelectorComponent
   onTenantSelected(tenant: Tenant) {
     this.currentTenant = tenant;
+    this.analytics.trackEvent({
+      name: AnalyticsEventName.TenantSwitched,
+      data: { tenant_id: tenant.id, tenant_slug: tenant.slug, tenant_role: tenant.role },
+    });
     // TODO: Implement actual tenant switch logic (reload session or redirect to SSO)
     console.log('Selected tenant:', tenant);
     // Option 1: Reload page to get new session with updated tenant

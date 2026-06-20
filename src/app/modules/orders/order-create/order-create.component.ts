@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AnalyticsEventName, AnalyticsService } from '../../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 import { CustomerService } from '../../../core/services/customer/customer.service';
 import { OrderService } from '../../../core/services/order/order.service';
@@ -86,6 +87,7 @@ export class OrderCreateComponent implements OnInit {
     private productService: ProductService,
     private sessionService: SessionService,
     public config: AppConfigService,
+    private analytics: AnalyticsService,
   ) { }
 
   ngOnInit() {
@@ -182,6 +184,15 @@ export class OrderCreateComponent implements OnInit {
     }).subscribe({
       next: (res: any) => {
         this.saving = false;
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.OrderCreated,
+          data: {
+            order_id: res.data.id,
+            item_count: this.items.length,
+            has_discount: this.discount > 0,
+            has_due_date: !!this.dueDate,
+          },
+        });
         this.router.navigate(['/orders', res.data.id]);
       },
       error: () => { this.saving = false; },
@@ -205,6 +216,10 @@ export class OrderCreateComponent implements OnInit {
       next: (res: any) => {
         this.savingCustomer = false;
         this.showCreateCustomer = false;
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.CustomerCreatedInline,
+          data: { customer_id: res.data.id, source: 'order_create' },
+        });
         // Auto-select the newly created customer
         this.selectedCustomer = res.data;
         this.customerSearch = '';

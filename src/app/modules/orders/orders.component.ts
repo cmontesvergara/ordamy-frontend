@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { OrderService } from '../../core/services/order/order.service';
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { OrderService } from '../../core/services/order/order.service';
 
 @Component({
-    selector: 'app-orders',
-    imports: [CommonModule, FormsModule, RouterLink],
-    templateUrl: './orders.component.html',
-    styleUrl: './orders.component.scss'
+  selector: 'app-orders',
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './orders.component.html',
+  styleUrl: './orders.component.scss'
 })
 export class OrdersComponent implements OnInit {
   orders: any[] = [];
@@ -43,6 +44,7 @@ export class OrdersComponent implements OnInit {
     private orderService: OrderService,
     private router: Router,
     public config: AppConfigService,
+    private analytics: AnalyticsService,
   ) {
     // Close menu on outside click
     document.addEventListener('click', () => { this.openMenuId = null; });
@@ -122,6 +124,10 @@ export class OrdersComponent implements OnInit {
     if (!this.cancelTarget || !this.cancelReason.trim()) return;
     this.orderService.cancel(this.cancelTarget.id, this.cancelReason).subscribe({
       next: () => {
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.OrderCancelled,
+          data: { order_id: this.cancelTarget.id, reason: this.cancelReason, source: 'orders_list' },
+        });
         this.showCancelModal = false;
         this.loadOrders();
       },

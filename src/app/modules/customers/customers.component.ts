@@ -2,14 +2,15 @@ import { Component, OnInit } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { CustomerService } from '../../core/services/customer/customer.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
-    selector: 'app-customers',
-    imports: [FormsModule, RouterLink],
-    templateUrl: './customers.component.html',
-    styleUrl: './customers.component.scss'
+  selector: 'app-customers',
+  imports: [FormsModule, RouterLink],
+  templateUrl: './customers.component.html',
+  styleUrl: './customers.component.scss'
 })
 export class CustomersComponent implements OnInit {
   customers: any[] = [];
@@ -26,7 +27,11 @@ export class CustomersComponent implements OnInit {
 
   get totalPages() { return Math.ceil(this.total / this.limit); }
 
-  constructor(private customerService: CustomerService, private toast: ToastService) { }
+  constructor(
+    private customerService: CustomerService,
+    private toast: ToastService,
+    private analytics: AnalyticsService,
+  ) { }
 
   ngOnInit() { this.loadCustomers(); }
 
@@ -66,9 +71,13 @@ export class CustomersComponent implements OnInit {
 
     this.saving = true;
     this.customerService.create(this.newCustomer).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.saving = false;
         this.showForm = false;
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.CustomerCreated,
+          data: { customer_id: res.data.id, source: 'customers_module' },
+        });
         this.newCustomer = { identification: '', name: '', phone: '', email: '', address: '' };
         this.loadCustomers();
       },

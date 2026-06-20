@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ReportService } from '../../core/services/report/report.service';
-import { CustomerService } from '../../core/services/customer/customer.service';
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { CustomerService } from '../../core/services/customer/customer.service';
+import { ReportService } from '../../core/services/report/report.service';
 
 @Component({
-    selector: 'app-portfolio',
-    imports: [CommonModule, FormsModule, RouterLink],
-    templateUrl: './portfolio.component.html',
-    styleUrl: './portfolio.component.scss'
+  selector: 'app-portfolio',
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './portfolio.component.html',
+  styleUrl: './portfolio.component.scss'
 })
 export class PortfolioComponent implements OnInit {
   orders: any[] = [];
@@ -37,6 +38,7 @@ export class PortfolioComponent implements OnInit {
     private reportService: ReportService,
     private customerService: CustomerService,
     public config: AppConfigService,
+    private analytics: AnalyticsService,
   ) { }
 
   ngOnInit() { this.loadPortfolio(); }
@@ -130,6 +132,15 @@ export class PortfolioComponent implements OnInit {
       next: (blob: Blob) => {
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(pdfBlob);
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.PortfolioDownloaded,
+          data: {
+            customer_id: this.selectedCustomer?.id,
+            status: this.statusFilter,
+            date_from: this.dateFrom,
+            date_to: this.dateTo,
+          },
+        });
         window.open(url, '_blank');
         // Revoke after a delay to ensure the new tab has time to load it
         setTimeout(() => window.URL.revokeObjectURL(url), 10000);

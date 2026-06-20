@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AnalyticsEventName, AnalyticsService } from '../../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
 import { OrderService } from '../../../core/services/order/order.service';
 import { PaymentService } from '../../../core/services/payment/payment.service';
@@ -94,6 +95,7 @@ export class OrderDetailComponent implements OnInit {
     private el: ElementRef,
     public config: AppConfigService,
     private toast: ToastService,
+    private analytics: AnalyticsService,
   ) { }
 
   ngOnInit() {
@@ -135,6 +137,14 @@ export class OrderDetailComponent implements OnInit {
       next: () => {
         this.savingPayment = false;
         this.showPaymentForm = false;
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.PaymentRegistered,
+          data: {
+            order_id: this.order.id,
+            amount: this.newPayment.amount,
+            payment_method_id: this.newPayment.paymentMethodId,
+          },
+        });
         this.newPayment = { paymentMethodId: '', amount: 0, notes: '' };
         this.loadOrder(this.order.id);
       },
@@ -146,7 +156,13 @@ export class OrderDetailComponent implements OnInit {
     const reason = prompt('Razón de anulación:');
     if (!reason) return;
     this.orderService.cancel(this.order.id, reason).subscribe({
-      next: () => { this.loadOrder(this.order.id); },
+      next: () => {
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.OrderCancelled,
+          data: { order_id: this.order.id, reason },
+        });
+        this.loadOrder(this.order.id);
+      },
       error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al anular orden'); },
     });
   }
@@ -213,6 +229,14 @@ export class OrderDetailComponent implements OnInit {
         this.order = res.data;
         this.savingOrder = false;
         this.editingOrder = false;
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.OrderUpdated,
+          data: {
+            order_id: this.order.id,
+            item_count: this.editOrderData.items.length,
+            has_discount: this.editDiscount > 0,
+          },
+        });
       },
       error: () => { this.savingOrder = false; },
     });
@@ -257,6 +281,10 @@ export class OrderDetailComponent implements OnInit {
     this.updatingStatus = true;
     this.orderService.updateOperationalStatus(this.order.id, nextStatus).subscribe({
       next: () => {
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.OrderStatusChanged,
+          data: { order_id: this.order.id, status: nextStatus },
+        });
         this.loadOrder(this.order.id);
         this.updatingStatus = false;
       },
@@ -272,6 +300,10 @@ export class OrderDetailComponent implements OnInit {
       next: (blob) => {
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
         const fileURL = URL.createObjectURL(pdfBlob);
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.OrderPrinted,
+          data: { order_id: this.order.id, mode },
+        });
         window.open(fileURL, '_blank');
         setTimeout(() => URL.revokeObjectURL(fileURL), 10000);
       },

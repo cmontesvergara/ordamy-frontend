@@ -1,16 +1,17 @@
-import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CustomerService } from '../../../core/services/customer/customer.service';
+import { AnalyticsEventName, AnalyticsService } from '../../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../../core/services/app-config/app-config.service';
+import { CustomerService } from '../../../core/services/customer/customer.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
 
 @Component({
-    selector: 'app-customer-detail',
-    imports: [CommonModule, FormsModule, RouterLink],
-    templateUrl: './customer-detail.component.html',
-    styleUrl: './customer-detail.component.scss'
+  selector: 'app-customer-detail',
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './customer-detail.component.html',
+  styleUrl: './customer-detail.component.scss'
 })
 export class CustomerDetailComponent implements OnInit {
   customer: any = null;
@@ -48,6 +49,7 @@ export class CustomerDetailComponent implements OnInit {
     private el: ElementRef,
     public config: AppConfigService,
     private toast: ToastService,
+    private analytics: AnalyticsService,
   ) { }
 
   @HostListener('document:click', ['$event'])
@@ -132,6 +134,7 @@ export class CustomerDetailComponent implements OnInit {
       next: (res: any) => {
         // Merge updated fields into customer
         Object.assign(this.customer, res.data);
+        this.analytics.trackEvent({ name: AnalyticsEventName.CustomerUpdated, data: { customer_id: this.customer.id } });
         this.savingCustomer = false;
         this.editingCustomer = false;
       },
@@ -142,7 +145,10 @@ export class CustomerDetailComponent implements OnInit {
   deleteCustomer() {
     if (!confirm(`¿Eliminar al cliente "${this.customer.name}"? Esta acción no se puede deshacer.`)) return;
     this.customerService.delete(this.customer.id).subscribe({
-      next: () => { this.router.navigate(['/customers']); },
+      next: () => {
+        this.analytics.trackEvent({ name: AnalyticsEventName.CustomerDeleted, data: { customer_id: this.customer.id } });
+        this.router.navigate(['/customers']);
+      },
       error: (err: any) => {
         this.toast.error('Error', err.error?.error || 'Error al eliminar cliente');
       },

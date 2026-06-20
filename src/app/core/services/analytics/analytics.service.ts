@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+import { AnalyticsEventName } from './analytics-event-name.enum';
+
+export { AnalyticsEventName };
 
 export interface AnalyticsConfig {
     enabled: boolean;

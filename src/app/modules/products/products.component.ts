@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { ProductService } from '../../core/services/product/product.service';
 import { SessionService } from '../../core/services/session/session.service';
@@ -27,6 +28,7 @@ export class ProductsComponent implements OnInit {
         public config: AppConfigService,
         private toast: ToastService,
         private sessionService: SessionService,
+        private analytics: AnalyticsService,
     ) { }
 
     ngOnInit() {
@@ -54,7 +56,8 @@ export class ProductsComponent implements OnInit {
     addProduct() {
         if (!this.newProduct.name) return;
         this.productService.create(this.newProduct).subscribe({
-            next: () => {
+            next: (res: any) => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.ProductCreated, data: { product_id: res.data.id } });
                 this.newProduct = { name: '', description: '', basePrice: 0, unit: '' };
                 this.showCreateForm = false;
                 this.loadProducts();
@@ -76,7 +79,10 @@ export class ProductsComponent implements OnInit {
     saveEdit() {
         if (!this.editing) return;
         this.productService.update(this.editing.id, this.editing.data).subscribe({
-            next: () => { this.editing = null; this.loadProducts(); },
+            next: () => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.ProductUpdated, data: { product_id: this.editing.id } });
+                this.editing = null; this.loadProducts();
+            },
             error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al actualizar'); },
         });
     }

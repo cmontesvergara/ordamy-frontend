@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
 import { MaterialService } from '../../core/services/material/material.service';
 import { SessionService } from '../../core/services/session/session.service';
@@ -28,6 +29,7 @@ export class MaterialsComponent implements OnInit {
         public config: AppConfigService,
         private toast: ToastService,
         private sessionService: SessionService,
+        private analytics: AnalyticsService,
     ) { }
 
     ngOnInit() {
@@ -57,7 +59,8 @@ export class MaterialsComponent implements OnInit {
     addMaterial() {
         if (!this.newMaterial.name) return;
         this.materialService.create(this.newMaterial).subscribe({
-            next: () => {
+            next: (res: any) => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.MaterialCreated, data: { material_id: res.data.id } });
                 this.newMaterial = { name: '', description: '', price: 0, cost: 0, unit: '' };
                 this.showCreateForm = false;
                 this.loadMaterials();
@@ -79,7 +82,10 @@ export class MaterialsComponent implements OnInit {
     saveEdit() {
         if (!this.editing) return;
         this.materialService.update(this.editing.id, this.editing.data).subscribe({
-            next: () => { this.editing = null; this.loadMaterials(); },
+            next: () => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.MaterialUpdated, data: { material_id: this.editing.id } });
+                this.editing = null; this.loadMaterials();
+            },
             error: (err: any) => { this.toast.error('Error', err.error?.error || 'Error al actualizar'); },
         });
     }
@@ -92,6 +98,7 @@ export class MaterialsComponent implements OnInit {
         if (!confirm(`¿Eliminar "${item.name}"?`)) return;
         this.materialService.delete(item.id).subscribe({
             next: () => {
+                this.analytics.trackEvent({ name: AnalyticsEventName.MaterialDeleted, data: { material_id: item.id } });
                 this.loadMaterials();
                 this.toast.success('Eliminado', 'Material eliminado');
             },

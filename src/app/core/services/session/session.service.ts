@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ExchangeResponse } from '../../../modules/auth/pages/callback/callback.component';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 const STORAGE_KEY = 'ordamy_session_v1';
 
@@ -36,7 +37,10 @@ export class SessionService {
     private permissions: Permission[] | null = null;
     private relatedTenants: Tenant[] = [];
 
-    constructor(private readonly http: HttpClient) {
+    constructor(
+        private readonly http: HttpClient,
+        private readonly analytics: AnalyticsService,
+    ) {
         // Restore session from sessionStorage on initialization
         this.restoreFromStorage();
     }
@@ -97,6 +101,18 @@ export class SessionService {
         }
         // Persist to sessionStorage
         this.persistToStorage();
+
+        // Identify session for analytics
+        this.analytics.identify({
+            id: user.userId,
+            data: {
+                email: user.email,
+                tenant_id: data.currentTenant?.id,
+                tenant_slug: data.currentTenant?.slug,
+                tenant_role: data.currentTenant?.role,
+                system_role: user.systemRole || 'user',
+            },
+        });
     }
 
     isDefined() {
@@ -177,6 +193,9 @@ export class SessionService {
         } catch (error) {
             console.error('[SessionService] Error clearing storage:', error);
         }
+
+        // Analytics: reset session identity on logout
+        this.analytics.identify({ id: 'anonymous' });
     }
 
     /**
