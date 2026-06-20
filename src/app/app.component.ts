@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { AnalyticsService } from './core/services/analytics/analytics.service';
 import { LoadingService } from './core/services/loading/loading.service';
 import { SdkService } from './core/services/sdk/sdk.service';
 import { ToastService } from './core/services/toast/toast.service';
@@ -75,12 +77,28 @@ import { SdkWrapperComponent } from './shared/components/sdk-modal-wrapper/sdk-w
     .toast-close:hover { color: #1e293b; }
   `]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(
     public loadingService: LoadingService,
     public toastService: ToastService,
-    public sdkService: SdkService
+    public sdkService: SdkService,
+    private router: Router,
+    private analytics: AnalyticsService,
   ) { }
+
+  ngOnInit(): void {
+    // SPA page view tracking — Umami auto-tracks the first load, but we
+    // explicitly send every NavigationEnd so the provider stays swappable.
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.analytics.trackPageView({
+          url: event.urlAfterRedirects,
+          title: document.title,
+          referrer: document.referrer,
+        });
+      });
+  }
 
   // Prevent scroll from changing number input values globally
   @HostListener('wheel', ['$event'])
