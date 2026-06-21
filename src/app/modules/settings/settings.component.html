@@ -329,9 +329,9 @@
       <div class="form-group">
         <label>Mensaje al crear orden</label>
         <textarea [(ngModel)]="notificationsConfig.messages.orderCreated" rows="4"
-          placeholder="Hola {{customerName}}, tu orden #{{orderNumber}} ha sido creada..."></textarea>
-        <small>Variables disponibles: <code>{{orderNumber}}</code>, <code>{{customerName}}</code>,
-          <code>{{portalUrl}}</code></small>
+          placeholder="Hola {{'{{customerName}}'}}, tu orden #{{'{{orderNumber}}'}} ha sido creada..."></textarea>
+        <small>Variables disponibles: <code>{{'{{orderNumber}}'}}</code>, <code>{{'{{customerName}}'}}</code>,
+          <code>{{'{{portalUrl}}'}}</code></small>
       </div>
 
       <div class="form-group">
