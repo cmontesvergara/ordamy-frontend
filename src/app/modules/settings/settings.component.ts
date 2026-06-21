@@ -20,6 +20,11 @@ export class SettingsComponent implements OnInit {
     suppliers: any[] = [];
     taxConfigs: any[] = [];
     financialConfig: any = null;
+    notificationsConfig: any = {
+        enabled: false,
+        messages: { orderCreated: '' },
+        portalUrl: '',
+    };
 
     newPaymentMethod = '';
     newCategory = { name: '', type: 'EXPENSE' };
@@ -46,6 +51,7 @@ export class SettingsComponent implements OnInit {
         this.settingsService.getSuppliers().subscribe({ next: (res: any) => { this.suppliers = res.data; } });
         this.settingsService.getTaxConfigs().subscribe({ next: (res: any) => { this.taxConfigs = res.data; } });
         this.settingsService.getFinancialConfig().subscribe({ next: (res: any) => { this.financialConfig = res.data; } });
+        this.settingsService.getNotificationsConfig().subscribe({ next: (res: any) => { this.notificationsConfig = res.data; } });
     }
 
     // ─── Create ───
@@ -92,6 +98,21 @@ export class SettingsComponent implements OnInit {
                 this.appConfig.refresh(); this.toast.success('Guardado', 'Configuración guardada');
             },
         });
+    }
+
+    saveNotifications() {
+        this.settingsService.updateNotificationsConfig(this.notificationsConfig).subscribe({
+            next: () => {
+                this.toast.success('Guardado', 'Configuración de notificaciones guardada');
+            },
+            error: (err: any) => {
+                this.toast.error('Error', err.error?.error || 'Error al guardar notificaciones');
+            },
+        });
+    }
+
+    openConnectChannel() {
+        window.open('https://connect.bigso.org', '_blank');
     }
 
     // ─── Edit (generic) ───

@@ -73,4 +73,12 @@ export class SettingsService {
     updateFinancialConfig(data: any) {
         return this.http.put<any>(`${this.url}/financial`, data, { withCredentials: true });
     }
+
+    // Notifications Config
+    getNotificationsConfig() {
+        return this.http.get<any>(`${this.url}/notifications`, { withCredentials: true });
+    }
+    updateNotificationsConfig(data: any) {
+        return this.http.put<any>(`${this.url}/notifications`, data, { withCredentials: true });
+    }
 }
