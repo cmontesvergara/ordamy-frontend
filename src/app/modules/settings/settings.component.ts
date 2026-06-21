@@ -5,6 +5,7 @@ import { SettingsService } from '../../core/services/settings/settings.service';
 
 import { AnalyticsEventName, AnalyticsService } from '../../core/services/analytics/analytics.service';
 import { AppConfigService } from '../../core/services/app-config/app-config.service';
+import { SessionService } from '../../core/services/session/session.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
@@ -39,6 +40,7 @@ export class SettingsComponent implements OnInit {
         private appConfig: AppConfigService,
         private toast: ToastService,
         private analytics: AnalyticsService,
+        private session: SessionService,
     ) { }
 
     ngOnInit() {
@@ -112,7 +114,11 @@ export class SettingsComponent implements OnInit {
     }
 
     openConnectChannel() {
-        window.open('https://connect.bigso.org', '_blank');
+        const tenantId = this.session.getCurrentTenant()?.id;
+        const url = tenantId
+            ? `https://connect.bigso.org?x-tenant-id=${encodeURIComponent(tenantId)}`
+            : 'https://connect.bigso.org';
+        window.open(url, '_blank');
     }
 
     // ─── Edit (generic) ───
