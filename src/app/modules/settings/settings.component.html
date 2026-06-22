@@ -327,6 +327,29 @@
       </div>
 
       <div class="form-group">
+        <label>Canal de WhatsApp *</label>
+        @if (loadingChannels) {
+        <small>Cargando canales...</small>
+        }
+        @if (!loadingChannels && whatsappChannels.length === 0) {
+        <small class="text-danger">No se encontraron canales de WhatsApp activos. Habilita uno en BigSo Connect.</small>
+        }
+        @if (!loadingChannels && whatsappChannels.length > 0) {
+        <select [(ngModel)]="notificationsConfig.channelId">
+          @for (channel of whatsappChannels; track channel.id) {
+          <option [ngValue]="channel.id">{{ channel.name }} ({{ channel.status }})</option>
+          }
+        </select>
+        @if (!notificationsConfig.channelId) {
+        <small class="text-danger">Debes seleccionar un canal para activar las notificaciones.</small>
+        }
+        @if (notificationsConfig.channelId) {
+        <small>Canal seleccionado: {{ notificationsConfig.channelId }}</small>
+        }
+        }
+      </div>
+
+      <div class="form-group">
         <label>Mensaje al crear orden</label>
         <textarea [(ngModel)]="notificationsConfig.messages.orderCreated" rows="4"
           placeholder="Hola {{'{{customerName}}'}}, tu orden #{{'{{orderNumber}}'}} ha sido creada..."></textarea>
@@ -346,6 +369,35 @@
       <button class="btn btn-outline" (click)="openConnectChannel()" type="button">Habilitar canal en BigSo
         Connect</button>
       <button class="btn btn-primary" (click)="saveNotifications()">Guardar</button>
+    </div>
+  </div>
+
+  <div class="card form-card" style="margin-top: 1rem;">
+    <h3>Mensaje de prueba</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Teléfono de prueba</label>
+        <input [(ngModel)]="testPhone" placeholder="573008578561" />
+        <small>Se enviará el mensaje configurado arriba usando el canal seleccionado.</small>
+      </div>
+    </div>
+
+    @if (testResult) {
+    <div class="debug-box" style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+      <strong>Resultado:</strong>
+      @if (testResult.success) {
+      <pre style="margin: 0.5rem 0 0; white-space: pre-wrap;">{{ testResult.data | json }}</pre>
+      }
+      @if (!testResult.success) {
+      <p style="color: #dc3545; margin: 0.5rem 0 0;">{{ testResult.error }}</p>
+      }
+    </div>
+    }
+
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="sendTestMessage()" [disabled]="sendingTest || !testPhone">
+        {{ sendingTest ? 'Enviando...' : 'Enviar mensaje de prueba' }}
+      </button>
     </div>
   </div>
 </div>

@@ -81,4 +81,10 @@ export class SettingsService {
     updateNotificationsConfig(data: any) {
         return this.http.put<any>(`${this.url}/notifications`, data, { withCredentials: true });
     }
+    getWhatsAppChannels() {
+        return this.http.get<any>(`${this.url}/notifications/channels`, { withCredentials: true });
+    }
+    sendTestNotification(data: any) {
+        return this.http.post<any>(`${this.url}/notifications/test`, data, { withCredentials: true });
+    }
 }

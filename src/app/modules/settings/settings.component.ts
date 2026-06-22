@@ -1,5 +1,5 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings/settings.service';
 
@@ -10,7 +10,7 @@ import { ToastService } from '../../core/services/toast/toast.service';
 
 @Component({
     selector: 'app-settings',
-    imports: [FormsModule],
+    imports: [CommonModule, FormsModule],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss'
 })
@@ -23,9 +23,15 @@ export class SettingsComponent implements OnInit {
     financialConfig: any = null;
     notificationsConfig: any = {
         enabled: false,
+        channelId: null,
         messages: { orderCreated: '' },
         portalUrl: '',
     };
+    whatsappChannels: any[] = [];
+    testPhone = '';
+    testResult: any = null;
+    loadingChannels = false;
+    sendingTest = false;
 
     newPaymentMethod = '';
     newCategory = { name: '', type: 'EXPENSE' };
@@ -53,7 +59,23 @@ export class SettingsComponent implements OnInit {
         this.settingsService.getSuppliers().subscribe({ next: (res: any) => { this.suppliers = res.data; } });
         this.settingsService.getTaxConfigs().subscribe({ next: (res: any) => { this.taxConfigs = res.data; } });
         this.settingsService.getFinancialConfig().subscribe({ next: (res: any) => { this.financialConfig = res.data; } });
-        this.settingsService.getNotificationsConfig().subscribe({ next: (res: any) => { this.notificationsConfig = res.data; } });
+        this.settingsService.getNotificationsConfig().subscribe({ next: (res: any) => { this.notificationsConfig = res.data; this.loadWhatsAppChannels(); } });
+    }
+
+    loadWhatsAppChannels() {
+        this.loadingChannels = true;
+        this.settingsService.getWhatsAppChannels().subscribe({
+            next: (res: any) => {
+                this.whatsappChannels = res.data || [];
+                this.loadingChannels = false;
+                console.log('[Settings] WhatsApp channels loaded:', this.whatsappChannels);
+            },
+            error: (err: any) => {
+                this.loadingChannels = false;
+                console.error('[Settings] Failed to load WhatsApp channels:', err);
+                this.toast.error('Error', 'No se pudieron cargar los canales de WhatsApp');
+            },
+        });
     }
 
     // ─── Create ───
@@ -103,12 +125,46 @@ export class SettingsComponent implements OnInit {
     }
 
     saveNotifications() {
+        console.log('[Settings] Saving notifications config:', this.notificationsConfig);
         this.settingsService.updateNotificationsConfig(this.notificationsConfig).subscribe({
-            next: () => {
+            next: (res: any) => {
+                this.notificationsConfig = res.data;
                 this.toast.success('Guardado', 'Configuración de notificaciones guardada');
             },
             error: (err: any) => {
+                console.error('[Settings] Failed to save notifications config:', err);
                 this.toast.error('Error', err.error?.error || 'Error al guardar notificaciones');
+            },
+        });
+    }
+
+    sendTestMessage() {
+        if (!this.testPhone || !this.notificationsConfig.messages.orderCreated) {
+            this.toast.error('Error', 'Ingresa un teléfono y un mensaje de prueba');
+            return;
+        }
+
+        this.sendingTest = true;
+        this.testResult = null;
+        const payload = {
+            phone: this.testPhone,
+            message: this.notificationsConfig.messages.orderCreated,
+            channelId: this.notificationsConfig.channelId,
+        };
+        console.log('[Settings] Sending test message:', payload);
+
+        this.settingsService.sendTestNotification(payload).subscribe({
+            next: (res: any) => {
+                this.sendingTest = false;
+                this.testResult = { success: true, data: res.data };
+                console.log('[Settings] Test message sent:', res.data);
+                this.toast.success('Enviado', 'Mensaje de prueba enviado');
+            },
+            error: (err: any) => {
+                this.sendingTest = false;
+                this.testResult = { success: false, error: err.error?.error || 'Error al enviar mensaje de prueba' };
+                console.error('[Settings] Test message failed:', err);
+                this.toast.error('Error', this.testResult.error);
             },
         });
     }
