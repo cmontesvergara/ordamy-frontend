@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings/settings.service';
 
@@ -27,11 +27,14 @@ export class SettingsComponent implements OnInit {
         messages: { orderCreated: '' },
         portalUrl: '',
     };
+    originalNotificationsConfig: any = null;
     whatsappChannels: any[] = [];
     testPhone = '';
     testResult: any = null;
     loadingChannels = false;
     sendingTest = false;
+    saving = false;
+    hasChanges = false;
 
     newPaymentMethod = '';
     newCategory = { name: '', type: 'EXPENSE' };
@@ -40,6 +43,8 @@ export class SettingsComponent implements OnInit {
 
     // Generic inline edit state
     editing: any = null;
+
+    @ViewChild('messageTextarea') messageTextarea!: ElementRef<HTMLTextAreaElement>;
 
     constructor(
         private settingsService: SettingsService,
@@ -59,7 +64,14 @@ export class SettingsComponent implements OnInit {
         this.settingsService.getSuppliers().subscribe({ next: (res: any) => { this.suppliers = res.data; } });
         this.settingsService.getTaxConfigs().subscribe({ next: (res: any) => { this.taxConfigs = res.data; } });
         this.settingsService.getFinancialConfig().subscribe({ next: (res: any) => { this.financialConfig = res.data; } });
-        this.settingsService.getNotificationsConfig().subscribe({ next: (res: any) => { this.notificationsConfig = res.data; this.loadWhatsAppChannels(); } });
+        this.settingsService.getNotificationsConfig().subscribe({
+            next: (res: any) => {
+                this.notificationsConfig = res.data;
+                this.originalNotificationsConfig = JSON.parse(JSON.stringify(res.data));
+                this.hasChanges = false;
+                this.loadWhatsAppChannels();
+            }
+        });
     }
 
     loadWhatsAppChannels() {
@@ -124,14 +136,66 @@ export class SettingsComponent implements OnInit {
         });
     }
 
+    markDirty() {
+        this.hasChanges = true;
+    }
+
+    resetNotifications() {
+        if (this.originalNotificationsConfig) {
+            this.notificationsConfig = JSON.parse(JSON.stringify(this.originalNotificationsConfig));
+        }
+        this.hasChanges = false;
+    }
+
+    insertVariable(variableName: string) {
+        const textarea = this.messageTextarea?.nativeElement;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        const before = text.substring(0, start);
+        const after = text.substring(end);
+        const insertion = `{{${variableName}}}`;
+
+        this.notificationsConfig.messages.orderCreated = before + insertion + after;
+        this.markDirty();
+
+        // Restore focus and set cursor after inserted text
+        setTimeout(() => {
+            textarea.focus();
+            const newCursor = start + insertion.length;
+            textarea.setSelectionRange(newCursor, newCursor);
+        });
+    }
+
+    get selectedChannelStatus(): string | null {
+        if (!this.notificationsConfig.channelId) return null;
+        const channel = this.whatsappChannels.find((c: any) => c.id === this.notificationsConfig.channelId);
+        return channel?.status || null;
+    }
+
+    get previewMessage(): string {
+        let msg = this.notificationsConfig.messages.orderCreated || '';
+        msg = msg.replace(/\{\{customerName\}\}/g, 'Carlos');
+        msg = msg.replace(/\{\{orderNumber\}\}/g, 'ORD-1024');
+        msg = msg.replace(/\{\{portalUrl\}\}/g, this.notificationsConfig.portalUrl || 'https://ordamy.com/portal-usuarios');
+        return msg;
+    }
+
     saveNotifications() {
+        this.saving = true;
         console.log('[Settings] Saving notifications config:', this.notificationsConfig);
         this.settingsService.updateNotificationsConfig(this.notificationsConfig).subscribe({
             next: (res: any) => {
+                this.saving = false;
                 this.notificationsConfig = res.data;
+                this.originalNotificationsConfig = JSON.parse(JSON.stringify(res.data));
+                this.hasChanges = false;
                 this.toast.success('Guardado', 'Configuración de notificaciones guardada');
             },
             error: (err: any) => {
+                this.saving = false;
                 console.error('[Settings] Failed to save notifications config:', err);
                 this.toast.error('Error', err.error?.error || 'Error al guardar notificaciones');
             },
@@ -158,13 +222,13 @@ export class SettingsComponent implements OnInit {
                 this.sendingTest = false;
                 this.testResult = { success: true, data: res.data };
                 console.log('[Settings] Test message sent:', res.data);
-                this.toast.success('Enviado', 'Mensaje de prueba enviado');
+                this.toast.success('Enviado', 'Mensaje de prueba enviado correctamente');
             },
             error: (err: any) => {
                 this.sendingTest = false;
-                this.testResult = { success: false, error: err.error?.error || 'Error al enviar mensaje de prueba' };
+                this.testResult = { success: false, error: err.error?.error || 'No fue posible enviar el mensaje.' };
                 console.error('[Settings] Test message failed:', err);
-                this.toast.error('Error', this.testResult.error);
+                this.toast.error('No fue posible enviar el mensaje.', this.testResult.error);
             },
         });
     }

@@ -314,91 +314,198 @@
 
 <!-- Notifications -->
 @if (activeTab === 'notifications') {
-<div>
-  <div class="card form-card">
-    <div class="form-grid">
-      <div class="form-group">
-        <label>
-          <input type="checkbox" [(ngModel)]="notificationsConfig.enabled" />
-          Activar notificaciones WhatsApp
+<div class="notifications-layout">
+
+  <!-- Card 1 — Estado de Notificaciones -->
+  <div class="card notification-card">
+    <div class="card-header">
+      <div class="card-title-group">
+        <h2 class="card-title">Notificaciones por WhatsApp</h2>
+        <p class="card-description">Envía automáticamente mensajes a tus clientes cuando se crea una orden.</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Switch principal -->
+      <div class="switch-row">
+        <div class="switch-label-group">
+          <span class="switch-label">Activar notificaciones</span>
+          <span class="switch-status">
+            @if (notificationsConfig.enabled) {
+            <span class="badge badge-green">Activo</span>
+            } @else {
+            <span class="badge badge-gray">Desactivado</span>
+            }
+          </span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="notificationsConfig.enabled" (change)="markDirty()" />
+          <span class="switch-slider"></span>
         </label>
-        <small>Las notificaciones se envían al crear una orden si el cliente tiene teléfono válido y el canal está
-          activo.</small>
       </div>
 
-      <div class="form-group">
-        <label>Canal de WhatsApp *</label>
+      <hr class="divider" />
+
+      <!-- Canal conectado -->
+      <div class="channel-section">
+        <h3 class="section-title">Canal conectado</h3>
+
         @if (loadingChannels) {
-        <small>Cargando canales...</small>
+        <div class="loading-text">Cargando canales...</div>
         }
+
         @if (!loadingChannels && whatsappChannels.length === 0) {
-        <small class="text-danger">No se encontraron canales de WhatsApp activos. Habilita uno en BigSo Connect.</small>
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+            </svg>
+          </div>
+          <h4 class="empty-title">No hay canales disponibles</h4>
+          <p class="empty-desc">Conecta un canal de WhatsApp para comenzar a enviar notificaciones.</p>
+          <button class="btn btn-primary" (click)="openConnectChannel()">Conectar canal</button>
+        </div>
         }
+
         @if (!loadingChannels && whatsappChannels.length > 0) {
-        <select [(ngModel)]="notificationsConfig.channelId">
-          @for (channel of whatsappChannels; track channel.id) {
-          <option [ngValue]="channel.id">{{ channel.name }} ({{ channel.status }})</option>
+        <div class="select-row">
+          <select [(ngModel)]="notificationsConfig.channelId" (change)="markDirty()" class="channel-select">
+            @for (channel of whatsappChannels; track channel.id) {
+            <option [ngValue]="channel.id">{{ channel.name }}</option>
+            }
+          </select>
+
+          @if (selectedChannelStatus === 'CONNECTED') {
+          <span class="badge badge-green">Conectado</span>
           }
-        </select>
-        @if (!notificationsConfig.channelId) {
-        <small class="text-danger">Debes seleccionar un canal para activar las notificaciones.</small>
-        }
-        @if (notificationsConfig.channelId) {
-        <small>Canal seleccionado: {{ notificationsConfig.channelId }}</small>
-        }
+          @if (selectedChannelStatus === 'DISCONNECTED') {
+          <span class="badge badge-red">Desconectado</span>
+          <div class="channel-alert">
+            <span class="alert-icon">⚠️</span>
+            <span>El canal seleccionado no puede enviar mensajes.</span>
+            <button class="btn btn-sm btn-outline" (click)="openConnectChannel()">Reconectar</button>
+          </div>
+          }
+          @if (selectedChannelStatus === 'PENDING_AUTH') {
+          <span class="badge badge-orange">Requiere autenticación</span>
+          }
+        </div>
         }
       </div>
 
-      <div class="form-group">
-        <label>Mensaje al crear orden</label>
-        <textarea [(ngModel)]="notificationsConfig.messages.orderCreated" rows="4"
-          placeholder="Hola {{'{{customerName}}'}}, tu orden #{{'{{orderNumber}}'}} ha sido creada..."></textarea>
-        <small>Variables disponibles: <code>{{'{{orderNumber}}'}}</code>, <code>{{'{{customerName}}'}}</code>,
-          <code>{{'{{portalUrl}}'}}</code></small>
+      <div class="channel-actions">
+        <button class="btn btn-secondary" (click)="openConnectChannel()">Administrar canales</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2 — Plantilla del Mensaje -->
+  <div class="card notification-card">
+    <div class="card-header">
+      <div class="card-title-group">
+        <h2 class="card-title">Mensaje automático</h2>
+        <p class="card-description">Personaliza el mensaje que recibirán los clientes al crear una orden.</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Variables disponibles -->
+      <div class="variables-section">
+        <span class="variables-label">Variables disponibles</span>
+        <div class="variables-chips">
+          <button class="chip" (click)="insertVariable('customerName')">{{ '{{customerName}}' }}</button>
+          <button class="chip" (click)="insertVariable('orderNumber')">{{ '{{orderNumber}}' }}</button>
+          <button class="chip" (click)="insertVariable('portalUrl')">{{ '{{portalUrl}}' }}</button>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>URL del portal de usuarios</label>
-        <input [(ngModel)]="notificationsConfig.portalUrl"
+      <!-- Editor -->
+      <div class="editor-section">
+        <label class="editor-label">Mensaje</label>
+        <textarea #messageTextarea [(ngModel)]="notificationsConfig.messages.orderCreated" (input)="markDirty()"
+          rows="6" class="message-textarea" placeholder="Escribe el mensaje que recibirán tus clientes..."></textarea>
+      </div>
+
+      <!-- URL Portal -->
+      <div class="portal-url-section">
+        <label class="input-label">Portal de usuarios</label>
+        <input [(ngModel)]="notificationsConfig.portalUrl" (input)="markDirty()"
           placeholder="https://ordamy.com/portal-usuarios/mi-negocio" />
-        <small>Se arma por defecto con el slug del negocio.</small>
+        <span class="helper-text">Esta URL se utilizará para generar {{ '{{portalUrl}}' }}.</span>
       </div>
-    </div>
-
-    <div class="form-actions">
-      <button class="btn btn-outline" (click)="openConnectChannel()" type="button">Habilitar canal en BigSo
-        Connect</button>
-      <button class="btn btn-primary" (click)="saveNotifications()">Guardar</button>
     </div>
   </div>
 
-  <div class="card form-card" style="margin-top: 1rem;">
-    <h3>Mensaje de prueba</h3>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Teléfono de prueba</label>
-        <input [(ngModel)]="testPhone" placeholder="573008578561" />
-        <small>Se enviará el mensaje configurado arriba usando el canal seleccionado.</small>
+  <!-- Card 3 — Vista previa y prueba -->
+  <div class="card notification-card">
+    <div class="card-header">
+      <div class="card-title-group">
+        <h2 class="card-title">Vista previa y prueba</h2>
       </div>
     </div>
 
-    @if (testResult) {
-    <div class="debug-box" style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
-      <strong>Resultado:</strong>
-      @if (testResult.success) {
-      <pre style="margin: 0.5rem 0 0; white-space: pre-wrap;">{{ testResult.data | json }}</pre>
-      }
-      @if (!testResult.success) {
-      <p style="color: #dc3545; margin: 0.5rem 0 0;">{{ testResult.error }}</p>
-      }
-    </div>
-    }
+    <div class="card-body preview-grid">
+      <!-- Columna izquierda: Vista previa -->
+      <div class="preview-column">
+        <h3 class="section-title">Vista previa</h3>
+        <div class="whatsapp-bubble">
+          <div class="whatsapp-header">
+            <div class="whatsapp-dot"></div>
+            <span class="whatsapp-label">WhatsApp</span>
+          </div>
+          <div class="whatsapp-body">
+            <p class="whatsapp-text">{{ previewMessage }}</p>
+            <span class="whatsapp-time">12:30</span>
+          </div>
+        </div>
+      </div>
 
-    <div class="form-actions">
-      <button class="btn btn-primary" (click)="sendTestMessage()" [disabled]="sendingTest || !testPhone">
-        {{ sendingTest ? 'Enviando...' : 'Enviar mensaje de prueba' }}
-      </button>
+      <!-- Columna derecha: Enviar prueba -->
+      <div class="test-column">
+        <h3 class="section-title">Enviar prueba</h3>
+        <p class="test-desc">Envía una prueba utilizando el canal seleccionado.</p>
+
+        <div class="test-input-group">
+          <label class="input-label">Número de teléfono</label>
+          <input [(ngModel)]="testPhone" placeholder="573001234567" />
+          <span class="helper-text">Incluye código de país.</span>
+        </div>
+
+        <button class="btn btn-primary btn-full" (click)="sendTestMessage()" [disabled]="sendingTest || !testPhone">
+          @if (sendingTest) {
+          <span class="spinner"></span>
+          }
+          {{ sendingTest ? 'Enviando...' : 'Enviar mensaje de prueba' }}
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- Footer persistente -->
+  <div class="sticky-footer">
+    <div class="footer-inner">
+      <div class="footer-status">
+        @if (hasChanges) {
+        <span class="status-dot status-unsaved"></span>
+        <span class="status-text">Tienes cambios sin guardar</span>
+        } @else {
+        <span class="status-dot status-saved"></span>
+        <span class="status-text">Todos los cambios guardados</span>
+        }
+      </div>
+      <div class="footer-actions">
+        <button class="btn btn-outline" (click)="resetNotifications()" [disabled]="saving">Cancelar</button>
+        <button class="btn btn-primary" (click)="saveNotifications()" [disabled]="saving || !hasChanges">
+          @if (saving) {
+          <span class="spinner"></span>
+          }
+          {{ saving ? 'Guardando...' : 'Guardar configuración' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>
 }
