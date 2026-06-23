@@ -431,7 +431,7 @@
       <!-- URL Portal -->
       <div class="portal-url-section">
         <label class="input-label">Portal de usuarios</label>
-        <input [(ngModel)]="notificationsConfig.portalUrl" (input)="markDirty()"
+        <input class="form-input" [(ngModel)]="notificationsConfig.portalUrl" (input)="markDirty()"
           placeholder="https://ordamy.com/portal-usuarios/mi-negocio" />
         <span class="helper-text">Esta URL se utilizará para generar {{ '{{portalUrl}}' }}.</span>
       </div>
@@ -469,7 +469,7 @@
 
         <div class="test-input-group">
           <label class="input-label">Número de teléfono</label>
-          <input [(ngModel)]="testPhone" placeholder="573001234567" />
+          <input class="form-input" [(ngModel)]="testPhone" placeholder="573001234567" />
           <span class="helper-text">Incluye código de país.</span>
         </div>
 
@@ -483,29 +483,29 @@
     </div>
   </div>
 
-  <!-- Footer persistente -->
-  <div class="sticky-footer">
-    <div class="footer-inner">
-      <div class="footer-status">
-        @if (hasChanges) {
-        <span class="status-dot status-unsaved"></span>
-        <span class="status-text">Tienes cambios sin guardar</span>
-        } @else {
-        <span class="status-dot status-saved"></span>
-        <span class="status-text">Todos los cambios guardados</span>
+</div>
+
+<!-- Footer persistente -->
+<div class="sticky-footer">
+  <div class="footer-inner">
+    <div class="footer-status">
+      @if (hasChanges) {
+      <span class="status-dot status-unsaved"></span>
+      <span class="status-text">Tienes cambios sin guardar</span>
+      } @else {
+      <span class="status-dot status-saved"></span>
+      <span class="status-text">Todos los cambios guardados</span>
+      }
+    </div>
+    <div class="footer-actions">
+      <button class="btn btn-outline" (click)="resetNotifications()" [disabled]="saving">Cancelar</button>
+      <button class="btn btn-primary" (click)="saveNotifications()" [disabled]="saving || !hasChanges">
+        @if (saving) {
+        <span class="spinner"></span>
         }
-      </div>
-      <div class="footer-actions">
-        <button class="btn btn-outline" (click)="resetNotifications()" [disabled]="saving">Cancelar</button>
-        <button class="btn btn-primary" (click)="saveNotifications()" [disabled]="saving || !hasChanges">
-          @if (saving) {
-          <span class="spinner"></span>
-          }
-          {{ saving ? 'Guardando...' : 'Guardar configuración' }}
-        </button>
-      </div>
+        {{ saving ? 'Guardando...' : 'Guardar configuración' }}
+      </button>
     </div>
   </div>
-
 </div>
 }

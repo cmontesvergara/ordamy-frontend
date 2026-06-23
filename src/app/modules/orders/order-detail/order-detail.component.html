@@ -1,137 +1,134 @@
 @if (order) {
-  <div class="detail-page">
-    <!-- Top Bar -->
-    <div class="detail-bar no-print">
-      <a routerLink="/orders" class="btn btn-outline btn-sm">← Volver</a>
-      <div class="actions-dropdown" [class.open]="actionsOpen">
-        <button class="actions-toggle" (click)="actionsOpen = !actionsOpen">
-          Acciones <span class="caret">▼</span>
+<div class="detail-page">
+  <!-- Top Bar -->
+  <div class="detail-bar no-print">
+    <a routerLink="/orders" class="btn btn-outline btn-sm">← Volver</a>
+    <div class="actions-dropdown" [class.open]="actionsOpen">
+      <button class="actions-toggle" (click)="actionsOpen = !actionsOpen">
+        Acciones <span class="caret">▼</span>
+      </button>
+      <div class="actions-menu">
+        <button class="action-item" (click)="printOrder('production'); actionsOpen = false">Imprimir Producción</button>
+        <button class="action-item" (click)="printOrder('customer'); actionsOpen = false">Imprimir Cliente</button>
+        @if (order.status === 'ACTIVE') {
+        <button class="action-item" (click)="toggleEditOrder(); actionsOpen = false">
+          Editar Orden
         </button>
-        <div class="actions-menu">
-          <button class="action-item" (click)="printOrder('production'); actionsOpen = false">Imprimir Producción</button>
-          <button class="action-item" (click)="printOrder('customer'); actionsOpen = false">Imprimir Cliente</button>
-          @if (order.status === 'ACTIVE') {
-            <button class="action-item" (click)="toggleEditOrder(); actionsOpen = false">
-              Editar Orden
-            </button>
-          }
-          @if (order.status === 'ACTIVE' && canCancel) {
-            <div class="action-separator"></div>
-          }
-          @if (order.status === 'ACTIVE' && canCancel) {
-            <button class="action-item danger"
-              (click)="cancelOrder(); actionsOpen = false">
-              Anular Orden
-            </button>
-          }
-        </div>
-      </div>
-    </div>
-    <div class="page-header no-print">
-      <div>
-        <h1>Orden #{{ order.number }}</h1>
-        <span class="badge status-{{ order.status }}">{{ order.status }}</span>
-      </div>
-    </div>
-    <!-- Print Header (only visible when printing) -->
-    <div class="print-header" id="print-header">
-      <h2>{{ printMode === 'production' ? 'Orden de Producción' : 'Orden de Servicio' }}</h2>
-      <div class="print-meta">
-        <span><strong>Orden #{{ order.number }}</strong></span>
-        <span>Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</span>
-        @if (order.dueDate) {
-          <span>Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</span>
+        }
+        @if (order.status === 'ACTIVE' && canCancel) {
+        <div class="action-separator"></div>
+        }
+        @if (order.status === 'ACTIVE' && canCancel) {
+        <button class="action-item danger" (click)="cancelOrder(); actionsOpen = false">
+          Anular Orden
+        </button>
         }
       </div>
     </div>
-    <!-- O10: Operational Status Stepper -->
-    @if (order.status === 'ACTIVE' && !editingOrder) {
-      <div class="stepper-card">
-        <h4>Estado Operativo</h4>
-        <div class="stepper">
-          @for (step of operationalSteps; track step.key; let i = $index) {
-            <div class="step" [class.completed]="i < currentStepIndex" [class.active]="i === currentStepIndex"
-              [class.pending]="i > currentStepIndex">
-              <div class="step-dot">
-              {{ i < currentStepIndex ? '✓' : (i + 1) }} </div>
-              <span class="step-label">{{ step.label }}</span>
-            </div>
-            @if (i < operationalSteps.length - 1) { <div class="step-connector" [class.completed]="i < currentStepIndex">
-            </div>
-          }
-        }
-      </div>
-      @if (!updatingStatus) {
-        <div class="stepper-actions">
-          @if (currentStepIndex > 0) {
-            <button class="btn btn-outline btn-sm" (click)="changeOperationalStatus(-1)">
-              ← {{ operationalSteps[currentStepIndex - 1].label }}
-            </button>
-          }
-          @if (currentStepIndex < operationalSteps.length - 1) {
-            <button class="btn btn-primary btn-sm"
-              (click)="changeOperationalStatus(1)">
-              {{ operationalSteps[currentStepIndex + 1].label }} →
-            </button>
-          }
-        </div>
-      }
-      @if (updatingStatus) {
-        <div class="stepper-actions">
-          <span class="text-muted">Actualizando...</span>
-        </div>
+  </div>
+  <div class="page-header no-print">
+    <div>
+      <h1>Orden #{{ order.number }}</h1>
+      <span class="badge status-{{ order.status }}">{{ order.status }}</span>
+    </div>
+  </div>
+  <!-- Print Header (only visible when printing) -->
+  <div class="print-header" id="print-header">
+    <h2>{{ printMode === 'production' ? 'Orden de Producción' : 'Orden de Servicio' }}</h2>
+    <div class="print-meta">
+      <span><strong>Orden #{{ order.number }}</strong></span>
+      <span>Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</span>
+      @if (order.dueDate) {
+      <span>Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</span>
       }
     </div>
+  </div>
+  <!-- O10: Operational Status Stepper -->
+  @if (order.status === 'ACTIVE' && !editingOrder) {
+  <div class="stepper-card">
+    <h4>Estado Operativo</h4>
+    <div class="stepper">
+      @for (step of operationalSteps; track step.key; let i = $index) {
+      <div class="step" [class.completed]="i < currentStepIndex" [class.active]="i === currentStepIndex"
+        [class.pending]="i > currentStepIndex">
+        <div class="step-dot">
+          {{ i < currentStepIndex ? '✓' : (i + 1) }} </div>
+            <span class="step-label">{{ step.label }}</span>
+        </div>
+        @if (i < operationalSteps.length - 1) { <div class="step-connector" [class.completed]="i < currentStepIndex">
+      </div>
+      }
+      }
+    </div>
+    @if (!updatingStatus) {
+    <div class="stepper-actions">
+      @if (currentStepIndex > 0) {
+      <button class="btn btn-outline btn-sm" (click)="changeOperationalStatus(-1)">
+        ← {{ operationalSteps[currentStepIndex - 1].label }}
+      </button>
+      }
+      @if (currentStepIndex < operationalSteps.length - 1) { <button class="btn btn-primary btn-sm"
+        (click)="changeOperationalStatus(1)">
+        {{ operationalSteps[currentStepIndex + 1].label }} →
+        </button>
+        }
+    </div>
+    }
+    @if (updatingStatus) {
+    <div class="stepper-actions">
+      <span class="text-muted">Actualizando...</span>
+    </div>
+    }
+  </div>
   }
   <!-- Info Grid -->
   @if (!editingOrder) {
-    <div class="info-grid">
-      <div class="info-card">
-        <h4>Cliente</h4>
-        <p>
-          <strong>{{ order.customer?.name }}</strong>
-          @if (order.customer && !order.customer.isActive) {
-            <span class="badge badge-sm inactive"
-            style="margin-left: 8px;">Inactivo</span>
-          }
-        </p>
-        <p class="sub">{{ order.customer?.identification }}</p>
-        @if (order.customer?.phone) {
-          <p class="sub">📞 {{ order.customer.phone }}</p>
+  <div class="info-grid">
+    <div class="info-card">
+      <h4>Cliente</h4>
+      <p>
+        <strong>{{ order.customer?.name }}</strong>
+        @if (order.customer && !order.customer.isActive) {
+        <span class="badge badge-sm inactive" style="margin-left: 8px;">Inactivo</span>
         }
-      </div>
-      <div class="info-card" [class.hide-on-production]="printMode === 'production'">
-        <h4>Resumen</h4>
-        <div class="summary-row"><span>Subtotal</span><span>{{ config.currency }} {{ order.subtotal | number:'1.0-0'
-      }}</span></div>
+      </p>
+      <p class="sub">{{ order.customer?.identification }}</p>
+      @if (order.customer?.phone) {
+      <p class="sub">📞 {{ order.customer.phone }}</p>
+      }
+    </div>
+    <div class="info-card" [class.hide-on-production]="printMode === 'production'">
+      <h4>Resumen</h4>
+      <div class="summary-row"><span>Subtotal</span><span>{{ config.currency }} {{ order.subtotal | number:'1.0-0'
+          }}</span></div>
       <div class="summary-row"><span>IVA ({{ order.taxRate * 100 }}%)</span><span>{{ config.currency }} {{
-      order.taxAmount | number:'1.0-0'
-    }}</span></div>
-    @if (order.discount > 0) {
+          order.taxAmount | number:'1.0-0'
+          }}</span></div>
+      @if (order.discount > 0) {
       <div class="summary-row"><span>Descuento</span><span>-{{ config.currency }} {{
-      order.discount |
-    number:'1.0-0' }}</span></div>
+          order.discount |
+          number:'1.0-0' }}</span></div>
+      }
+      <div class="summary-row total"><span>Total</span><span>{{ config.currency }} {{ order.total | number:'1.0-0'
+          }}</span></div>
+      <div class="summary-row balance"><span>Saldo</span><span>{{ config.currency }} {{ order.balance | number:'1.0-0'
+          }}</span></div>
+    </div>
+    <div class="info-card">
+      <h4>Detalles</h4>
+      <p class="sub">Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</p>
+      @if (order.dueDate) {
+      <p class="sub">Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</p>
+      }
+      <p class="sub">Vendedor: {{ order.sellerName }}</p>
+      @if (order.notes) {
+      <p class="sub">Notas: {{ order.notes }}</p>
+      }
+    </div>
+  </div>
   }
-  <div class="summary-row total"><span>Total</span><span>{{ config.currency }} {{ order.total | number:'1.0-0'
-}}</span></div>
-<div class="summary-row balance"><span>Saldo</span><span>{{ config.currency }} {{ order.balance | number:'1.0-0'
-}}</span></div>
-</div>
-<div class="info-card">
-  <h4>Detalles</h4>
-  <p class="sub">Fecha: {{ order.orderDate | date:'dd/MM/yyyy':config.timezone }}</p>
-  @if (order.dueDate) {
-    <p class="sub">Vence: {{ order.dueDate | date:'dd/MM/yyyy':config.timezone }}</p>
-  }
-  <p class="sub">Vendedor: {{ order.sellerName }}</p>
-  @if (order.notes) {
-    <p class="sub">Notas: {{ order.notes }}</p>
-  }
-</div>
-</div>
-}
-<!-- Edit Order Form -->
-@if (editingOrder) {
+  <!-- Edit Order Form -->
+  @if (editingOrder) {
   <div class="card section no-print">
     <h3>Editar Orden</h3>
     <div class="edit-form">
@@ -165,75 +162,98 @@
         </thead>
         <tbody>
           @for (item of editOrderData.items; track $index; let i = $index) {
-            <tr>
-              <td>
-                <input type="text" [(ngModel)]="item.description" class="input-full" [readonly]="!!item.productId" />
-                @if (item.composition && item.composition.length > 0) {
-                  <div class="composition-view mt-1" style="margin-top: 8px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                      <div style="font-weight: 600; color: #475569; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; display: flex; align-items: center; gap: 4px; user-select: none;" (click)="item._compositionCollapsed = !item._compositionCollapsed" title="Ocultar/Mostrar tabla">
-                        <span style="font-size: 0.7rem; transition: transform 0.2s;" [style.transform]="item._compositionCollapsed ? 'rotate(-90deg)' : 'none'">▼</span>
-                        ↳ Composición del Ítem
-                      </div>
-                      <button class="btn-icon primary btn-xs" style="font-size: 0.75rem; padding: 2px 8px; background: #e0e7ff; color: #4338ca; border-radius: 4px; font-weight: 600;" (click)="openCompositionCalc(i)" title="Agregar/Editar composición">+ Agregar / Editar</button>
-                    </div>
-                    @if (!item._compositionCollapsed) {
-                      <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem;">
-                        <thead>
-                          <tr style="color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;">
-                            <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Material</th>
-                            <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Medidas</th>
-                            <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Cant.</th>
-                            <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Factor</th>
-                            <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Valor</th>
-                            <th style="padding: 4px; border-bottom: 1px solid #cbd5e1; width: 30px;"></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          @for (c of item.composition; track $index) {
-                            <tr>
-                              <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #1e293b; font-weight: 500;">
-                                {{ c.name }}
-                                @if (c.unitId) {
-                                  <span style="color: #94a3b8; font-size: 0.75rem; font-weight: normal;">({{ c.unitId }})</span>
-                                }
-                              </td>
-                              <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569;">{{ c.quantityExpr }}</td>
-                              <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">{{ c.quantity }}</td>
-                              <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">{{ c.factor | number:'1.0-2' }}</td>
-                              <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #0f172a; font-weight: 500; text-align: right;">{{ config.currency }} {{ (c.subtotal || 0) | number:'1.0-0' }}</td>
-                              <td style="padding: 6px 4px; border-bottom: 1px dashed #e2e8f0; text-align: center;">
-                                <button class="btn-icon danger btn-xs" style="padding: 2px; color: #ef4444;" (click)="removeMaterialFromComposition(item, $index, i)" title="Eliminar material">×</button>
-                              </td>
-                            </tr>
-                          }
-                        </tbody>
-                      </table>
-                    }
+          <tr>
+            <td>
+              <input type="text" [(ngModel)]="item.description" class="input-full" [readonly]="!!item.productId" />
+              @if (item.composition && item.composition.length > 0) {
+              <div class="composition-view mt-1"
+                style="margin-top: 8px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div
+                    style="font-weight: 600; color: #475569; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; display: flex; align-items: center; gap: 4px; user-select: none;"
+                    (click)="item._compositionCollapsed = !item._compositionCollapsed" title="Ocultar/Mostrar tabla">
+                    <span style="font-size: 0.7rem; transition: transform 0.2s;"
+                      [style.transform]="item._compositionCollapsed ? 'rotate(-90deg)' : 'none'">▼</span>
+                    ↳ Composición del Ítem
                   </div>
+                  <button class="btn-icon primary btn-xs"
+                    style="font-size: 0.75rem; padding: 2px 8px; background: #e0e7ff; color: #4338ca; border-radius: 4px; font-weight: 600;"
+                    (click)="openCompositionCalc(i)" title="Agregar/Editar composición">+ Agregar / Editar</button>
+                </div>
+                @if (!item._compositionCollapsed) {
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem;">
+                  <thead>
+                    <tr style="color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;">
+                      <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Material</th>
+                      <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Medidas</th>
+                      <th
+                        style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">
+                        Cant.</th>
+                      <th
+                        style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">
+                        Factor</th>
+                      <th
+                        style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">
+                        Valor</th>
+                      <th style="padding: 4px; border-bottom: 1px solid #cbd5e1; width: 30px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (c of item.composition; track $index) {
+                    <tr>
+                      <td
+                        style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #1e293b; font-weight: 500;">
+                        {{ c.name }}
+                        @if (c.unitId) {
+                        <span style="color: #94a3b8; font-size: 0.75rem; font-weight: normal;">({{ c.unitId }})</span>
+                        }
+                      </td>
+                      <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569;">{{ c.quantityExpr
+                        }}</td>
+                      <td
+                        style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">
+                        {{ c.quantity }}</td>
+                      <td
+                        style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">
+                        {{ c.factor | number:'1.0-2' }}</td>
+                      <td
+                        style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #0f172a; font-weight: 500; text-align: right;">
+                        {{ config.currency }} {{ (c.subtotal || 0) | number:'1.0-0' }}</td>
+                      <td style="padding: 6px 4px; border-bottom: 1px dashed #e2e8f0; text-align: center;">
+                        <button class="btn-icon danger btn-xs" style="padding: 2px; color: #ef4444;"
+                          (click)="removeMaterialFromComposition(item, $index, i)" title="Eliminar material">×</button>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
                 }
-              </td>
-              <td><input type="number" [(ngModel)]="item.quantity" min="1" class="input-full text-right"
-              (input)="recalcEditTotals()" /></td>
-              <td><input type="number" [(ngModel)]="item.unitPrice" min="0" class="input-full text-right"
-              (input)="recalcEditTotals()" [readonly]="!!item.productId || (item.composition && item.composition.length > 0)"
-              [style.background]="(!!item.productId || (item.composition && item.composition.length > 0)) ? '#f1f5f9' : ''"
-              [style.cursor]="(!!item.productId || (item.composition && item.composition.length > 0)) ? 'not-allowed' : 'text'"
-              [style.opacity]="(!!item.productId || (item.composition && item.composition.length > 0)) ? '0.8' : '1'" /></td>
-              <td class="text-center">
-                @if (!item.productId && !(item.composition && item.composition.length > 0)) {
-                  <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)" title="Calcular con materiales"
-                  >🔢</button>
-                  <button class="btn-icon calc-btn" (click)="openCompositionCalc(i)" title="Composición de materiales"
-                  >🧩</button>
-                }
-              </td>
-              <td class="text-right">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
-              <td class="text-center">
-                <button class="btn-icon danger" (click)="removeEditItem(i)" title="Eliminar"><span
-                class="icon icon-close"></span></button>
-              </td>
-            </tr>
+              </div>
+              }
+            </td>
+            <td><input type="number" [(ngModel)]="item.quantity" min="1" class="input-full text-right"
+                (input)="recalcEditTotals()" /></td>
+            <td><input type="number" [(ngModel)]="item.unitPrice" min="0" class="input-full text-right"
+                (input)="recalcEditTotals()"
+                [readonly]="!!item.productId || (item.composition && item.composition.length > 0)"
+                [style.background]="(!!item.productId || (item.composition && item.composition.length > 0)) ? '#f1f5f9' : ''"
+                [style.cursor]="(!!item.productId || (item.composition && item.composition.length > 0)) ? 'not-allowed' : 'text'"
+                [style.opacity]="(!!item.productId || (item.composition && item.composition.length > 0)) ? '0.8' : '1'" />
+            </td>
+            <td class="text-center">
+              @if (!item.productId && !(item.composition && item.composition.length > 0)) {
+              <button class="btn-icon calc-btn" (click)="openMaterialCalc(i)"
+                title="Calcular con materiales">🔢</button>
+              <button class="btn-icon calc-btn" (click)="openCompositionCalc(i)"
+                title="Composición de materiales">🧩</button>
+              }
+            </td>
+            <td class="text-right">{{ config.currency }} {{ (item.quantity * item.unitPrice) | number:'1.0-0' }}</td>
+            <td class="text-center">
+              <button class="btn-icon danger" (click)="removeEditItem(i)" title="Eliminar"><span
+                  class="icon icon-close"></span></button>
+            </td>
+          </tr>
           }
         </tbody>
         <tfoot>
@@ -245,10 +265,8 @@
           <tr>
             <td colspan="4" class="text-right">Descuento</td>
             <td class="text-right">
-              <input type="number" [(ngModel)]="editDiscount" min="0"
-                (input)="recalcEditTotals()"
-                [disabled]="!canApplyDiscount"
-                style="width:100px; text-align:right" />
+              <input type="number" [(ngModel)]="editDiscount" min="0" (input)="recalcEditTotals()"
+                [disabled]="!canApplyDiscount" style="width:100px; text-align:right" />
             </td>
             <td></td>
           </tr>
@@ -261,10 +279,10 @@
       </table>
       <div class="form-actions">
         <button class="btn btn-outline btn-sm" (click)="editingOrder = false">Cancelar</button>
-        <div style="display: inline-block;" [style.cursor]="(!isEditValid && requireComposition && editOrderData.items?.length > 0) ? 'not-allowed' : 'default'"
-             [title]="(!isEditValid && requireComposition && editOrderData.items?.length > 0) ? 'Todos los ítems deben tener composición y descripción' : ''">
-          <button class="btn btn-primary btn-sm" (click)="saveOrderEdit()"
-            [disabled]="savingOrder || !isEditValid"
+        <div style="display: inline-block;"
+          [style.cursor]="(!isEditValid && requireComposition && editOrderData.items?.length > 0) ? 'not-allowed' : 'default'"
+          [title]="(!isEditValid && requireComposition && editOrderData.items?.length > 0) ? 'Todos los ítems deben tener composición y descripción' : ''">
+          <button class="btn btn-primary btn-sm" (click)="saveOrderEdit()" [disabled]="savingOrder || !isEditValid"
             [style.pointer-events]="(!isEditValid && requireComposition && editOrderData.items?.length > 0) ? 'none' : 'auto'">
             {{ savingOrder ? 'Guardando...' : 'Guardar Cambios' }}
           </button>
@@ -272,9 +290,9 @@
       </div>
     </div>
   </div>
-}
-<!-- Items -->
-@if (!editingOrder) {
+  }
+  <!-- Items -->
+  @if (!editingOrder) {
   <div class="card section">
     <h3>Items ({{ order.items?.length }})</h3>
     <table class="data-table">
@@ -289,244 +307,266 @@
       </thead>
       <tbody>
         @for (item of order.items; track item.id) {
-          <tr>
-            <td>
-              {{ item.description }}
-              @if (item.composition && item.composition.length > 0) {
-                <div class="composition-view mt-1" style="margin-top: 8px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
-                  <div style="font-weight: 600; color: #475569; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; user-select: none;" (click)="item._compositionCollapsed = !item._compositionCollapsed" title="Ocultar/Mostrar tabla">
-                    <span style="font-size: 0.7rem; transition: transform 0.2s;" [style.transform]="item._compositionCollapsed ? 'rotate(-90deg)' : 'none'">▼</span>
-                    ↳ Composición del Ítem
-                  </div>
-                  @if (!item._compositionCollapsed) {
-                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem;">
-                      <thead>
-                        <tr style="color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;">
-                          <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Material</th>
-                          <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Medidas</th>
-                          <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Cant.</th>
-                          <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Factor</th>
-                          <th style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">Valor</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for (c of item.composition; track $index) {
-                          <tr>
-                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #1e293b; font-weight: 500;">
-                              {{ c.name }}
-                              @if (c.unitId) {
-                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: normal;">({{ c.unitId }})</span>
-                              }
-                            </td>
-                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569;">{{ c.quantityExpr }}</td>
-                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">{{ c.quantity }}</td>
-                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">{{ c.factor | number:'1.0-2' }}</td>
-                            <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #0f172a; font-weight: 500; text-align: right;">{{ config.currency }} {{ (c.subtotal || 0) | number:'1.0-0' }}</td>
-                          </tr>
-                        }
-                      </tbody>
-                    </table>
+        <tr>
+          <td>
+            {{ item.description }}
+            @if (item.composition && item.composition.length > 0) {
+            <div class="composition-view mt-1"
+              style="margin-top: 8px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+              <div
+                style="font-weight: 600; color: #475569; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; user-select: none;"
+                (click)="item._compositionCollapsed = !item._compositionCollapsed" title="Ocultar/Mostrar tabla">
+                <span style="font-size: 0.7rem; transition: transform 0.2s;"
+                  [style.transform]="item._compositionCollapsed ? 'rotate(-90deg)' : 'none'">▼</span>
+                ↳ Composición del Ítem
+              </div>
+              @if (!item._compositionCollapsed) {
+              <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem;">
+                <thead>
+                  <tr style="color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;">
+                    <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Material</th>
+                    <th style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1;">Medidas</th>
+                    <th
+                      style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">
+                      Cant.</th>
+                    <th
+                      style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">
+                      Factor</th>
+                    <th
+                      style="padding: 4px 8px; font-weight: 600; text-align: right; border-bottom: 1px solid #cbd5e1;">
+                      Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (c of item.composition; track $index) {
+                  <tr>
+                    <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #1e293b; font-weight: 500;">
+                      {{ c.name }}
+                      @if (c.unitId) {
+                      <span style="color: #94a3b8; font-size: 0.75rem; font-weight: normal;">({{ c.unitId }})</span>
+                      }
+                    </td>
+                    <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569;">{{ c.quantityExpr
+                      }}</td>
+                    <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">
+                      {{ c.quantity }}</td>
+                    <td style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #475569; text-align: right;">
+                      {{ c.factor | number:'1.0-2' }}</td>
+                    <td
+                      style="padding: 6px 8px; border-bottom: 1px dashed #e2e8f0; color: #0f172a; font-weight: 500; text-align: right;">
+                      {{ config.currency }} {{ (c.subtotal || 0) | number:'1.0-0' }}</td>
+                  </tr>
                   }
-                </div>
+                </tbody>
+              </table>
               }
-            </td>
-            <td>{{ item.product?.name || '—' }}</td>
-            <td class="text-right">{{ item.quantity }}</td>
-            <td class="text-right hide-on-production">{{ config.currency }} {{ item.unitPrice | number:'1.0-0' }}</td>
-            <td class="text-right hide-on-production">{{ config.currency }} {{ item.lineTotal | number:'1.0-0' }}</td>
-          </tr>
+            </div>
+            }
+          </td>
+          <td>{{ item.product?.name || '—' }}</td>
+          <td class="text-right">{{ item.quantity }}</td>
+          <td class="text-right hide-on-production">{{ config.currency }} {{ item.unitPrice | number:'1.0-0' }}</td>
+          <td class="text-right hide-on-production">{{ config.currency }} {{ item.lineTotal | number:'1.0-0' }}</td>
+        </tr>
         }
       </tbody>
     </table>
   </div>
-}
-<!-- Payments (no-print for production) -->
-@if (!editingOrder) {
+  }
+  <!-- Payments (no-print for production) -->
+  @if (!editingOrder) {
   <div class="card section no-print-production">
     <div class="section-header">
       <h3>Pagos ({{ order.payments?.length }})</h3>
       @if (order.status === 'ACTIVE' && order.balance > 0 && canAddPayment) {
-        <button class="btn btn-primary btn-sm no-print"
-          (click)="showPaymentForm = !showPaymentForm">
-          {{ showPaymentForm ? 'Cancelar' : '+ Registrar Pago' }}
-        </button>
+      <button class="btn btn-primary btn-sm no-print" (click)="showPaymentForm = !showPaymentForm">
+        {{ showPaymentForm ? 'Cancelar' : '+ Registrar Pago' }}
+      </button>
       }
     </div>
     <!-- Payment Form -->
     @if (showPaymentForm) {
-      <div class="form-inline no-print">
-        <select [(ngModel)]="newPayment.paymentMethodId">
-          <option value="">Medio de pago</option>
-          @for (m of paymentMethods; track m.id) {
-            <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
-          }
-        </select>
-        <input type="number" [(ngModel)]="newPayment.amount" [max]="order.balance" placeholder="Monto" />
-        <input type="text" [(ngModel)]="newPayment.notes" placeholder="Nota (opcional)" />
-        <button class="btn btn-primary btn-sm" (click)="registerPayment()" [disabled]="savingPayment">
-          {{ savingPayment ? '...' : 'Guardar' }}
-        </button>
-      </div>
+    <div class="form-inline no-print">
+      <select [(ngModel)]="newPayment.paymentMethodId">
+        <option value="">Medio de pago</option>
+        @for (m of paymentMethods; track m.id) {
+        <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
+        }
+      </select>
+      <input type="number" [(ngModel)]="newPayment.amount" [max]="order.balance" placeholder="Monto" />
+      <input type="text" [(ngModel)]="newPayment.notes" placeholder="Nota (opcional)" />
+      <button class="btn btn-primary btn-sm" (click)="registerPayment()" [disabled]="savingPayment">
+        {{ savingPayment ? '...' : 'Guardar' }}
+      </button>
+    </div>
     }
     @if (order.payments?.length > 0) {
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Medio</th>
-            <th class="text-right">Monto</th>
-            <th>Nota</th>
-            <th class="text-center no-print">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of order.payments; track p.id) {
-            <tr>
-              <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm':config.timezone }}</td>
-              <td>{{ p.paymentMethod?.name }}</td>
-              <td class="text-right">{{ config.currency }} {{ p.amount | number:'1.0-0' }}</td>
-              <td>{{ p.notes || '—' }}</td>
-              @if (order.status !== 'CANCELLED') {
-                <td class="text-center no-print">
-                  <button class="btn-icon" title="Editar" (click)="startEditPayment(p)"><span
-                  class="icon icon-edit"></span></button>
-                  <button class="btn-icon danger" title="Eliminar" (click)="deletePayment(p)"><span
-                  class="icon icon-delete"></span></button>
-                </td>
-              }
-            </tr>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Medio</th>
+          <th class="text-right">Monto</th>
+          <th>Nota</th>
+          <th class="text-center no-print">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of order.payments; track p.id) {
+        <tr>
+          <td>{{ p.paymentDate | date:'dd/MM/yyyy HH:mm':config.timezone }}</td>
+          <td>{{ p.paymentMethod?.name }}</td>
+          <td class="text-right">{{ config.currency }} {{ p.amount | number:'1.0-0' }}</td>
+          <td>{{ p.notes || '—' }}</td>
+          @if (order.status !== 'CANCELLED') {
+          <td class="text-center no-print">
+            <button class="btn-icon" title="Editar" (click)="startEditPayment(p)"><span
+                class="icon icon-edit"></span></button>
+            <button class="btn-icon danger" title="Eliminar" (click)="deletePayment(p)"><span
+                class="icon icon-delete"></span></button>
+          </td>
           }
-        </tbody>
-      </table>
+        </tr>
+        }
+      </tbody>
+    </table>
     }
     <!-- Edit Payment Form -->
     @if (editingPayment) {
-      <div class="form-inline no-print">
-        <strong class="form-label">Editando pago:</strong>
-        <select [(ngModel)]="editPaymentData.paymentMethodId">
-          @for (m of paymentMethods; track m.id) {
-            <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
-          }
-        </select>
-        <input type="number" [(ngModel)]="editPaymentData.amount" placeholder="Monto" />
-        <input type="text" [(ngModel)]="editPaymentData.notes" placeholder="Nota (opcional)" />
-        <button class="btn btn-primary btn-sm" (click)="savePaymentEdit()" [disabled]="savingPayment">
-          {{ savingPayment ? '...' : 'Guardar' }}
-        </button>
-        <button class="btn btn-outline btn-sm" (click)="editingPayment = null">Cancelar</button>
-      </div>
+    <div class="form-inline no-print">
+      <strong class="form-label">Editando pago:</strong>
+      <select [(ngModel)]="editPaymentData.paymentMethodId">
+        @for (m of paymentMethods; track m.id) {
+        <option [value]="m.id" [disabled]="!m.isActive">{{ m.name }} {{ m.isActive ? '' : '[Inactivo]' }}</option>
+        }
+      </select>
+      <input type="number" [(ngModel)]="editPaymentData.amount" placeholder="Monto" />
+      <input type="text" [(ngModel)]="editPaymentData.notes" placeholder="Nota (opcional)" />
+      <button class="btn btn-primary btn-sm" (click)="savePaymentEdit()" [disabled]="savingPayment">
+        {{ savingPayment ? '...' : 'Guardar' }}
+      </button>
+      <button class="btn btn-outline btn-sm" (click)="editingPayment = null">Cancelar</button>
+    </div>
     }
   </div>
-}
-<!-- Status History Timeline -->
-@if (order.events?.length > 0 && !editingOrder) {
+  }
+  <!-- Status History Timeline -->
+  @if (order.events?.length > 0 && !editingOrder) {
   <div class="card section no-print">
     <div class="section-header clickable" (click)="historyOpen = !historyOpen">
       <h3>Historial de Movimientos ({{ order.events.length }})</h3>
       <span class="toggle-icon">{{ historyOpen ? '▲' : '▼' }}</span>
     </div>
     @if (historyOpen) {
-      <div class="timeline">
-        @for (e of order.events; track e.id) {
-          <div class="timeline-item">
-            <div class="timeline-dot" [class.cancelled]="e.toStatus === 'CANCELLED' || e.type === 'PAYMENT_DELETED'"
-            [class.completed]="e.toStatus === 'COMPLETED'" [class.payment]="e.type === 'PAYMENT_ADDED'"></div>
-            <div class="timeline-content">
-              <span class="timeline-date">{{ e.createdAt | date:'dd/MM/yyyy HH:mm':config.timezone }} por <strong>{{
+    <div class="timeline">
+      @for (e of order.events; track e.id) {
+      <div class="timeline-item">
+        <div class="timeline-dot"
+          [class.cancelled]="e.toStatus === 'CANCELLED' || e.type === 'PAYMENT_DELETED' || e.type === 'NOTIFICATION_FAILED'"
+          [class.completed]="e.toStatus === 'COMPLETED' || e.type === 'NOTIFICATION_SENT'"
+          [class.payment]="e.type === 'PAYMENT_ADDED'"></div>
+        <div class="timeline-content">
+          <span class="timeline-date">{{ e.createdAt | date:'dd/MM/yyyy HH:mm':config.timezone }} por <strong>{{
               e.changedByName }}</strong></span>
-              <span class="timeline-change">
-                @if (e.type === 'STATUS_CHANGE') {
-                  <span>
-                    <span class="badge badge-sm">{{ e.fromStatus || '—' }}</span> → <span class="badge badge-sm">{{ e.toStatus
-                  }}</span>
-                </span>
-              }
-              @if (e.type === 'PAYMENT_ADDED') {
-                <span class="text-success fw-bold">
-                  💰 Abono Registrado
-                </span>
-              }
-              @if (e.type === 'PAYMENT_DELETED') {
-                <span class="text-danger fw-bold">
-                  🚫 Abono Eliminado
-                </span>
-              }
+          <span class="timeline-change">
+            @if (e.type === 'STATUS_CHANGE') {
+            <span>
+              <span class="badge badge-sm">{{ e.fromStatus || '—' }}</span> → <span class="badge badge-sm">{{ e.toStatus
+                }}</span>
             </span>
-            @if (e.description) {
-              <span class="timeline-reason">{{ e.description }}</span>
             }
-          </div>
+            @if (e.type === 'PAYMENT_ADDED') {
+            <span class="text-success fw-bold">
+              💰 Abono Registrado
+            </span>
+            }
+            @if (e.type === 'PAYMENT_DELETED') {
+            <span class="text-danger fw-bold">
+              🚫 Abono Eliminado
+            </span>
+            }
+            @if (e.type === 'NOTIFICATION_SENT') {
+            <span class="text-success fw-bold">
+              ✅ Notificación WhatsApp enviada
+            </span>
+            }
+            @if (e.type === 'NOTIFICATION_FAILED') {
+            <span class="text-danger fw-bold">
+              ❌ Notificación WhatsApp fallida
+            </span>
+            }
+          </span>
+          @if (e.description) {
+          <span class="timeline-reason">{{ e.description }}</span>
+          }
         </div>
+      </div>
       }
     </div>
-  }
-</div>
-}
-<!-- Print Footer -->
-<div class="print-footer">
-  <div class="signature-line">
-    <span>Firma del cliente</span>
+    }
   </div>
-  <p class="print-note">Documento generado el {{ today | date:'dd/MM/yyyy HH:mm':config.timezone }}</p>
-</div>
+  }
+  <!-- Print Footer -->
+  <div class="print-footer">
+    <div class="signature-line">
+      <span>Firma del cliente</span>
+    </div>
+    <p class="print-note">Documento generado el {{ today | date:'dd/MM/yyyy HH:mm':config.timezone }}</p>
+  </div>
 </div>
 }
 
 @if (loading) {
-  <div class="loading">
-    <div class="spinner"></div>
-    <p>Cargando orden...</p>
-  </div>
+<div class="loading">
+  <div class="spinner"></div>
+  <p>Cargando orden...</p>
+</div>
 }
 
 <!-- Product Picker Modal -->
 @if (showProductPicker) {
-  <div class="modal-overlay" (click)="showProductPicker = false">
-    <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Seleccionar Producto</h3>
-        <button class="btn-close" (click)="showProductPicker = false">×</button>
-      </div>
-      <div class="modal-body">
-        <input type="text" [(ngModel)]="productSearch" (input)="searchProducts()" placeholder="Buscar producto..."
-          class="full-width" autofocus />
-        <div class="product-list">
-          @for (p of productResults; track p.id) {
-            <div class="product-item" (click)="addProductToEdit(p)">
-              <div class="product-info">
-                <strong>{{ p.name }}</strong>
-                @if (p.description) {
-                  <span class="product-desc">{{ p.description }}</span>
-                }
-              </div>
-              <div class="product-meta">
-                <span class="product-price">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
-                @if (p.unit) {
-                  <span class="product-unit">/ {{ p.unit }}</span>
-                }
-              </div>
-            </div>
-          }
-          @if (productResults.length === 0) {
-            <p class="empty">No se encontraron productos</p>
-          }
+<div class="modal-overlay" (click)="showProductPicker = false">
+  <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Seleccionar Producto</h3>
+      <button class="btn-close" (click)="showProductPicker = false">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" [(ngModel)]="productSearch" (input)="searchProducts()" placeholder="Buscar producto..."
+        class="full-width" autofocus />
+      <div class="product-list">
+        @for (p of productResults; track p.id) {
+        <div class="product-item" (click)="addProductToEdit(p)">
+          <div class="product-info">
+            <strong>{{ p.name }}</strong>
+            @if (p.description) {
+            <span class="product-desc">{{ p.description }}</span>
+            }
+          </div>
+          <div class="product-meta">
+            <span class="product-price">{{ config.currency }} {{ p.basePrice | number:'1.0-0' }}</span>
+            @if (p.unit) {
+            <span class="product-unit">/ {{ p.unit }}</span>
+            }
+          </div>
         </div>
+        }
+        @if (productResults.length === 0) {
+        <p class="empty">No se encontraron productos</p>
+        }
       </div>
     </div>
   </div>
+</div>
 }
 
 
 <!-- Material Calculator -->
-<app-material-calculator
-  [(visible)]="showMaterialCalc"
-  (priceApplied)="onCalcPriceApplied($event)">
+<app-material-calculator [(visible)]="showMaterialCalc" (priceApplied)="onCalcPriceApplied($event)">
 </app-material-calculator>
 
 <!-- Item Composition Calculator -->
-<app-item-composition-calculator
-  *ngIf="showCompositionCalc"
-  [(visible)]="showCompositionCalc"
+<app-item-composition-calculator *ngIf="showCompositionCalc" [(visible)]="showCompositionCalc"
   [initialComposition]="compItemIndex !== -1 ? (editOrderData.items[compItemIndex].composition || []) : []"
   (compositionApplied)="onCompositionApplied($event)">
 </app-item-composition-calculator>

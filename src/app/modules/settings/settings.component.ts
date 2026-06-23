@@ -226,9 +226,13 @@ export class SettingsComponent implements OnInit {
             },
             error: (err: any) => {
                 this.sendingTest = false;
-                this.testResult = { success: false, error: err.error?.error || 'No fue posible enviar el mensaje.' };
+                const isChannelInactive = err.status === 424 || err.error?.detail === 'channel_connection_inactive';
+                const errorMessage = isChannelInactive
+                    ? (err.error?.error || 'El canal no tiene una conexión activa. Reconecta el canal en BigSo Connect.')
+                    : (err.error?.error || 'No fue posible enviar el mensaje.');
+                this.testResult = { success: false, error: errorMessage, detail: err.error?.detail || null };
                 console.error('[Settings] Test message failed:', err);
-                this.toast.error('No fue posible enviar el mensaje.', this.testResult.error);
+                this.toast.error('No fue posible enviar el mensaje.', errorMessage);
             },
         });
     }
