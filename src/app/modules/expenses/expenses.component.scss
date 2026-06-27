@@ -74,6 +74,12 @@
   white-space: nowrap;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .dropdown {
   position: relative;
   display: inline-block;
