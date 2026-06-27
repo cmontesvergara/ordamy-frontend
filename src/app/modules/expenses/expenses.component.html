@@ -1,8 +1,16 @@
 <div class="page-header">
   <h1>Egresos</h1>
-  <button class="btn btn-primary" (click)="showForm = !showForm">
-    {{ showForm ? 'Cancelar' : '+ Nuevo Egreso' }}
-  </button>
+  <div class="page-header-actions">
+    <button class="btn btn-outline" (click)="printRange('internal')" title="Imprimir relación interna con totales">
+      🖨 Relación INTERNO
+    </button>
+    <button class="btn btn-outline" (click)="printRange('provider')" title="Imprimir relación limpia para proveedor">
+      🖨 Relación PROVEEDOR
+    </button>
+    <button class="btn btn-primary" (click)="showForm = !showForm">
+      {{ showForm ? 'Cancelar' : '+ Nuevo Egreso' }}
+    </button>
+  </div>
 </div>
 
 @if (showForm) {
@@ -158,6 +166,9 @@
             </button>
             }
 
+            <button class="btn-icon" title="Imprimir comprobante" (click)="printExpense(e, $event)">
+              <span class="icon icon-print"></span>
+            </button>
             <button class="btn-icon" title="Editar" (click)="startEditExpense(e)"><span
                 class="icon icon-edit"></span></button>
             <button class="btn-icon danger" title="Eliminar" (click)="deleteExpense(e.id)"><span

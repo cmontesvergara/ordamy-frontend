@@ -148,6 +148,60 @@ export class ExpensesComponent implements OnInit {
     this.loadExpenses();
   }
 
+  /**
+   * Print individual expense comprobante (provider variant).
+   * Mirrors `printOrder` in order-detail.component.ts.
+   */
+  printExpense(expense: any, event: Event) {
+    event.stopPropagation();
+    this.toastService.show?.('info', 'Generando', 'Descargando comprobante...');
+    this.expenseService.downloadPdf(expense.id).subscribe({
+      next: (blob) => {
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const fileURL = URL.createObjectURL(pdfBlob);
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.ExpensePrinted,
+          data: { expense_id: expense.id, mode: 'provider' },
+        });
+        window.open(fileURL, '_blank');
+        setTimeout(() => URL.revokeObjectURL(fileURL), 10000);
+      },
+      error: () => this.toastService.error('Error', 'No se pudo generar el PDF'),
+    });
+  }
+
+  /**
+   * Print PDF relación of expenses matching the currently active filters.
+   */
+  printRange(mode: 'internal' | 'provider') {
+    const filters: { categoryId?: string; from?: string; to?: string; search?: string } = {};
+    if (this.filterCategory) filters.categoryId = this.filterCategory;
+    if (this.filterFrom) filters.from = this.filterFrom;
+    if (this.filterTo) filters.to = this.filterTo;
+    if (this.search) filters.search = this.search;
+
+    const label = mode === 'internal' ? 'Relación INTERNO' : 'Relación PROVEEDOR';
+    this.toastService.show?.('info', 'Generando', `Descargando ${label}...`);
+    this.expenseService.downloadPdfRange(filters, mode).subscribe({
+      next: (blob) => {
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const fileURL = URL.createObjectURL(pdfBlob);
+        this.analytics.trackEvent({
+          name: AnalyticsEventName.ExpenseRangePrinted,
+          data: {
+            from: filters.from || '',
+            to: filters.to || '',
+            categoryId: filters.categoryId || '',
+            mode,
+          },
+        });
+        window.open(fileURL, '_blank');
+        setTimeout(() => URL.revokeObjectURL(fileURL), 10000);
+      },
+      error: () => this.toastService.error('Error', 'No se pudo generar el PDF'),
+    });
+  }
+
   // File handling methods for CREATE
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;

@@ -33,6 +33,8 @@ export enum AnalyticsEventName {
     ExpenseCreated = 'expense_created',
     ExpenseUpdated = 'expense_updated',
     ExpenseDeleted = 'expense_deleted',
+    ExpensePrinted = 'expense_printed',
+    ExpenseRangePrinted = 'expense_range_printed',
 
     // Products
     ProductCreated = 'product_created',

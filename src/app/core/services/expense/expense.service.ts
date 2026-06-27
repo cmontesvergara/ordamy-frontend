@@ -66,14 +66,14 @@ export class ExpenseService {
     create(data: any, file?: File): Observable<CreateExpenseResponse> {
         // If no file, send as JSON (backward compatible)
         if (!file) {
-            return this.http.post<CreateExpenseResponse>(this.url, data, { 
-                withCredentials: true 
+            return this.http.post<CreateExpenseResponse>(this.url, data, {
+                withCredentials: true
             });
         }
 
         // If file present, use FormData
         const formData = new FormData();
-        
+
         // Add expense fields
         Object.keys(data).forEach(key => {
             if (data[key] !== undefined && data[key] !== null) {
@@ -84,8 +84,8 @@ export class ExpenseService {
         // Add single file
         formData.append('files', file, file.name);
 
-        return this.http.post<CreateExpenseResponse>(this.url, formData, { 
-            withCredentials: true 
+        return this.http.post<CreateExpenseResponse>(this.url, formData, {
+            withCredentials: true
         });
     }
 
@@ -98,16 +98,16 @@ export class ExpenseService {
     }
 
     // Attachment methods
-    
+
     /**
      * Upload attachment to existing expense
      */
     uploadAttachment(expenseId: string, file: File): Observable<any> {
         const formData = new FormData();
         formData.append('file', file, file.name);
-        
-        return this.http.post(`${this.url}/${expenseId}/attachments`, formData, { 
-            withCredentials: true 
+
+        return this.http.post(`${this.url}/${expenseId}/attachments`, formData, {
+            withCredentials: true
         });
     }
 
@@ -122,8 +122,8 @@ export class ExpenseService {
      * Delete an attachment from an expense
      */
     deleteAttachment(expenseId: string, attachmentId: string): Observable<any> {
-        return this.http.delete(`${this.url}/${expenseId}/attachments/${attachmentId}`, { 
-            withCredentials: true 
+        return this.http.delete(`${this.url}/${expenseId}/attachments/${attachmentId}`, {
+            withCredentials: true
         });
     }
 
@@ -131,8 +131,8 @@ export class ExpenseService {
      * Get presigned download URL for attachment
      */
     getDownloadUrl(expenseId: string, attachmentId: string, expirySeconds: number = 3600): Observable<any> {
-        return this.http.post(`${this.url}/${expenseId}/attachments/${attachmentId}/download-url`, 
-            { expirySeconds }, 
+        return this.http.post(`${this.url}/${expenseId}/attachments/${attachmentId}/download-url`,
+            { expirySeconds },
             { withCredentials: true }
         );
     }
@@ -146,6 +146,39 @@ export class ExpenseService {
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    /**
+     * Download individual expense PDF (comprobante, always provider variant)
+     */
+    downloadPdf(id: string): Observable<Blob> {
+        return this.http.get(`${this.url}/${id}/pdf`, {
+            responseType: 'blob',
+            withCredentials: true,
+        });
+    }
+
+    /**
+     * Download PDF relación of expenses matching filters
+     * @param filters { categoryId?, supplierId?, from?, to?, search? }
+     * @param mode 'internal' (totals) | 'provider' (clean)
+     */
+    downloadPdfRange(
+        filters: { categoryId?: string; supplierId?: string; from?: string; to?: string; search?: string },
+        mode: 'internal' | 'provider'
+    ): Observable<Blob> {
+        let params = new HttpParams().set('mode', mode);
+        Object.keys(filters || {}).forEach((key) => {
+            const value = (filters as any)[key];
+            if (value !== undefined && value !== null && value !== '') {
+                params = params.set(key, value);
+            }
+        });
+        return this.http.get(`${this.url}/pdf`, {
+            params,
+            responseType: 'blob',
+            withCredentials: true,
+        });
     }
 
     /**
