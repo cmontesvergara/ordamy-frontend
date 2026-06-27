@@ -30,6 +30,7 @@ export class ExpensesComponent implements OnInit {
   limit = 20;
   total = 0;
   searchTimeout: any;
+  rangeMenuOpen = false;
   newExpense: any = {
     description: '', amount: 0, categoryId: '', supplierId: '',
     paymentMethodId: '', invoiceNumber: '', expenseDate: '', notes: ''
@@ -174,6 +175,7 @@ export class ExpensesComponent implements OnInit {
    * Print PDF relación of expenses matching the currently active filters.
    */
   printRange(mode: 'internal' | 'provider') {
+    this.rangeMenuOpen = false;
     const filters: { categoryId?: string; from?: string; to?: string; search?: string } = {};
     if (this.filterCategory) filters.categoryId = this.filterCategory;
     if (this.filterFrom) filters.from = this.filterFrom;

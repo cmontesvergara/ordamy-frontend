@@ -1,13 +1,20 @@
 <div class="page-header">
   <h1>Egresos</h1>
-  <button class="btn btn-outline" (click)="printRange('internal')" title="Imprimir relación interna con totales">
-    <span class="icon icon-print"></span>
-    Relación INTERNO
-  </button>
-  <button class="btn btn-outline" (click)="printRange('provider')" title="Imprimir relación limpia para proveedor">
-    <span class="icon icon-print"></span>
-    Relación PROVEEDOR
-  </button>
+  <div class="dropdown" [class.open]="rangeMenuOpen">
+    <button class="btn btn-outline" (click)="rangeMenuOpen = !rangeMenuOpen" title="Opciones de impresión">
+      <span class="icon icon-more-vertical"></span>
+    </button>
+    <div class="dropdown-menu">
+      <button (click)="printRange('internal')">
+        <span class="icon icon-print"></span>
+        Relación INTERNO
+      </button>
+      <button (click)="printRange('provider')">
+        <span class="icon icon-print"></span>
+        Relación PROVEEDOR
+      </button>
+    </div>
+  </div>
   <button class="btn btn-primary" (click)="showForm = !showForm">
     {{ showForm ? 'Cancelar' : '+ Nuevo Egreso' }}
   </button>
