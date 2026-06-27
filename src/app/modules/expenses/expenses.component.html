@@ -1,16 +1,16 @@
 <div class="page-header">
   <h1>Egresos</h1>
-  <div class="page-header-actions">
-    <button class="btn btn-outline" (click)="printRange('internal')" title="Imprimir relación interna con totales">
-      🖨 Relación INTERNO
-    </button>
-    <button class="btn btn-outline" (click)="printRange('provider')" title="Imprimir relación limpia para proveedor">
-      🖨 Relación PROVEEDOR
-    </button>
-    <button class="btn btn-primary" (click)="showForm = !showForm">
-      {{ showForm ? 'Cancelar' : '+ Nuevo Egreso' }}
-    </button>
-  </div>
+  <button class="btn btn-outline" (click)="printRange('internal')" title="Imprimir relación interna con totales">
+    <span class="icon icon-print"></span>
+    Relación INTERNO
+  </button>
+  <button class="btn btn-outline" (click)="printRange('provider')" title="Imprimir relación limpia para proveedor">
+    <span class="icon icon-print"></span>
+    Relación PROVEEDOR
+  </button>
+  <button class="btn btn-primary" (click)="showForm = !showForm">
+    {{ showForm ? 'Cancelar' : '+ Nuevo Egreso' }}
+  </button>
 </div>
 
 @if (showForm) {
