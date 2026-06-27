@@ -1,5 +1,8 @@
 <div class="page-header">
   <h1>Egresos</h1>
+  <button class="btn btn-primary" (click)="showForm = !showForm">
+    {{ showForm ? 'Cancelar' : '+ Nuevo Egreso' }}
+  </button>
   <div class="dropdown" [class.open]="rangeMenuOpen">
     <button class="btn btn-outline" (click)="rangeMenuOpen = !rangeMenuOpen" title="Opciones de impresión">
       <span class="icon icon-more-vertical"></span>
@@ -7,17 +10,14 @@
     <div class="dropdown-menu">
       <button (click)="printRange('internal')">
         <span class="icon icon-print"></span>
-        Relación INTERNO
+        imprimir relación interno
       </button>
       <button (click)="printRange('provider')">
         <span class="icon icon-print"></span>
-        Relación PROVEEDOR
+        imprimir relación proveedor
       </button>
     </div>
   </div>
-  <button class="btn btn-primary" (click)="showForm = !showForm">
-    {{ showForm ? 'Cancelar' : '+ Nuevo Egreso' }}
-  </button>
 </div>
 
 @if (showForm) {
